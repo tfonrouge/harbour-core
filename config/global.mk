@@ -16,7 +16,7 @@
 # GNU coding standards:
 #    https://www.gnu.org/prep/standards/standards.html
 # GNU Make NEWS:
-#    http://git.savannah.gnu.org/cgit/make.git/tree/NEWS
+#    http://.savannah.gnu.org/cgit/make.git/tree/NEWS
 
 # NOTE: $(realpath/abspath) need GNU Make 3.81 or upper
 # NOTE: $(eval) needs GNU Make 3.80 or upper
@@ -1884,10 +1884,13 @@ ifeq ($(HB_INIT_DONE),)
    endif
    ifneq ($(wildcard $(TOP)$(ROOT).git),)
       ifneq ($(call find_in_path,git),)
-         $(info $(shell git --version))
-         $(info $(shell git diff --name-only))
+         $(info 1_$(shell git symbolic-ref --short -q HEAD)_1)
+         $(info 2_$(shell git diff --name-only)_2)
          ifneq ($(shell git diff --name-only -q),)
-            $(info ! === WARNING: Locally modified source code ===)
+            $(info ! === WARNING: Locally modified source code 1 ===)
+         endif
+         ifneq ($(shell git diff --name-only --quiet),)
+            $(info ! === WARNING: Locally modified source code 2 ===)
          endif
          $(info ! Source code: $(shell git rev-parse --short -q HEAD) $(shell git symbolic-ref --short -q HEAD) $(shell git ls-remote --get-url))
          _cmd := git show --no-patch --format="%H%n%h%n%ci%n%an%n%ae" HEAD
