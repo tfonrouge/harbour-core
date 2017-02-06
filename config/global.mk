@@ -1884,8 +1884,8 @@ ifeq ($(HB_INIT_DONE),)
    endif
    ifneq ($(wildcard $(TOP)$(ROOT).git),)
       ifneq ($(call find_in_path,git),)
-         $(shell git --version)
-         $(shell git diff --name-only)
+         $(info $(shell git --version))
+         $(info $(shell git diff --name-only))
          ifneq ($(shell git diff --name-only -q),)
             $(info ! === WARNING: Locally modified source code ===)
          endif
