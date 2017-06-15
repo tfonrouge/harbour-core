@@ -650,33 +650,81 @@
    $TEMPLATE$
       Function
    $NAME$
+      hb_DateTime()
+   $CATEGORY$
+      API
+   $SUBCATEGORY$
+      Date/Time
+   $ONELINER$
+      Create a <tTimeStamp> value
+   $SYNTAX$
+      hb_DateTime( [<nYear>], [<nMonth>], [<nDay>],
+                   [<nHour>], [<nMinute>], [<nSecond>], [<nFragment>] )
+         --> <tTimeStamp>
+   $ARGUMENTS$
+      Optional: <nYear>, <nMonth>, <nDay>: a valid numeric value for
+      year, month and day respectively. Note: the tree arguments are required
+      if provided.
+
+      Optional: <nHour>, <nMinute>, <nSecond>, <nFragment> : a valid numeric
+      value for hour, minute, second and millisecond respectively; the time
+      part of timeStamp.
+   $RETURNS$
+      <tTimeStamp> a timeStamp type value
+   $DESCRIPTION$
+      This function returns a the current <tTimeStamp> value when no arguments
+      are provided. Optionally, arguments can be provided to build a specific
+      timeStamp value.
+   $EXAMPLES$
+      ? hb_DateTime()  // the current timeStamp value
+      ? hb_DateTime( 2000, 1, 1 )  // a timeStamp with date set to jan 1, 2000
+      ? hb_DateTime( 2001, 1, 1, 12, 30 )  // a timeStamp with time part 12:30 pm
+   $STATUS$
+      R
+   $COMPLIANCE$
+      H
+   $PLATFORMS$
+      All
+   $FILES$
+      Library is core
+   $SEEALSO$
+      Date()
+   $END$
+ */
+
+/* $DOC$
+   $AUTHOR$
+
+   $TEMPLATE$
+      Function
+   $NAME$
       hb_DToT()
    $CATEGORY$
       API
    $SUBCATEGORY$
       Date/Time
    $ONELINER$
-      Create a <tDateTime> value from a <dDate> parameter
+      Create a <tTimeStamp> value from a <dDate> parameter
    $SYNTAX$
-      hb_DToT( <dDate> [, <cTime|nSeconds>] ) --> <tDateTime>
+      hb_DToT( <dDate> [, <cTime|nSeconds>] ) --> <tTimeStamp>
    $ARGUMENTS$
       <dDate> Any valid date expression.
 
       Optional: <cTime|nSeconds> representing a time of the day value.
-      <cTime> is a string in a valid time format: "hh:mm:ss.nnn".
+      <cTime> is a string time with format: HH:MM[:S[S][.f[f[f[f]]]]] [PM|AM],
       <nSeconds> is a numeric value in seconds in the range from
       0 to 86399.999~ ( 60 secs * 60 mins * 24 hours - 1 millisecond )
    $RETURNS$
-      <tDateTime> a dateTime value
+      <tTimeStamp> a timeStamp value
    $DESCRIPTION$
-      This function returns a <tDateTime> value from a <dDate> value.
+      This function returns a <tTimeStamp> value from a <dDate> value.
       Optionally, a second parameter with the time of the day value
       can be provided which can be represented by either of a string
       time value or a numeric value in seconds.
    $EXAMPLES$
-      ? hb_DToT( Date() )  // a dateTime with a empty time part
-      ? hb_DToT( Date(), "14:30:00.500" )  // a dateTime with time part 14:30pm with 500 milliseconds
-      ? hb_DToT( Date(), 3600 )  // a dateTime with time part 1:00am (one hour)
+      ? hb_DToT( Date() )  // a timeStamp with a empty time part
+      ? hb_DToT( Date(), "14:30:00.500" )  // a timeStamp with time part 14:30pm with 500 milliseconds
+      ? hb_DToT( Date(), 3600 )  // a timeStamp with time part 1:00am (one hour)
    $STATUS$
       R
    $COMPLIANCE$
