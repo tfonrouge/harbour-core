@@ -2677,9 +2677,9 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
                   Permanently enabled. Apparently this is still top problem for bcc users. It is
                   also in sync this way with Harbour core build system. */
          IF .T. .OR. ;
-            ! hb_vfExists( hb_FNameDir( cPath_CompC ) + ".." + hb_ps() + "Bin" + hb_ps() + "bcc32.cfg" ) .OR. ;
-            ! hb_vfExists( hb_FNameDir( cPath_CompC ) + ".." + hb_ps() + "Bin" + hb_ps() + "ilink32.cfg" )
-            /* Override default bcc32.cfg/ilink32.cfg with nul files. */
+            ! hb_vfExists( hb_FNameDir( cPath_CompC ) + ".." + hb_ps() + "Bin" + hb_ps() + hb_FNameName( cPath_CompC ) + ".cfg" ) .OR. ;
+            ! hb_vfExists( hb_FNameDir( cPath_CompC ) + ".." + hb_ps() + "Bin" + hb_ps() + "ilink32.cfg" )  /* ilink64.cfg ? */
+            /* Override default bcc*.cfg/ilink*.cfg with nul files. */
             AAddNew( hbmk[ _HBMK_aOPTC ], "+nul" )
             AAddNew( hbmk[ _HBMK_aOPTL ], "+nul" )
             AAddNew( hbmk[ _HBMK_aOPTD ], "+nul" )
@@ -14665,12 +14665,12 @@ STATIC FUNCTION CompVersionDetect( hbmk, cPath_CompC )
                NOTE: It's an interim SVN revision with possible differences in features.
                [vszakats] */
 
-            DO CASE
-            CASE cVer == "0700" ; cVer := "0307"
-            CASE cVer == "0703" ; cVer := "0308"
-            CASE cVer == "0800" ; cVer := "0309"  /* guess right after WWDC2016 */
-            CASE cVer == "0801" ; cVer := "0309"
-            ENDCASE
+            SWITCH cVer
+            CASE "0700" ; cVer := "0307" ; EXIT
+            CASE "0703" ; cVer := "0308" ; EXIT
+            CASE "0800" ; cVer := "0309" ; EXIT  /* guess right after WWDC2016 */
+            CASE "0801" ; cVer := "0309" ; EXIT
+            ENDSWITCH
          CASE ( tmp1 := hb_AtX( R_( "version [0-9]*\.[0-9]*\.[0-9]*" ), cStdOutErr ) ) != NIL
             tmp1 := hb_ATokens( SubStr( tmp1, Len( "version " ) + 1 ), "." )
             cVer := StrZero( Val( tmp1[ 1 ] ), 2 ) + StrZero( Val( tmp1[ 2 ] ), 2 )
@@ -14792,7 +14792,7 @@ STATIC FUNCTION VCSID( hbmk, cDir, cVCSHEAD, /* @ */ cType, /* @ */ hCustom )
    LOCAL aResult
    LOCAL cResult := ""
    LOCAL tmp
-   LOCAL cOldDir
+   LOCAL cChDir
    LOCAL nOffset
    LOCAL cGitBase
 
@@ -14805,7 +14805,7 @@ STATIC FUNCTION VCSID( hbmk, cDir, cVCSHEAD, /* @ */ cType, /* @ */ hCustom )
       EXIT
    CASE _VCS_GIT_SUB
    CASE _VCS_GIT
-      cOldDir := hb_cwd( cDir )
+      cChDir := cDir
       cType := "git"
       cGitBase := "git" + " "
       cCommand := cGitBase + "log -1 --format=format:%h%n%H%n%ci%n%cn%n%ce%n%ai%n%an%n%ae --encoding=utf8"
@@ -14857,6 +14857,10 @@ STATIC FUNCTION VCSID( hbmk, cDir, cVCSHEAD, /* @ */ cType, /* @ */ hCustom )
          OutStd( cCommand + _OUT_EOL )
       ENDIF
 
+      IF HB_ISSTRING( cChDir )
+         cChDir := hb_cwd( cChDir )
+      ENDIF
+
       hb_processRun( cCommand,, @cStdOut )
 
       SWITCH nType
@@ -14864,7 +14868,6 @@ STATIC FUNCTION VCSID( hbmk, cDir, cVCSHEAD, /* @ */ cType, /* @ */ hCustom )
          /* 10959<n> */
       CASE _VCS_GIT_SUB
       CASE _VCS_GIT
-         hb_cwd( cOldDir )
          /* 5f561a7
             5f561a78ebf2ad1aa6866f469c82231fc8104925
             2013-04-26 02:12:08 +0200
@@ -14996,6 +14999,10 @@ STATIC FUNCTION VCSID( hbmk, cDir, cVCSHEAD, /* @ */ cType, /* @ */ hCustom )
          ENDIF
          EXIT
       ENDSWITCH
+
+      IF HB_ISSTRING( cChDir )
+         hb_cwd( cChDir )
+      ENDIF
    ENDIF
 
    RETURN cResult
@@ -15594,13 +15601,16 @@ STATIC FUNCTION GetListOfFunctionsKnown( hbmk, lIncludeCore )
    LOCAL hAll := { => }
    LOCAL cDir
    LOCAL aFile
+   LOCAL cFile
    LOCAL hHash
 
    hb_HCaseMatch( hAll, .F. )
 
    FOR EACH cDir IN { hbmk[ _HBMK_cHB_INSTALL_CON ], hbmk[ _HBMK_cHB_INSTALL_ADD ], hb_DirBase() }
       FOR EACH aFile IN hb_vfDirectory( hb_DirSepAdd( cDir ) + "*.hbr" )
-         IF HB_ISHASH( hHash := hb_Deserialize( hb_MemoRead( hb_DirSepAdd( cDir ) + aFile[ F_NAME ] ) ) )
+         cFile := hb_MemoRead( hb_DirSepAdd( cDir ) + aFile[ F_NAME ] )
+         IF HB_ISHASH( hHash := hb_Deserialize( cFile ) ) .OR. ;
+            HB_ISHASH( hHash := hb_jsonDecode( cFile ) )
             /* FIXME: To handle function names present in multiple containers */
             hb_HMerge( hAll, hHash )
          ENDIF

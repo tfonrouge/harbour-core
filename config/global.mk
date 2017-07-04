@@ -696,7 +696,7 @@ ifeq ($(HB_COMPILER),)
                                                       ifneq ($(HB_COMP_PATH),)
                                                          HB_COMPILER := msvc
                                                       else
-                                                         # TODO: Add bcc64 auto-detection
+                                                         # TODO: Add bcc64, bcc32c auto-detection
                                                          HB_COMP_PATH := $(call find_in_path_raw,bcc32.exe)
                                                          ifneq ($(HB_COMP_PATH),)
                                                             HB_COMPILER := bcc
@@ -904,6 +904,14 @@ ifeq ($(HB_COMPILER),)
       endif
       endif
       endif
+   endif
+endif
+
+ifneq ($(HB_COMPILER_VER),)
+   strlen = $(strip $(eval __temp := $(subst $(subst x,x, ),x,$1))$(foreach a,0 1 2 3 4 5 6 7 8 9 .,$(eval __temp := $$(subst $a,x,$(__temp))))$(eval __temp := $(subst x,x ,$(__temp)))$(words $(__temp)))
+   ifneq ($(call strlen,$(HB_COMPILER_VER)), 4)
+      $(info ! Warning: Invalid HB_COMPILER_VER value '$(HB_COMPILER_VER)' ignored. Format should be: <MMmm>, where <MM> is major version and <mm> is minor version.)
+      HB_COMPILER_VER :=
    endif
 endif
 

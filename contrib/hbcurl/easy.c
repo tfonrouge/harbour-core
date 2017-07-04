@@ -1020,6 +1020,11 @@ HB_FUNC( CURL_EASY_SETOPT )
                res = curl_easy_setopt( hb_curl->curl, CURLOPT_PROXYAUTH, hb_parnl( 3 ) );
                break;
 #endif
+#if LIBCURL_VERSION_NUM >= 0x073700
+            case HB_CURLOPT_SOCKS5_AUTH:
+               res = curl_easy_setopt( hb_curl->curl, CURLOPT_SOCKS5_AUTH, hb_parnl( 3 ) );
+               break;
+#endif
 #if LIBCURL_VERSION_NUM >= 0x072100
             case HB_CURLOPT_XOAUTH2_BEARER:
                res = curl_easy_setopt( hb_curl->curl, CURLOPT_XOAUTH2_BEARER, hb_parc( 3 ) );
@@ -1046,6 +1051,11 @@ HB_FUNC( CURL_EASY_SETOPT )
 #if LIBCURL_VERSION_NUM >= 0x071506
             case HB_CURLOPT_TRANSFER_ENCODING:
                res = curl_easy_setopt( hb_curl->curl, CURLOPT_TRANSFER_ENCODING, hb_parnl( 3 ) );
+               break;
+#endif
+#if LIBCURL_VERSION_NUM >= 0x073700
+            case HB_CURLOPT_REQUEST_TARGET:
+               res = curl_easy_setopt( hb_curl->curl, CURLOPT_REQUEST_TARGET, hb_parc( 3 ) );
                break;
 #endif
             case HB_CURLOPT_FOLLOWLOCATION:
@@ -2144,6 +2154,9 @@ HB_FUNC( CURL_EASY_DL_BUFF_GET )
 #define HB_CURL_INFO_TYPE_LONG       4
 #define HB_CURL_INFO_TYPE_DOUBLE     5
 #define HB_CURL_INFO_TYPE_SLIST      6
+#define HB_CURL_INFO_TYPE_SOCKET     7
+#define HB_CURL_INFO_TYPE_CERTINFO   8
+#define HB_CURL_INFO_TYPE_OFFSET     9
 
 #define HB_CURL_EASY_GETINFO( hb_curl, n, p )  ( hb_curl ? curl_easy_getinfo( hb_curl->curl, n, p ) : ( CURLcode ) HB_CURLE_ERROR )
 
@@ -2162,6 +2175,11 @@ HB_FUNC( CURL_EASY_GETINFO )
       long   ret_long   = 0;
       struct curl_slist * ret_slist = NULL;
       double ret_double = 0.0;
+      curl_socket_t ret_socket = CURL_SOCKET_BAD;
+      struct curl_certinfo * ret_certinfo = NULL;
+#if LIBCURL_VERSION_NUM >= 0x073700
+      curl_off_t ret_offset = 0;
+#endif
 
       switch( hb_parni( 2 ) )
       {
@@ -2226,20 +2244,40 @@ HB_FUNC( CURL_EASY_GETINFO )
             type = HB_CURL_INFO_TYPE_STR;
             break;
          case HB_CURLINFO_SIZE_UPLOAD:
+#if LIBCURL_VERSION_NUM >= 0x073700
+            res  = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_SIZE_UPLOAD_T, &ret_offset );
+            type = HB_CURL_INFO_TYPE_OFFSET;
+#else
             res  = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_SIZE_UPLOAD, &ret_double );
             type = HB_CURL_INFO_TYPE_DOUBLE;
+#endif
             break;
          case HB_CURLINFO_SIZE_DOWNLOAD:
+#if LIBCURL_VERSION_NUM >= 0x073700
+            res  = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_SIZE_DOWNLOAD_T, &ret_offset );
+            type = HB_CURL_INFO_TYPE_OFFSET;
+#else
             res  = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_SIZE_DOWNLOAD, &ret_double );
             type = HB_CURL_INFO_TYPE_DOUBLE;
+#endif
             break;
          case HB_CURLINFO_SPEED_DOWNLOAD:
+#if LIBCURL_VERSION_NUM >= 0x073700
+            res  = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_SPEED_DOWNLOAD_T, &ret_offset );
+            type = HB_CURL_INFO_TYPE_OFFSET;
+#else
             res  = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_SPEED_DOWNLOAD, &ret_double );
             type = HB_CURL_INFO_TYPE_DOUBLE;
+#endif
             break;
          case HB_CURLINFO_SPEED_UPLOAD:
+#if LIBCURL_VERSION_NUM >= 0x073700
+            res  = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_SPEED_UPLOAD_T, &ret_offset );
+            type = HB_CURL_INFO_TYPE_OFFSET;
+#else
             res  = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_SPEED_UPLOAD, &ret_double );
             type = HB_CURL_INFO_TYPE_DOUBLE;
+#endif
             break;
          case HB_CURLINFO_HEADER_SIZE:
             res  = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_HEADER_SIZE, &ret_long );
@@ -2266,12 +2304,22 @@ HB_FUNC( CURL_EASY_GETINFO )
             type = HB_CURL_INFO_TYPE_SLIST;
             break;
          case HB_CURLINFO_CONTENT_LENGTH_DOWNLOAD:
+#if LIBCURL_VERSION_NUM >= 0x073700
+            res  = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &ret_offset );
+            type = HB_CURL_INFO_TYPE_OFFSET;
+#else
             res  = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &ret_double );
             type = HB_CURL_INFO_TYPE_DOUBLE;
+#endif
             break;
          case HB_CURLINFO_CONTENT_LENGTH_UPLOAD:
+#if LIBCURL_VERSION_NUM >= 0x073700
+            res  = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_CONTENT_LENGTH_UPLOAD_T, &ret_offset );
+            type = HB_CURL_INFO_TYPE_OFFSET;
+#else
             res  = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_CONTENT_LENGTH_UPLOAD, &ret_double );
             type = HB_CURL_INFO_TYPE_DOUBLE;
+#endif
             break;
          case HB_CURLINFO_CONTENT_TYPE:
             res  = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_CONTENT_TYPE, &ret_string );
@@ -2315,9 +2363,9 @@ HB_FUNC( CURL_EASY_GETINFO )
             break;
          case HB_CURLINFO_ACTIVESOCKET:
 #if LIBCURL_VERSION_NUM >= 0x072D00
-            res = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_ACTIVESOCKET, &ret_slist );
+            res = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_ACTIVESOCKET, &ret_socket );
 #endif
-            type = HB_CURL_INFO_TYPE_PTR_SLIST;
+            type = HB_CURL_INFO_TYPE_SOCKET;
             break;
          case HB_CURLINFO_LASTSOCKET:  /* NOTE: Not compatible with 64-bit Windows builds */
 #if LIBCURL_VERSION_NUM >= 0x070F02
@@ -2345,9 +2393,9 @@ HB_FUNC( CURL_EASY_GETINFO )
             break;
          case HB_CURLINFO_CERTINFO:
 #if LIBCURL_VERSION_NUM >= 0x071301
-            res = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_CERTINFO, &ret_slist );
+            res = HB_CURL_EASY_GETINFO( hb_curl, CURLINFO_CERTINFO, &ret_certinfo );
 #endif
-            type = HB_CURL_INFO_TYPE_SLIST;
+            type = HB_CURL_INFO_TYPE_CERTINFO;
             break;
          case HB_CURLINFO_CONDITION_UNMET:
 #if LIBCURL_VERSION_NUM >= 0x071304
@@ -2459,6 +2507,47 @@ HB_FUNC( CURL_EASY_GETINFO )
             else
                hb_reta( 0 );
             break;
+         case HB_CURL_INFO_TYPE_SOCKET:
+            hb_retnint( ret_socket );
+            break;
+         case HB_CURL_INFO_TYPE_CERTINFO:
+         {
+            int nCerts = ret_certinfo != NULL ? ret_certinfo->num_of_certs : 0;
+
+            PHB_ITEM pCerts = hb_itemArrayNew( nCerts );
+            int nPos = 0;
+
+            for( nPos = 0; nPos < nCerts; ++nPos )
+            {
+               PHB_ITEM pArray;
+               int      nCount;
+               struct curl_slist * walk_ret_slist;
+
+               /* Count */
+               for( walk_ret_slist = ret_certinfo->certinfo[ nPos ], nCount = 0; walk_ret_slist->next; nCount++ )
+                  walk_ret_slist = walk_ret_slist->next;
+
+               /* Fill */
+               pArray = hb_itemArrayNew( nCount );
+               for( walk_ret_slist = ret_certinfo->certinfo[ nPos ], nCount = 1; walk_ret_slist->next; )
+               {
+                  hb_arraySetC( pArray, nCount++, walk_ret_slist->data );
+                  walk_ret_slist = walk_ret_slist->next;
+               }
+               hb_arraySetForward( pCerts, nPos + 1, pArray );
+               hb_itemRelease( pArray );
+
+               curl_slist_free_all( ret_slist );
+            }
+
+            hb_itemReturnRelease( pCerts );
+            break;
+         }
+#if LIBCURL_VERSION_NUM >= 0x073700
+         case HB_CURL_INFO_TYPE_OFFSET:
+            hb_retnint( ( HB_MAXINT ) ret_offset );
+            break;
+#endif
       }
 
       hb_stornl( ( long ) res, 3 );
