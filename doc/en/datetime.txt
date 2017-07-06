@@ -737,3 +737,53 @@
       Date()
    $END$
  */
+
+ /* $DOC$
+   $AUTHOR$
+
+   $TEMPLATE$
+      Function
+   $NAME$
+      hb_TToC()
+   $CATEGORY$
+      API
+   $SUBCATEGORY$
+      Date/Time
+   $ONELINER$
+      Create a string representation of a <tTimeStamp> value
+   $SYNTAX$
+      hb_TToC( <tTimeStamp>, [ <cDateFormat> ] [, <cTimeFormat> ] ) -->
+         <cTimeStamp>
+   $ARGUMENTS$
+      <tTimeStamp> a timeStamp value
+
+      Optional: <cDateFormat>, a string with any valid date format value, by
+      default the SET DATEFORMAT value is used
+
+      Optional: <cTimeFormat>, a string with any valid time format value, by
+      default the SET TIMEFORMAT value is used
+   $RETURNS$
+      <cTimeStamp> a string representing a timeStamp type value
+   $DESCRIPTION$
+      This function returns a string representation of a timeStamp value,
+      arguments can be provided in order to give a specific format to the
+      DATE and TIME values
+   $EXAMPLES$
+      ? hb_TToC( hb_DateTime() )  // string with timeStamp using default DATE
+         and TIME format values
+      ? hb_TToC( hb_DateTime(), "DD/MM/YY" )  // string with timeStamp using
+         a DATE format
+      ? hb_TToC( hb_DateTime(), , "HH:MM:SS.ffff" )  // string with timeStamp
+         using a TIME format
+   $STATUS$
+      R
+   $COMPLIANCE$
+      H
+   $PLATFORMS$
+      All
+   $FILES$
+      Library is core
+   $SEEALSO$
+      hb_DateTime(), SET DATEFORMAT, SET TIMEFORMAT
+   $END$
+ */
