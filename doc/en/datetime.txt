@@ -769,12 +769,10 @@
       arguments can be provided in order to give a specific format to the
       DATE and TIME values
    $EXAMPLES$
-      ? hb_TToC( hb_DateTime() )  // string with timeStamp using default DATE
-         and TIME format values
-      ? hb_TToC( hb_DateTime(), "DD/MM/YY" )  // string with timeStamp using
-         a DATE format
-      ? hb_TToC( hb_DateTime(), , "HH:MM:SS.ffff" )  // string with timeStamp
-         using a TIME format
+      ? hb_TToC( hb_DateTime() )  // string with timeStamp using default DATE and TIME format values
+      ? hb_TToC( hb_DateTime(), "DD/MM/YY" )  // string with timeStamp using a DATE format
+      ? hb_TToC( hb_DateTime(), , "HH:MM:SS.fff" )  // string with timeStamp using a TIME format
+      ? hb_TToC( hb_DateTime(), "DD/MM/YY", "HH:MM" )  // string with timeStamp using DATE and TIME formats
    $STATUS$
       R
    $COMPLIANCE$
