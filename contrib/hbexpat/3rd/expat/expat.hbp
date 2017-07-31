@@ -6,21 +6,24 @@
 -o${hb_targetname}
 
 -warn=low
+-cpp=no
 -pic
 
 xmlparse.c
 xmlrole.c
 xmltok.c
 
--cflag=-DHARBOUR_CONF
+-cflag=-DHAVE_EXPAT_CONFIG_H
+# needed to have <expat_config.h> found:
+-I.
+
 {hblib}-cflag=-DXML_STATIC
 {bcc}-cflag=-w-8057
 {bcc}-cflag=-w-8008
 {bcc}-cflag=-w-8066
 
 # ORIGIN https://libexpat.github.io/
-# URL    https://downloads.sourceforge.net/project/expat/expat/2.2.1/expat-2.2.1.tar.bz2
-# DIFF   expat.diff
+# URL    https://downloads.sourceforge.net/project/expat/expat/2.2.2/expat-2.2.2.tar.bz2
 #
 # MAP    COPYING
 # MAP    lib/xmlparse.c       xmlparse.c

@@ -232,7 +232,7 @@ You should see `Hello, world!` on screen.
 
 ## on Minix hosts
 
-Install GNU make from the Minix pkgsrc repository; for details see [here](http://wiki.minix3.org/en/UsersGuide/InstallingBinaryPackages).
+Install GNU make from the Minix pkgsrc repository; for details see [here](http://wiki.minix3.org/doku.php?id=usersguide:installingbinarypackages).
 
 Optionally, GCC may also be installed if you wish to use that instead
 of Clang, the Minix system compiler.
@@ -364,12 +364,12 @@ to adjust them to your own directories:
     HB_WITH_CURSES= (on \*nix systems and DJGPP, auto-detected on both)
     HB_WITH_GPM= (on Linux only)
     HB_WITH_PCRE2=C:\pcre2
-    HB_WITH_PCRE=C:\pcre (defaults to locally hosted version if not found)
-    HB_WITH_PNG=C:\libpng (defaults to locally hosted version if not found)
+    HB_WITH_PCRE=C:\pcre (defaults to locally hosted copy if not found)
+    HB_WITH_PNG=C:\libpng (defaults to locally hosted copy if not found)
     HB_WITH_SLANG= (on \*nix systems)
     HB_WITH_WATT= (on MS-DOS systems)
     HB_WITH_X11= (on \*nix systems)
-    HB_WITH_ZLIB=C:\zlib (defaults to locally hosted version if not found)
+    HB_WITH_ZLIB=C:\zlib (defaults to locally hosted copy if not found)
 
 To explicitly disable any given components, use the value `no`. This may be
 useful to avoid auto-detection of installed packages on \*nix systems. You
@@ -1404,7 +1404,7 @@ Supported shells per host platforms:
      * MSYS2 [win, free software, open-source]
         * <https://msys2.github.io/>
      * Clang [multi-platform, free software, open-source]
-        * <http://releases.llvm.org/>
+        * <https://llvm.org/releases/>
      * Cygwin [win, free software, open-source]
         * <https://cygwin.com/>
      * OS/2 GCC [os2, free software, open-source]
@@ -1506,11 +1506,6 @@ Supported shells per host platforms:
      * [hbqt (GUI)](https://groups.google.com/forum/#!forum/qtcontribs)
      * [hwgui (GUI)](https://sourceforge.net/p/hwgui/mailman/hwgui-developers/)
      * [xHarbour fork](https://groups.google.com/forum/#!forum/comp.lang.xharbour)
-
-  * Translators:
-     * [Bing Translator](https://www.bing.com/translator/)
-     * [Google Translate](https://translate.google.com/)
-
 
 # Harbour Links
 
