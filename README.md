@@ -541,11 +541,6 @@ settings are case-sensitive.
 
      Enable C compiler optimizations. Default: `yes`
 
-   - `HB_BUILD_MODE=[cpp|c]`
-
-     Change default build mode to C++ or C.
-     Default: `c`, except for msvc* compilers, where it's `cpp`.
-
    - `HB_BUILD_PARTS=[all|compiler|lib]`
 
      Build only specific part of Harbour.
@@ -628,6 +623,14 @@ settings are case-sensitive.
      Rebuild language parser sources. You only need this if your are Harbour
      core developer modifying grammar rules (.y). Requires GNU Bison 1.28 or
      upper in `PATH`. Default: `no`
+
+   - `HB_BUILD_MODE=[cpp|c]`
+
+     Set default build mode to C++ or C. Default: `c`
+
+     This option is meant for testing Harbour code base for issues revealed
+     by stricter C++ compiler rules and/or for C/C++ interoperability issues.
+     Do not use it for production builds.
 
    - `HB_CCPATH=[<dir>/]`
 
@@ -1523,6 +1526,7 @@ Supported shells per host platforms:
      * Harbour [online documentation](https://harbour.github.io/doc/)
      * Harbour [internal documents](doc/)
      * [Harbour for Beginners (by Alexander Kresin)](https://www.kresin.ru/en/hrbfaq_3.html)
+     * [Harbour Wiki (by Pete D)](https://github.com/Petewg/V-harbour-core/wiki)
      * [Wikipedia](https://en.wikipedia.org/wiki/Harbour_compiler)
      * [Stack Overflow](https://stackoverflow.com/questions/tagged/clipper)
      * [Medium](https://medium.com/harbour-magazine)

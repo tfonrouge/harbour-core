@@ -26,12 +26,24 @@ C_SOURCES := \
 
 ifeq ($(filter $(HB_COMPILER),poccarm xcc tcc),)
 
+   # Detect libpng
+
+   HB_HAS_PNG :=
+   HB_HAS_PNG_LOCAL :=
+
+   # libpng12-dev{deb}
+   # libpng-devel{rpm}
+   # libpng{homebrew}
+   # libpng{pacman}
+   # mingw-w64-i686-libpng{msys2&mingw}
+   # mingw-w64-x86_64-libpng{msys2&mingw64}
+
    _DET_DSP_NAME := libpng
    _DET_VAR_INC_ := HB_INC_PNG
    _DET_VAR_HAS_ := HB_HAS_PNG
    _DET_FLT_PLAT :=
    _DET_FLT_COMP :=
-   _DET_INC_DEFP := /usr/include /boot/develop/headers/3rdparty
+   _DET_INC_DEFP := /usr/local/opt/png/include /usr/include /usr/local/include /boot/develop/headers/3rdparty
    _DET_INC_LOCL := src/3rd/png
    _DET_INC_HEAD := /png.h
    include $(TOP)$(ROOT)config/detfun.mk
