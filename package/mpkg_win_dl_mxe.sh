@@ -111,15 +111,18 @@ mkdir -p "${MXE_HOME}"
   base='http://pkg.mxe.cc/repos/apt/debian'  # APT root
   suid='D43A795B73B16ABE9643FE1AFD8FFF16DB45C6AB'  # Signer UID
 
-  alias gpg='gpg --batch --keyserver-options timeout=15 --keyid-format LONG'
+  alias gpg='gpg --batch --keyid-format LONG'
 
   echo "! Downloading and verifying MXE package list..."
   mxe_curl \
     -O "${base}/dists/wheezy/Release.gpg" \
     -O "${base}/dists/wheezy/Release"
-  mxe_curl \
-    "https://keyserver.ubuntu.com/pks/lookup?search=0x${suid}&op=get" \
-  | gpg --import --status-fd 1
+  (
+    set -x
+    mxe_curl \
+      "https://keyserver.ubuntu.com/pks/lookup?search=0x${suid}&op=get" \
+    | gpg --import --status-fd 1
+  )
   gpg --verify-options show-primary-uid-only --verify Release.gpg Release || exit 1
   mxe_curl \
     -O "${base}/dists/wheezy/main/binary-amd64/Packages.gz"

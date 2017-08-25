@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -269,8 +269,9 @@ HB_FUNC( HB_ATX )
 
                if( hb_regexec( pRegEx, pszString + nStart, nLen, 1, aMatches ) > 0 )
                {
-                  nStart += HB_REGMATCH_SO( aMatches, 0 ) + 1;
-                  nLen = HB_REGMATCH_EO( aMatches, 0 ) - HB_REGMATCH_SO( aMatches, 0 );
+                  nStart += ( HB_SIZE ) HB_REGMATCH_SO( aMatches, 0 ) + 1;
+                  nLen = ( HB_SIZE ) HB_REGMATCH_EO( aMatches, 0 ) -
+                         ( HB_SIZE ) HB_REGMATCH_SO( aMatches, 0 );
                   hb_retclen( pszString + nStart - 1, nLen );
                }
                else
@@ -351,9 +352,9 @@ static HB_BOOL hb_regex( int iRequest )
             {
                if( HB_REGMATCH_EO( aMatches, i ) != HB_REGMATCH_UNSET )
                   hb_arraySetCL( pRetArray, i + 1,
-                                 pszString + HB_REGMATCH_SO( aMatches, i ),
-                                 HB_REGMATCH_EO( aMatches, i ) -
-                                 HB_REGMATCH_SO( aMatches, i ) );
+                                 pszString + ( HB_SIZE ) HB_REGMATCH_SO( aMatches, i ),
+                                 ( HB_SIZE ) HB_REGMATCH_EO( aMatches, i ) -
+                                 ( HB_SIZE ) HB_REGMATCH_SO( aMatches, i ) );
                else
                   hb_arraySetCL( pRetArray, i + 1, NULL, 0 );
             }
@@ -377,10 +378,10 @@ static HB_BOOL hb_regex( int iRequest )
             iMatches = 0;
             do
             {
-               hb_itemPutCL( pMatch, pszString, HB_REGMATCH_SO( aMatches, 0 ) );
+               hb_itemPutCL( pMatch, pszString, ( HB_SIZE ) HB_REGMATCH_SO( aMatches, 0 ) );
                hb_arrayAddForward( pRetArray, pMatch );
-               nLen -= HB_REGMATCH_EO( aMatches, 0 );
-               pszString += HB_REGMATCH_EO( aMatches, 0 );
+               nLen -= ( HB_SIZE ) HB_REGMATCH_EO( aMatches, 0 );
+               pszString += ( HB_SIZE ) HB_REGMATCH_EO( aMatches, 0 );
                iMatches++;
             }
             while( HB_REGMATCH_EO( aMatches, 0 ) > 0 && nLen &&
@@ -405,18 +406,18 @@ static HB_BOOL hb_regex( int iRequest )
 
             for( i = 0; i < iMatches; i++ )
             {
-               int iSO = HB_REGMATCH_SO( aMatches, i ),
-                   iEO = HB_REGMATCH_EO( aMatches, i );
+               HB_SIZE nSO = ( HB_SIZE ) HB_REGMATCH_SO( aMatches, i ),
+                       nEO = ( HB_SIZE ) HB_REGMATCH_EO( aMatches, i );
                pMatch = hb_arrayGetItemPtr( pRetArray, i + 1 );
                hb_arrayNew( pMatch, 3 );
-               if( iEO != ( int ) HB_REGMATCH_UNSET )
+               if( nEO != ( HB_SIZE ) HB_REGMATCH_UNSET )
                {
                   /* matched string */
-                  hb_arraySetCL( pMatch, 1, pszString + iSO, iEO - iSO );
+                  hb_arraySetCL( pMatch, 1, pszString + nSO, nEO - nSO );
                   /* begin of match */
-                  hb_arraySetNS( pMatch, 2, iSO + 1 );
+                  hb_arraySetNS( pMatch, 2, nSO + 1 );
                   /* End of match */
-                  hb_arraySetNS( pMatch, 3, iEO );
+                  hb_arraySetNS( pMatch, 3, nEO );
                }
                else
                {
@@ -432,12 +433,12 @@ static HB_BOOL hb_regex( int iRequest )
          case 5: /* _ALL_ results AND positions */
          {
             PHB_ITEM pAtxArray;
-            int      iMax       = hb_parni( 5 );   /* max nuber of matches I want, 0 = unlimited */
+            int      iMax       = hb_parni( 5 );   /* max number of matches I want, 0 = unlimited */
             int      iGetMatch  = hb_parni( 6 );   /* Gets if want only one single match or a sub-match */
             HB_BOOL  fOnlyMatch = hb_parldef( 7, HB_TRUE ); /* if HB_TRUE returns only matches and sub-matches, not positions */
             HB_SIZE  nOffset    = 0;
             int      iCount     = 0;
-            int      iSO, iEO;
+            HB_SIZE  nSO, nEO;
 
             /* Set new array */
             pRetArray = hb_itemArrayNew( 0 );
@@ -450,20 +451,20 @@ static HB_BOOL hb_regex( int iRequest )
                   pAtxArray = hb_itemArrayNew( iMatches );
                   for( i = 0; i < iMatches; i++ )
                   {
-                     iSO = HB_REGMATCH_SO( aMatches, i );
-                     iEO = HB_REGMATCH_EO( aMatches, i );
+                     nSO = ( HB_SIZE ) HB_REGMATCH_SO( aMatches, i );
+                     nEO = ( HB_SIZE ) HB_REGMATCH_EO( aMatches, i );
                      pMatch = hb_arrayGetItemPtr( pAtxArray, i + 1 );
                      if( ! fOnlyMatch )
                      {
                         hb_arrayNew( pMatch, 3 );
-                        if( iEO != ( int ) HB_REGMATCH_UNSET )
+                        if( nEO != ( HB_SIZE ) HB_REGMATCH_UNSET )
                         {
                            /* matched string */
-                           hb_arraySetCL( pMatch, 1, pszString + iSO, iEO - iSO );
+                           hb_arraySetCL( pMatch, 1, pszString + nSO, nEO - nSO );
                            /* begin of match */
-                           hb_arraySetNS( pMatch, 2, nOffset + iSO + 1 );
+                           hb_arraySetNS( pMatch, 2, nOffset + nSO + 1 );
                            /* End of match */
-                           hb_arraySetNS( pMatch, 3, nOffset + iEO );
+                           hb_arraySetNS( pMatch, 3, nOffset + nEO );
                         }
                         else
                         {
@@ -474,9 +475,9 @@ static HB_BOOL hb_regex( int iRequest )
                      }
                      else
                      {
-                        if( iEO != ( int ) HB_REGMATCH_UNSET )
+                        if( nEO != ( HB_SIZE ) HB_REGMATCH_UNSET )
                            /* matched string */
-                           hb_itemPutCL( pMatch, pszString + iSO, iEO - iSO );
+                           hb_itemPutCL( pMatch, pszString + nSO, nEO - nSO );
                         else
                            hb_itemPutC( pMatch, NULL );
                      }
@@ -487,20 +488,20 @@ static HB_BOOL hb_regex( int iRequest )
                else /* Here I get only single matches */
                {
                   i = iGetMatch - 1;
-                  iSO = HB_REGMATCH_SO( aMatches, i );
-                  iEO = HB_REGMATCH_EO( aMatches, i );
+                  nSO = ( HB_SIZE ) HB_REGMATCH_SO( aMatches, i );
+                  nEO = ( HB_SIZE ) HB_REGMATCH_EO( aMatches, i );
                   pMatch = hb_itemNew( NULL );
                   if( ! fOnlyMatch )
                   {
                      hb_arrayNew( pMatch, 3 );
-                     if( iEO != ( int ) HB_REGMATCH_UNSET )
+                     if( nEO != ( HB_SIZE ) HB_REGMATCH_UNSET )
                      {
                         /* matched string */
-                        hb_arraySetCL( pMatch, 1, pszString + iSO, iEO - iSO );
+                        hb_arraySetCL( pMatch, 1, pszString + nSO, nEO - nSO );
                         /* begin of match */
-                        hb_arraySetNS( pMatch, 2, nOffset + iSO + 1 );
+                        hb_arraySetNS( pMatch, 2, nOffset + nSO + 1 );
                         /* End of match */
-                        hb_arraySetNS( pMatch, 3, nOffset + iEO );
+                        hb_arraySetNS( pMatch, 3, nOffset + nEO );
                      }
                      else
                      {
@@ -511,9 +512,9 @@ static HB_BOOL hb_regex( int iRequest )
                   }
                   else
                   {
-                     if( iEO != ( int ) HB_REGMATCH_UNSET )
+                     if( nEO != ( HB_SIZE ) HB_REGMATCH_UNSET )
                         /* matched string */
-                        hb_itemPutCL( pMatch, pszString + iSO, iEO - iSO );
+                        hb_itemPutCL( pMatch, pszString + nSO, nEO - nSO );
                      else
                         hb_itemPutC( pMatch, NULL );
                   }
@@ -521,15 +522,15 @@ static HB_BOOL hb_regex( int iRequest )
                   hb_itemRelease( pMatch );
                }
 
-               iEO = HB_REGMATCH_EO( aMatches, 0 );
-               if( iEO == ( int ) HB_REGMATCH_UNSET )
+               nEO = ( HB_SIZE ) HB_REGMATCH_EO( aMatches, 0 );
+               if( nEO == ( HB_SIZE ) HB_REGMATCH_UNSET )
                   break;
-               nLen -= iEO;
-               pszString += iEO;
-               nOffset += iEO;
+               nLen -= nEO;
+               pszString += nEO;
+               nOffset += nEO;
                iCount++;
             }
-            while( iEO && nLen && ( iMax == 0 || iCount < iMax ) &&
+            while( nEO && nLen && ( iMax == 0 || iCount < iMax ) &&
                    ( iMatches = hb_regexec( pRegEx, pszString, nLen, iMaxMatch, aMatches ) ) > 0 );
             hb_itemReturnRelease( pRetArray );
             fResult = HB_TRUE;

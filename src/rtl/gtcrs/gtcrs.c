@@ -10,13 +10,13 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.   If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -34,7 +34,7 @@
  * Project under the name Harbour.  If you copy code from other
  * Harbour Project or Free Software Foundation releases into a copy of
  * Harbour, as the General Public License permits, the exception does
- * not apply to the code that you add in this way.   To avoid misleading
+ * not apply to the code that you add in this way.  To avoid misleading
  * anyone as to the status of such modified files, you must delete
  * this exception notice from them.
  *
@@ -89,7 +89,7 @@ typedef struct
    int rbdn_row, rbdn_col;
    int mbup_row, mbup_col;
    int mbdn_row, mbdn_col;
-   /* to analize DBLCLK on xterm */
+   /* to analyze DBLCLK on xterm */
    int click_delay;
    struct timeval BL_time;
    struct timeval BR_time;
@@ -728,7 +728,7 @@ static void mouse_init( InOutBase * ioBase )
          GPM_MOVE | GPM_DRAG | GPM_UP | GPM_DOWN | GPM_SINGLE | GPM_DOUBLE;
       /* give me move events but handle them anyway */
       ioBase->Conn.defaultMask = GPM_MOVE | GPM_HARD;
-      /* only pure mouse events, no Ctrl,Alt,Shft events */
+      /* only pure mouse events, no Ctrl,Alt,Shift events */
       ioBase->Conn.minMod = 0;
       ioBase->Conn.maxMod = ( ( 1 << KG_SHIFT ) | ( 1 << KG_CTRL ) | ( 1 << KG_ALT ) );
       gpm_zerobased = 1;
@@ -1604,7 +1604,7 @@ static void set_sig_keys( InOutBase * ioBase, int key_int, int key_brk,
       if( key_stp >= 0 && key_stp <= 255 )
          ioBase->curr_TIO.c_cc[ VSUSP ] = key_stp;
 
-      /* enable siganls from terminal device */
+      /* enable signals from terminal device */
       if( ioBase->curr_TIO.c_cc[ VINTR ] != 0 ||
           ioBase->curr_TIO.c_cc[ VQUIT ] != 0 ||
           ioBase->curr_TIO.c_cc[ VSUSP ] != 0 )
@@ -1878,7 +1878,7 @@ static InOutBase * create_ioBase( char * term, int infd, int outfd, int errfd,
    }
 
 
-   /* curses SCREEN initialisation */
+   /* curses SCREEN initializ<ation */
    if( ioBase->base_infd == fileno( stdin ) )
       ioBase->basein = stdin;
    else
@@ -1922,7 +1922,7 @@ static InOutBase * create_ioBase( char * term, int infd, int outfd, int errfd,
    ioBase->attr_mask = ( chtype ) -1;
    if( has_colors() )
    {
-      /*  DOS->CURSES color maping
+      /*  DOS->CURSES color mapping
          DOS              -> curses
          --------------------------------
          0 black         -> COLOR_BLACK
@@ -1970,7 +1970,7 @@ static InOutBase * create_ioBase( char * term, int infd, int outfd, int errfd,
       {
          unsigned int n;
          bg = ( i >> 4 ) & 0x07; /* extract background color bits 4-6 */
-         fg = ( i & 0x07 );      /* extract forground color bits 0-2 */
+         fg = ( i & 0x07 );      /* extract foreground color bits 0-2 */
          n = bg * 8 + fg;
          /* n = bg * COLORS + fg */
          if( n == 0 )
@@ -1980,7 +1980,7 @@ static InOutBase * create_ioBase( char * term, int infd, int outfd, int errfd,
          if( ( i & 0x88 ) == 0 )
             init_pair( n, color_map[ fg ], color_map[ bg ] );
          ioBase->attr_map[ i ] = COLOR_PAIR( n );
-         if( i & 0x08 )        /* highlight forground bit 3 */
+         if( i & 0x08 )        /* highlight foreground bit 3 */
             ioBase->attr_map[ i ] |= A_BOLD;
          if( i & 0x80 )        /* blink/highlight background bit 7 */
             ioBase->attr_map[ i ] |= A_BLINK;
@@ -1992,13 +1992,13 @@ static InOutBase * create_ioBase( char * term, int infd, int outfd, int errfd,
       for( i = 0; i < 256; i++ )
       {
          bg = ( i >> 4 ) & 0x07; /* extract background color bits 4-6 */
-         fg = ( i & 0x07 );      /* extract forground color bits 0-2 */
+         fg = ( i & 0x07 );      /* extract foreground color bits 0-2 */
          ioBase->attr_map[ i ] = 0;
          if( fg < bg )
             ioBase->attr_map[ i ] |= A_REVERSE;
          if( fg == 1 )         /* underline? */
             ioBase->attr_map[ i ] |= A_UNDERLINE;
-         if( i & 0x08 )        /* highlight forground bit 3 */
+         if( i & 0x08 )        /* highlight foreground bit 3 */
             ioBase->attr_map[ i ] |= A_BOLD;
          if( i & 0x80 )        /* blink/highlight background bit 7 */
             ioBase->attr_map[ i ] |= A_BLINK;
@@ -2090,7 +2090,7 @@ static void destroy_ioBase( InOutBase * ioBase )
    /* restore terminal settings */
    gt_ttyrestore( ioBase );
 
-   /* kill terminal proces if any */
+   /* kill terminal process if any */
    if( ioBase->termpid > 0 )
    {
       kill( ioBase->termpid, SIGTERM );

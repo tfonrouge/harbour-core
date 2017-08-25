@@ -16,9 +16,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -53,7 +53,7 @@
 #include "hbvm.h"
 #include "hbset.h"
 
-/* The 5-th parameter is Harbour extensions */
+/* The 5th parameter is Harbour extension */
 HB_FUNC( AFIELDS )
 {
    HB_USHORT uiFields, uiCount;
@@ -319,11 +319,11 @@ HB_FUNC( DBCREATE )
    HB_ULONG ulConnection;
 
    /*
-    * NOTE: 4-th, 5-th and 6-th parameters are undocumented Clipper ones
-    * 4-th is boolean flag indicating if file should stay open (any boolean
-    *      value will enable this behavior)
-    * 5-th is alias - if not given then WA is open without alias
-    * 6-th is optional DELIMITED value used by some RDDs like DELIM
+    * NOTE: 4th, 5th and 6th parameters are undocumented Clipper ones
+    * 4th is boolean flag indicating if file should stay open (any boolean
+    *     value will enable this behavior)
+    * 5th is alias - if not given then WA is open without alias
+    * 6th is optional DELIMITED value used by some RDDs like DELIM
     */
 
    szFileName = hb_parc( 1 );
@@ -454,9 +454,9 @@ HB_FUNC( __DBOPENSDF )
    HB_ERRCODE errCode;
 
    /*
-    * NOTE: 4-th and 5-th parameters are undocumented Clipper ones
-    * 4-th is boolean flag indicating if file should stay open and
-    * 5-th is alias - if not given then WA is open without alias
+    * NOTE: 4th and 5th parameters are undocumented Clipper ones
+    * 4th is boolean flag indicating if file should stay open and
+    * 5th is alias - if not given then WA is open without alias
     */
 
    szFileName = hb_parc( 1 );
@@ -1268,7 +1268,7 @@ HB_FUNC( ORDCONDSET )
       /* 19th parameter is CL5.2 USEFILTER parameter which means
          that RDD should respect SET FILTER and SET DELETED flag */
       lpdbOrdCondInfo->fUseFilter    = hb_parl( 19 );
-      /* 20th parameter is Harbour extenstion and informs RDD that
+      /* 20th parameter is Harbour extension and informs RDD that
          index is not shared between other clients */
       lpdbOrdCondInfo->fExclusive    = hb_parl( 20 );
 

@@ -3,18 +3,18 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option )
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.   If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/ ).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -32,7 +32,7 @@
  * Project under the name Harbour.  If you copy code from other
  * Harbour Project or Free Software Foundation releases into a copy of
  * Harbour, as the General Public License permits, the exception does
- * not apply to the code that you add in this way.   To avoid misleading
+ * not apply to the code that you add in this way.  To avoid misleading
  * anyone as to the status of such modified files, you must delete
  * this exception notice from them.
  *
@@ -425,7 +425,7 @@ HB_FUNC( HPDF_SETENCRYPTIONMODE )
    HPDF_COMP_NONE         1    All contents are not compressed.
    HPDF_COMP_TEXT         2    Compress the contents stream of the page.
    HPDF_COMP_IMAGE        3    Compress the streams of the image objects.
-   HPDF_COMP_METADATA     4    Other stream datas (fonts, cmaps and so on)  are compressed.
+   HPDF_COMP_METADATA     4    Other stream datas (fonts, cmaps and so on) are compressed.
    HPDF_COMP_ALL          5    All stream datas are compressed. (The same as "HPDF_COMP_TEXT | HPDF_COMP_IMAGE | HPDF_COMP_METADATA")
  */
 HB_FUNC( HPDF_SETCOMPRESSIONMODE )

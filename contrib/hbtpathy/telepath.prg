@@ -16,9 +16,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -441,8 +441,8 @@ FUNCTION tp_waitfor( ... )  /* nPort, nTimeout, acList|cString..., lIgnorecase *
 
    RETURN 0
 
-/* We cannot set, well, _I_ think we cannot, CTS without setting RTS flowcontrol, so this
-   function and tp_ctrlrts() do the same thing, that is set/reset CRTSCTS flowcontol */
+/* We cannot set, well, _I_ think we cannot, CTS without setting RTS flow control, so this
+   function and tp_ctrlrts() do the same thing, that is set/reset CRTSCTS flow contol */
 FUNCTION tp_ctrlcts( nPort, nNewCtrl )
 
    LOCAL nCurValue
@@ -662,10 +662,10 @@ FUNCTION tp_outchrs()
 FUNCTION tp_keybd()
    RETURN 0
 
-// / tp_debug is not a real TP function.  I included it so you can define your own debug
+// / tp_debug() is not a real TP function.  I included it so you can define your own debug
 // / output function.
 // / the point of the first parameter is a "debug level".  I keep a system variable for how
-// / much debuggning output is wanted and if the tp_debug parameter is a LOWER number than
+// / much debugging output is wanted and if the tp_debug() parameter is a LOWER number than
 // / the global debug level I print the message.  Since I don't have your system globals,
 // / I will ignore the first parameter and always print it.
 // / I recommend you modify this function to suit your own debugging needs

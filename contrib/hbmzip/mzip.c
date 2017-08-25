@@ -1,6 +1,6 @@
 /*
  * Wrapper functions for minizip library
- * Some higher level zip archive functions
+ * Some higher-level ZIP archive functions
  *
  * Copyright 2008 Mindaugas Kavaliauskas <dbtopas.at.dbtopas.lt>
  * Copyright 2011-2013 Viktor Szakats (vszakats.net/harbour) (codepage/unicode)
@@ -16,9 +16,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -95,8 +95,8 @@
    #if defined( __USE_LARGEFILE64 )
       /*
        * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
-       * defined and effectively enables lseek64/flock64/ftruncate64 functions
-       * on 32-bit machines.
+       * defined and effectively enables lseek64()/flock64()/ftruncate64()
+       * functions on 32-bit machines.
        */
       #define HB_USE_LARGEFILE64
    #elif defined( HB_OS_UNIX ) && defined( O_LARGEFILE )
@@ -671,7 +671,7 @@ HB_FUNC( HB_UNZIPFILECLOSE )
 
 /*
  *
- * Higher level functions - not a wrappers of minizip code
+ * Higher-level functions - not wrappers of minizip code
  *
  */
 
@@ -983,7 +983,7 @@ static int hb_zipStoreFile( zipFile hZip, int iParamFileName, int iParamZipName,
 
    zfi.external_fa = ulExtAttr;
    /* TODO: zip.exe test: 0 for binary file, 1 for text. Does not depend on
-      extension. We should analyse content of file to determine this??? */
+      extension. We should analyze content of file to determine this??? */
    zfi.internal_fa = 0;
 
    if( ulExtAttr & 0x40000000 )
@@ -1130,7 +1130,7 @@ static int hb_zipStoreFileHandle( zipFile hZip, PHB_FILE pFile, int iParamZipNam
       zfi.internal_fa = fText ? 1 : 0;
    else
       /* TODO: zip.exe test: 0 for binary file, 1 for text. Does not depend on
-         extension. We should analyse content of file to determine this??? */
+         extension. We should analyze content of file to determine this??? */
       zfi.internal_fa = 0;
 
    iResult = zipOpenNewFileInZip4( hZip, szZipName, &zfi, NULL, 0, NULL, 0, szComment,

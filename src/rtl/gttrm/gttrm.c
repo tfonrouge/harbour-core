@@ -26,9 +26,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -1006,7 +1006,7 @@ static void mouse_init( PHB_GTTRM pTerm )
          GPM_MOVE | GPM_DRAG | GPM_UP | GPM_DOWN | GPM_SINGLE | GPM_DOUBLE;
       /* give me move events but handle them anyway */
       pTerm->Conn.defaultMask = GPM_MOVE | GPM_HARD;
-      /* report Ctrl,Alt,Shft events */
+      /* report Ctrl,Alt,Shift events */
       pTerm->Conn.minMod = 0;
       pTerm->Conn.maxMod = ( ( 1 << KG_SHIFT ) | ( 1 << KG_CTRL ) | ( 1 << KG_ALT ) );
       gpm_zerobased = 1;
@@ -1986,7 +1986,7 @@ static HB_BOOL hb_gt_trm_AnsiGetCursorPos( PHB_GTTRM pTerm, int * iRow, int * iC
       timer = hb_timerInit( timeout );
       for( ;; )
       {
-         /* loking for cursor position in "\033[%d;%dR" */
+         /* looking for cursor position in "\033[%d;%dR" */
          while( j < n && rdbuf[ j ] != '\033' )
             ++j;
          if( n - j >= 6 )

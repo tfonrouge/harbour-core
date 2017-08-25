@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -74,7 +74,7 @@
 #define AMQP_STATUS_UNKNOWN_CLASS               -0x0003  /* An unknown AMQP class was received. This is a protocol error. */
 #define AMQP_STATUS_UNKNOWN_METHOD              -0x0004  /* An unknown AMQP method was received. This is a protocol error. */
 #define AMQP_STATUS_HOSTNAME_RESOLUTION_FAILED  -0x0005  /* Unable to resolve the hostname */
-#define AMQP_STATUS_INCOMPATIBLE_AMQP_VERSION   -0x0006  /* The broker advertised an incompaible AMQP version */
+#define AMQP_STATUS_INCOMPATIBLE_AMQP_VERSION   -0x0006  /* The broker advertised an incompatible AMQP version */
 #define AMQP_STATUS_CONNECTION_CLOSED           -0x0007  /* The connection to the broker has been closed */
 #define AMQP_STATUS_BAD_URL                     -0x0008  /* malformed AMQP URL */
 #define AMQP_STATUS_SOCKET_ERROR                -0x0009  /* A socket error occurred */

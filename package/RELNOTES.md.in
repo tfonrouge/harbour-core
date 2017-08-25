@@ -8,10 +8,10 @@ Source archives and Windows binaries are available for download:
 
 ### Package content
 
-* Harbour tools (requires x64 OS)
-* static/shared libraries for x86 and x64 targets
+* Harbour tools (requires 64-bit OS)
+* static/shared libraries for 32-bit and 64-bit targets
 * static/shared libraries of libcurl, openssl, libssh2, nghttp2
-  for x86 and x64 targets
+  for 32-bit and 64-bit targets
 * example/test sources
 * script to download complete source code
 * `BUILD*.txt` in package root with build/package details
@@ -21,20 +21,19 @@ Source archives and Windows binaries are available for download:
 1. Install/unpack to any directory.
 2. Launch a Command Prompt.
 3. Add Harbour to `PATH`: `set PATH=<path-to-harbour>\bin;%PATH%`
-4. Install MSYS2: <https://msys2.github.io/>
+4. Install MSYS2. Follow steps on <https://msys2.github.io/>. Make
+   sure to update MSYS2 to its current latest version, as described.
 5. Install MinGW using this command on the MSYS2 console:
    `pacman -S git base-devel msys2-devel mingw-w64-{i686,x86_64}-toolchain`
-   (See above link about how to update MSYS2 packages from this point on
-   to their latest version.)
-6. Build test x86 executable:
+6. Build test 32-bit executable:
    ```
    set PATH=<path-to-msys2>\mingw32\bin;%PATH%
-   hbmk2 <path-to-harbour>/tests/hello.prg -cpu=x86
+   hbmk2 <path-to-harbour>/tests/hello.prg
    ```
-7. Build test x64 executable:
+7. Build test 64-bit executable:
    ```
    set PATH=<path-to-msys2>\mingw64\bin;%PATH%
-   hbmk2 <path-to-harbour>/tests/hello.prg -cpu=x64
+   hbmk2 <path-to-harbour>/tests/hello.prg
    ```
 8. Further hints in section **Build Your Own Harbour App**
    of `README.md`.

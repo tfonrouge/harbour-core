@@ -14,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -230,13 +230,13 @@ PROCEDURE Main_HVMA()
 #ifdef __HARBOUR__
    #pragma -kh-
 #endif
-   HBTEST "" $ ""                         IS .T.  /* Bug in CA-Cl*ppers compiler optimizer. It should return .F. */
-   HBTEST "" $ "bcde"                     IS .T.  /* Bug in CA-Cl*ppers compiler optimizer. It should return .F. */
+   HBTEST "" $ ""                         IS .T.  /* Bug in CA-Cl*pper compiler optimizer. It should return .F. */
+   HBTEST "" $ "bcde"                     IS .T.  /* Bug in CA-Cl*pper compiler optimizer. It should return .F. */
 #ifdef __HARBOUR__
    /* enable Harbour extensions and test correct results results */
    #pragma -kh+
-   HBTEST "" $ ""                         IS .F.  /* Bug in CA-Cl*ppers compiler optimizer. It should return .F. */
-   HBTEST "" $ "bcde"                     IS .F.  /* Bug in CA-Cl*ppers compiler optimizer. It should return .F. */
+   HBTEST "" $ ""                         IS .F.  /* Bug in CA-Cl*pper compiler optimizer. It should return .F. */
+   HBTEST "" $ "bcde"                     IS .F.  /* Bug in CA-Cl*pper compiler optimizer. It should return .F. */
 #endif
    HBTEST "d" $ "bcde"                    IS .T.
    HBTEST "D" $ "BCDE"                    IS .T.

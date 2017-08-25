@@ -14,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -45,13 +45,13 @@
  */
 
 /*
-   patterm format:
+   pattern format:
    '%' [<flags>*] [<field width>] [.<precision>] [<length modifier>]
        <conversion specifier>
  */
 
 /*
-   The folowwing conversions are not explicitly supported:
+   The following conversions are not explicitly supported:
       A, a
       E, e
       G, g
@@ -62,7 +62,7 @@
       S (or Ls)
    These are wide character conversions and needs locale settings.
 
-   double conversion if not necessary can be disabled to not create unnencessary
+   double conversion if not necessary can be disabled to not create unnecessary
    overhead and/or references to math library by
       #define __NO_DOUBLE__
    It can be also greatly optimized anyhow it will increase dependences list and
@@ -96,12 +96,11 @@
 #include <sys/param.h>
 #endif
 
-/* mingw-w64 6.1.0 x64-hosted multilib will crash hbpp.exe
+/* mingw-w64 6.1.0 x64-hosted multilib will crash hbpp executable
    inside this function if built in LTO mode for x86 target.
-   Working-around the problem by disabling LTO in this
-   specific case for this specific function. The setting
-   is applied to the whole file, regardless of where it's
-   placed. [vszakats] */
+   Working-around the problem by disabling LTO in this specific
+   case for this specific function. The setting is applied to the
+   whole file, regardless of where it's placed. [vszakats] */
 #if defined( HB_GCC_HAS_OPTIMIZE ) && ( HB_GCC_VER == 601 ) \
     && defined( __MINGW32__ ) && defined( HB_CPU_X86_64 )
 #  pragma GCC push_options

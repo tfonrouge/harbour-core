@@ -16,9 +16,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -614,7 +614,7 @@
 #define HB_CURLE_REMOTE_FILE_EXISTS           73 /* File already exists */
 #define HB_CURLE_TFTP_NOSUCHUSER              74 /* No such user */
 #define HB_CURLE_CONV_FAILED                  75 /* conversion failed */
-#define HB_CURLE_CONV_REQD                    76 /* caller must register conversion callbacks using curl_easy_setopt options CURLOPT_CONV_FROM_NETWORK_FUNCTION, CURLOPT_CONV_TO_NETWORK_FUNCTION, and CURLOPT_CONV_FROM_UTF8_FUNCTION */
+#define HB_CURLE_CONV_REQD                    76 /* caller must register conversion callbacks using curl_easy_setopt() options CURLOPT_CONV_FROM_NETWORK_FUNCTION, CURLOPT_CONV_TO_NETWORK_FUNCTION, and CURLOPT_CONV_FROM_UTF8_FUNCTION */
 #define HB_CURLE_SSL_CACERT_BADFILE           77 /* could not load CACERT file, missing or wrong format */
 #define HB_CURLE_REMOTE_FILE_NOT_FOUND        78 /* remote file not found */
 #define HB_CURLE_SSH                          79 /* error from the SSH layer, somewhat generic so the error message will be of interest when this has happened */

@@ -26,13 +26,13 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.   If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -50,7 +50,7 @@
  * Project under the name Harbour.  If you copy code from other
  * Harbour Project or Free Software Foundation releases into a copy of
  * Harbour, as the General Public License permits, the exception does
- * not apply to the code that you add in this way.   To avoid misleading
+ * not apply to the code that you add in this way.  To avoid misleading
  * anyone as to the status of such modified files, you must delete
  * this exception notice from them.
  *
@@ -488,7 +488,7 @@ static void hb_gt_win_xInitScreenParam( PHB_GT pGT )
       s_iUpdtBottom = s_iUpdtRight = 0;
 
       /*
-       * Unfortunatelly Windows refuse to read to big area :-(
+       * Unfortunately Windows refuse to read to big area :-(
        * (I do not know why) so we cannot read the whole console
        * buffer { 0, 0, s_csbi.dwSize.Y - 1, s_csbi.dwSize.X - 1 }
        * because it reads nothing, [druzus]
@@ -749,8 +749,8 @@ static void hb_gt_win_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
     * This is a hack for MSYS console. It does not support full screen output
     * so nothing can be seen on the screen and we have to close the MSYS
     * console to be able to allocate the MS-Windows one.
-    * Unfortunatelly I do not know any method to detect the MSYS console
-    * so I used this hack with checking OSTYPE environemnt variable. [druzus]
+    * Unfortunately I do not know any method to detect the MSYS console
+    * so I used this hack with checking OSTYPE environment variable. [druzus]
     */
    {
       TCHAR lpOsType[ 16 ];
@@ -1343,10 +1343,10 @@ static int hb_gt_win_ReadKey( PHB_GT pGT, int iEventMask )
 #endif
 
             /*
-             * Under Win9x, Upper row keys are affected by caps-lock
+             * Under Win9x, upper row keys are affected by caps-lock
              * and should not be.  There are 2 solutions - the first
              * is to enable the calling of SpecialHandling below - which
-             * will only be activated under Win9x (Preferrably under user
+             * will only be activated under Win9x (Preferably under user
              * control, since they know if their keyboard isn't working), or
              * just enable KeyB handling in config.sys, and do not enable the
              * following call.
@@ -1355,7 +1355,7 @@ static int hb_gt_win_ReadKey( PHB_GT pGT, int iEventMask )
              * (With some clarification by Paul Tucker)
              * If making this fix the default under Win98, then it doesn't
              * work for non-US keyboards.  (The default has now been changed)
-             * I tried to replicate the problem under Win98SE (spanish),
+             * I tried to replicate the problem under Win98SE (Spanish),
              * but it works fine. I hope someone could tell me how the
              * problem appears, for try to fix it.
 

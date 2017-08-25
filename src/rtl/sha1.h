@@ -1,5 +1,5 @@
 /*
- * WARNING: Outdated, unsecure algorithm.
+ * WARNING: Outdated, insecure algorithm.
  *
  * Originally taken from the public domain SHA1 implementation
  * written by by Steve Reid <steve@edmweb.com>
@@ -29,9 +29,7 @@
 
 #include "hbdefs.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 /* Define this if your machine is LITTLE_ENDIAN, otherwise #undef it: */
 /* Disabled to avoid conflicts with the same macro defined in system header
@@ -71,8 +69,6 @@ void hb_SHA1_Update();
 void hb_SHA1_Final();
 #endif
 
-#ifdef  __cplusplus
-}
-#endif
+HB_EXTERN_END
 
 #endif

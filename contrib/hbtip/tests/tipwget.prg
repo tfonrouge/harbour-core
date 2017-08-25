@@ -1,9 +1,9 @@
-/* TEST of TIP libs (for higher level URI interface)
+/* TEST of TIP libs (for higher-level URI interface)
  *
  * Usage: This file is similar to a wget command
  *
  * Without the filename, tipwget will be in demo mode,
- * just demostrating it is working
+ * just demonstrating it is working
  *
  * With the filename, data will be stored to the file or
  * retrieved from the file and sent to internet.

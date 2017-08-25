@@ -14,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -308,7 +308,7 @@ PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol )
              * for C code which makes something like: HB_FUNC_EXEC( funcname );
              * In such case we cannot do anything - we cannot even detect
              * such situation. In some cases even linker cannot detect it
-             * because C compiler can make autoinlining or some bindings
+             * because C compiler can make auto-inlining or some bindings
              * which are not visible for linker
              */
             /* Let's try to overload one of the functions. Simple:

@@ -2,7 +2,8 @@
  * Harbour Portable Object (.hrb) file runner
  *
  * Copyright 1999 Eddie Runia <eddie@runia.com>
- * Copyright 2002 Alexander Kresin <alex@belacy.belgorod.su> (hb_hrbLoad(), hb_hrbDo(), hb_hrbUnload(), hb_hrbGetFunSym())
+ * Copyright 2002 Alexander Kresin <alex@belacy.belgorod.su>
+ *   (hb_hrbLoad(), hb_hrbDo(), hb_hrbUnload(), hb_hrbGetFunSym())
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,9 +16,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -526,7 +527,7 @@ static PHRB_BODY hb_hrbLoad( const char * szHrbBody, HB_SIZE nBodySize, HB_USHOR
          {
             /*
              * Old unused symbol table has been recycled - free the one
-             * we allocated and disactivate static initialization [druzus]
+             * we allocated and deactivate static initialization [druzus]
              */
             pHrbBody->pSymRead = pHrbBody->pModuleSymbols->pModuleSymbols;
             hb_xfree( pSymRead );

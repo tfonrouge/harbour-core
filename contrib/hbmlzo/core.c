@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -94,11 +94,11 @@ HB_CALL_ON_STARTUP_END( _hb_mlzo_init_ )
 /* Compression */
 
 /*
- * int lzo1x_1_compress ( const lzo_bytep src,
- *                        lzo_uint  src_len,
- *                        lzo_bytep dst,
- *                        lzo_uintp dst_len,
- *                        lzo_voidp wrkmem );
+ * int lzo1x_1_compress( const lzo_bytep src,
+ *                       lzo_uint  src_len,
+ *                       lzo_bytep dst,
+ *                       lzo_uintp dst_len,
+ *                       lzo_voidp wrkmem );
  *
  * Memory requirements: LZO1X_1_MEM_COMPRESS (64 KiB on 32-bit machines)
  *

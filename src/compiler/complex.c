@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -45,8 +45,8 @@
  *
  */
 
-#include "hbpp.h"
 #include "hbcomp.h"
+#include "hbpp.h"
 #include "hbdate.h"
 #include "harboury.h"
 
@@ -378,7 +378,7 @@ static int hb_comp_dayTimeDecode( PHB_COMP_LEX pLex, PHB_PP_TOKEN pToken,
     * VFP accepts slash, dot or hyphen as date delimiter and
     * 12 or 24-hour formatted time,
     * If only hours are included in time part then comma have to
-    * be used to separate date and time parts or it's necesary
+    * be used to separate date and time parts or it's necessary
     * to follow the hours with a colon.
     *    { ^ <YEAR> <sep:/.-> <MONTH> <sep:/.-> <DAY> [[<sep2:,>]
     *      [ <HOUR> [ : <MIN> [ : <SEC> [ . <FRAQ> ] ] ] [AM|PP] ] }
@@ -873,7 +873,7 @@ int hb_comp_yylex( YYSTYPE * yylval_ptr, HB_COMP_DECL )
                   if( ! HB_SUPPORT_HARBOUR && HB_COMP_PARAM->iSyntaxCheckOnly < 2 )
                   {
                      /* Clipper does not like end[], end(), end->, end-- & end++ at
-                        the begining of line */
+                        the beginning of line */
                      if( HB_PP_TOKEN_TYPE( pToken->pNext->type ) == HB_PP_TOKEN_LEFT_PB ||
                          HB_PP_TOKEN_TYPE( pToken->pNext->type ) == HB_PP_TOKEN_LEFT_SB ||
                          HB_PP_TOKEN_TYPE( pToken->pNext->type ) == HB_PP_TOKEN_INC ||
@@ -975,7 +975,7 @@ int hb_comp_yylex( YYSTYPE * yylval_ptr, HB_COMP_DECL )
                   if( ! HB_SUPPORT_HARBOUR && HB_COMP_PARAM->iSyntaxCheckOnly < 2 )
                   {
                      /* Clipper does not like NEXT[], NEXT(), NEXT->,
-                        NEXT++ & NEXT-- at the begining of line */
+                        NEXT++ & NEXT-- at the beginning of line */
                      if( HB_PP_TOKEN_TYPE( pToken->pNext->type ) == HB_PP_TOKEN_LEFT_PB ||
                          HB_PP_TOKEN_TYPE( pToken->pNext->type ) == HB_PP_TOKEN_LEFT_SB ||
                          HB_PP_TOKEN_TYPE( pToken->pNext->type ) == HB_PP_TOKEN_INC ||

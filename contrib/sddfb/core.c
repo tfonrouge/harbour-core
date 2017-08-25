@@ -14,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -50,11 +50,10 @@
    #define __STDINT_H
 #endif
 
-#include "hbapi.h"
+#include "hbrddsql.h"
+
 #include "hbapiitm.h"
 #include "hbvm.h"
-
-#include "hbrddsql.h"
 
 #include "ibase.h"
 
@@ -292,7 +291,7 @@ static HB_ERRCODE fbOpen( SQLBASEAREAP pArea )
       int iType;
 
       /* FIXME: if pVar->sqlname is ended with 0 byte then this hb_strndup()
-       *        and hb_xfree() bewlow is redundant and
+       *        and hb_xfree() below is redundant and
        *          dbFieldInfo.atomName = pVar->sqlname;
        *        is enough.
        */

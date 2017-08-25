@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -86,8 +86,8 @@
 
 /* Windows registry key types in win_regWrite()/win_regSet()/win_regSetValueEx() functions */
 #define WIN_REG_NONE                       0   /* No value type */
-#define WIN_REG_SZ                         1   /* Unicode nul terminated string */
-#define WIN_REG_EXPAND_SZ                  2   /* Unicode nul terminated string (with environment variable references) */
+#define WIN_REG_SZ                         1   /* Unicode NUL terminated string */
+#define WIN_REG_EXPAND_SZ                  2   /* Unicode NUL terminated string (with environment variable references) */
 #define WIN_REG_BINARY                     3   /* Free form binary */
 #define WIN_REG_DWORD                      4   /* 32-bit number */
 #define WIN_REG_DWORD_LITTLE_ENDIAN        4   /* 32-bit number (same as REG_DWORD) */
@@ -126,7 +126,7 @@
 #define WIN_MARKPARITY                     3
 #define WIN_SPACEPARITY                    4
 
-/* win_comOpen() stopbit modes */
+/* win_comOpen() stop-bit modes */
 #define WIN_ONESTOPBIT                     0
 #define WIN_ONE5STOPBITS                   1
 #define WIN_TWOSTOPBITS                    2

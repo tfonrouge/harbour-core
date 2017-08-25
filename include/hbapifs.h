@@ -14,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -81,7 +81,7 @@ HB_EXTERN_BEGIN
 #define FXO_COPYNAME  0x8000        /* copy final szPath into pszFileName */
 
 /* these definitions should be cleared,
- * now they only help to clean lower level code
+ * now they only help to clean lower-level code
  */
 #define HB_FA_FIFO            HB_FA_TEMPORARY   /* S_ISFIFO() */
 #define HB_FA_FILE            HB_FA_ARCHIVE     /* S_ISREG() */
@@ -135,14 +135,14 @@ extern HB_EXPORT int        hb_fsCurDrv      ( void ); /* retrieve current drive
 extern HB_EXPORT HB_BOOL    hb_fsDelete      ( const char * pszFileName ); /* delete a file */
 extern HB_EXPORT HB_BOOL    hb_fsEof         ( HB_FHANDLE hFileHandle ); /* determine if an open file is position at end-of-file */
 extern HB_EXPORT HB_ERRCODE hb_fsError       ( void ); /* retrieve file system error */
-extern HB_EXPORT HB_ERRCODE hb_fsOsError     ( void ); /* retrieve system dependant file system error */
+extern HB_EXPORT HB_ERRCODE hb_fsOsError     ( void ); /* retrieve system dependent file system error */
 extern HB_EXPORT HB_BOOL    hb_fsFile        ( const char * pszFileName ); /* determine if a file exists */
 extern HB_EXPORT HB_BOOL    hb_fsIsDirectory ( const char * pszFileName );
 extern HB_EXPORT HB_FOFFSET hb_fsFSize       ( const char * pszFileName, HB_BOOL bUseDirEntry ); /* determine the size of a file */
 extern HB_EXPORT HB_FHANDLE hb_fsExtOpen     ( const char * pszFileName, const char * pDefExt,
                                                HB_FATTR nFlags, const char * pPaths, PHB_ITEM pError ); /* open a file using default extension and a list of paths */
 extern HB_EXPORT char *     hb_fsExtName     ( const char * pszFileName, const char * pDefExt,
-                                               HB_FATTR nExFlags, const char * pPaths ); /* convert file name for hb_fsExtOpen, caller must free the returned buffer */
+                                               HB_FATTR nExFlags, const char * pPaths ); /* convert file name for hb_fsExtOpen(), caller must free the returned buffer */
 extern HB_EXPORT HB_ERRCODE hb_fsIsDrv       ( int iDrive ); /* determine if a drive number is a valid drive */
 extern HB_EXPORT HB_BOOL    hb_fsIsDevice    ( HB_FHANDLE hFileHandle ); /* determine if a file is attached to a device (console?) */
 extern HB_EXPORT HB_BOOL    hb_fsLock        ( HB_FHANDLE hFileHandle, HB_ULONG ulStart, HB_ULONG ulLength, HB_USHORT uiMode ); /* request a lock on a portion of a file */
@@ -196,7 +196,7 @@ extern HB_EXPORT HB_BOOL    hb_fsLinkSym     ( const char * pszTarget, const cha
 extern HB_EXPORT char *     hb_fsLinkRead    ( const char * pszFileName ); /* returns the link pointed to */
 
 #if defined( HB_OS_UNIX ) || defined( __DJGPP__ )
-/* for POSIX systems only, hides low level select()/poll() access,
+/* for POSIX systems only, hides low-level select()/poll() access,
    intentionally covered by HB_OS_UNIX / __DJGPP__ macros to generate
    compile time error in code which tries to use it on other platforms */
 

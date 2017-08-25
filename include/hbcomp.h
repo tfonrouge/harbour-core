@@ -14,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -47,8 +47,8 @@
 #ifndef HB_COMP_H_
 #define HB_COMP_H_
 
-#include "hbmacro.ch"
 #include "hbapi.h"
+#include "hbmacro.ch"
 #include "hberrors.h"
 #include "hbpp.h"
 #include "hbmacro.h"
@@ -116,7 +116,7 @@ extern void hb_compParserRun( HB_COMP_DECL );
 #define HB_FUNF_WITH_RETURN       0x0020   /* there was RETURN statement in previous line */
 #define HB_FUNF_EXTBLOCK          0x0040   /* it's extended codeblock */
 #define HB_FUNF_FILE_DECL         0x0080   /* pseudo function with file wide declarations */
-#define HB_FUNF_FILE_FIRST        0x0100   /* 1-st real or pseudo function in compiled .prg module */
+#define HB_FUNF_FILE_FIRST        0x0100   /* 1st real or pseudo function in compiled .prg module */
 #define HB_FUNF_ATTACHED          0x0200   /* function attached to function list */
 
 extern               void         hb_compFunctionAdd( HB_COMP_DECL, const char * szFunName, HB_SYMBOLSCOPE cScope, int iType ); /* starts a new Clipper language function definition */
@@ -358,11 +358,11 @@ extern const HB_BYTE hb_comp_pcode_len[];
 */
 #define HB_COMPFLAG_HARBOUR      HB_SM_HARBOUR     /* 1 -kh */
 #define HB_COMPFLAG_XBASE        HB_SM_XBASE       /* 2 -kx */
-#define HB_COMPFLAG_SHORTCUTS    HB_SM_SHORTCUTS   /* 8 -z enable sortcuts for logical operators */
+#define HB_COMPFLAG_SHORTCUTS    HB_SM_SHORTCUTS   /* 8 -z enable shortcuts for logical operators */
 #define HB_COMPFLAG_ARRSTR       HB_SM_ARRSTR      /* 16 -ks strings as array of bytes */
 #define HB_COMPFLAG_EXTOPT       HB_SM_EXTOPT      /* 32 -ko Cl*pper incompatible optimizations */
 #define HB_COMPFLAG_RT_MACRO     HB_SM_RT_MACRO    /* 64 -kr */
-#define HB_COMPFLAG_OPTJUMP      0x0100            /* -kj turn off jump optimalization */
+#define HB_COMPFLAG_OPTJUMP      0x0100            /* -kj turn off jump optimization */
 #define HB_COMPFLAG_HB_INLINE    0x0200            /* -ki hb_inLine(...) { ... } support */
 #define HB_COMPFLAG_MACROTEXT    0x0400            /* -kM turn off macrotext substitution */
 #define HB_COMPFLAG_USERCP       0x0800            /* -ku strings in user encoding */

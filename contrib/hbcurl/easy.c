@@ -16,9 +16,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -1896,7 +1896,7 @@ HB_FUNC( CURL_EASY_SETOPT )
                res = curl_easy_setopt( hb_curl->curl, CURLOPT_SSH_AUTH_TYPES, hb_parnl( 3 ) );
                break;
 #endif
-#if LIBCURL_VERSION_NUM >= 0x073800
+#if LIBCURL_VERSION_NUM >= 0x073800 || defined( HB_CURL_SSH_COMPR )
             case HB_CURLOPT_SSH_COMPRESSION:
                res = curl_easy_setopt( hb_curl->curl, CURLOPT_SSH_COMPRESSION, HB_CURL_OPT_BOOL( 3 ) );
                break;

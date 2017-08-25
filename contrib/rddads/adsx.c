@@ -14,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -44,17 +44,16 @@
  *
  */
 
-#include "hbdefs.h"
-#include "hbapi.h"
+#include "rddads.h"
+
 #include "hbinit.h"
-#include "hbapiitm.h"
 #include "hbapierr.h"
 #include "hbdbferr.h"
 #include "hbapilng.h"
 #include "hbdate.h"
-#include "rddads.h"
 #include "hbset.h"
 #include "hbvm.h"
+
 #include "rddsys.ch"
 
 #ifndef SUPER_ORDDESTROY
@@ -94,7 +93,7 @@ typedef struct _MIXTAG
    HB_ULONG  ulRecMax;
    HB_ULONG  ulRecCount;
 
-   PHB_CODEPAGE pCodepage;      /* National sorttable for character key tags, NULL otherwise */
+   PHB_CODEPAGE pCodepage;      /* National sort table for character key tags, NULL otherwise */
 
    HB_ULONG ulKeyNo;
 } MIXTAG, * PMIXTAG;
@@ -409,7 +408,7 @@ static PMIXTAG mixTagCreate( const char * szTagName, PHB_ITEM pKeyExpr, PHB_ITEM
    pTag->szKeyExpr = ( char * ) hb_xgrab( hb_itemGetCLen( pKeyExpr ) + 1 );
    hb_strncpyTrim( pTag->szKeyExpr, hb_itemGetCPtr( pKeyExpr ), hb_itemGetCLen( pKeyExpr ) );
 
-   /* TODO: for expresion */
+   /* TODO: for expression */
    pTag->szForExpr = NULL;
 
    pTag->pKeyItem = pKeyItem;

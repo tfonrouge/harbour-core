@@ -24,9 +24,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -1569,10 +1569,10 @@ static void hb_wvg_RenderPicture( PHB_GTWVT pWVT, PHB_GOBJS gObj, int iLeft, int
 
 /* wvg_Object( nObj, bBlock )
    nObj == one of the objects == GOBJ_OBJTYPE_ROUNDRECT | GOBJ_OBJTYPE_IMAGE | etc
-   bBlock == Block returning the array conataining as many elements as necessary for the given object
+   bBlock == Block returning the array containing as many elements as necessary for the given object
              Also it will return those array elements in the same order expected by the object to draw
 
-   This protocol is necessary for dyanamic coordinates which might have been changed by the
+   This protocol is necessary for dynamic coordinates which might have been changed by the
    applications, like TBrowse dimensions.
 
    wvg_Object( GOBJ_OBJTYPE_BOXRAISED, {|| { oBrw:nTop, oBrw:nLeft, oBrw:nBottom, oBrw:nRight, {-2,-2,2,2} } } )

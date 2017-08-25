@@ -6,6 +6,8 @@
 # ---------------------------------------------------------------
 
 # - Requires '[PACKAGE]_VER' and '[PACKAGE]_HASH_[32|64]' envvars
+# - Requires bash extensions for curly brace expansion, but using
+#   'sh' anyway to stay in POSIX shell mode with shellcheck.
 
 case "$(uname)" in
   *_NT*)   readonly os='win';;
@@ -64,13 +66,16 @@ set | grep '_VER='
 set -e
 
 alias curl='curl -fsS --connect-timeout 15 --retry 3'
-alias gpg='gpg --batch --keyserver-options timeout=15 --keyid-format LONG'
+alias gpg='gpg --batch --keyid-format LONG'
 
 gpg_recv_keys() {
   req="pks/lookup?search=0x$1&op=get"
-  if ! curl "https://pgp.mit.edu/${req}" | gpg --import --status-fd 1; then
-    curl "https://sks-keyservers.net/${req}" | gpg --import --status-fd 1
-  fi
+  (
+    set -x
+    if ! curl "https://pgp.mit.edu/${req}" | gpg --import --status-fd 1; then
+      curl "https://sks-keyservers.net/${req}" | gpg --import --status-fd 1
+    fi
+  )
 }
 
 gpg --version | grep gpg
@@ -110,6 +115,12 @@ if [ "${_BRANC4}" != 'msvc' ]; then
       'curl' \
     ; do
       test=''
+      # Temporary hack to enable a custom libcurl patch (3/3)
+      if [ "${_BRANCH#*prod*}" != "${_BRANCH}" ] && \
+         [ "${name}" = 'curl' ]; then
+        test='-test'
+        echo "! Mod: Switching to curl-test (download)"
+      fi
       if [ ! -d "${name}-mingw${plat}" ]; then
         eval ver="\$$(echo "${name}" | tr '[:lower:]' '[:upper:]' 2> /dev/null)_VER"
         eval hash="\$$(echo "${name}" | tr '[:lower:]' '[:upper:]' 2> /dev/null)_HASH_${plat}"

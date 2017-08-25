@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -73,7 +73,7 @@
    #define HB_OLE_NO_SAFEARRAYGETVARTYPE
 #endif
 
-/* base date value in OLE (1899-12-30) as julian day */
+/* base date value in OLE (1899-12-30) as Julian day */
 #define HB_OLE_DATE_BASE  0x0024D9AB
 
 static PHB_DYNS s_pDyns_hb_oleauto;
@@ -1206,7 +1206,7 @@ void hb_oleDispatchToItem( PHB_ITEM pItem, IDispatch * pdispVal, HB_USHORT uiCla
          hb_vmRequestRestore();
 
          /* We should store object to pItem after hb_vmRequestRestore(),
-          * because pItem actualy can be stack's return item!
+          * because pItem actually can be stack's return item!
           */
          hb_itemMove( pItem, pObject );
          hb_itemRelease( pObject );
@@ -1334,7 +1334,7 @@ void hb_oleVariantToItemEx( PHB_ITEM pItem, VARIANT * pVariant, HB_USHORT uiClas
          break;
 
       case VT_UI8:
-         /* TODO: sign is lost. Convertion to double will lose significant digits. */
+         /* TODO: sign is lost. Conversion to double will lose significant digits. */
 #if HB_VMLONG_MAX == INT32_MAX || defined( HB_LONG_LONG_OFF )
          hb_itemPutNInt( pItem, ( HB_MAXINT ) V_UI4( pVariant ) );
 #elif defined( HB_OLE_NO_LL )
@@ -1346,7 +1346,7 @@ void hb_oleVariantToItemEx( PHB_ITEM pItem, VARIANT * pVariant, HB_USHORT uiClas
          break;
 
       case VT_UI8 | VT_BYREF:
-         /* TODO: sign is lost. Convertion to double will lose significant digits. */
+         /* TODO: sign is lost. Conversion to double will lose significant digits. */
 #if HB_VMLONG_MAX == INT32_MAX || defined( HB_LONG_LONG_OFF )
          hb_itemPutNInt( pItem, ( HB_MAXINT ) *V_UI4REF( pVariant ) );
 #elif defined( HB_OLE_NO_LLREF )

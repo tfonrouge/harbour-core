@@ -16,7 +16,7 @@
  * Copyright 1999 David G. Holm <dholm@jsd-llc.com>
  *    hb_gt_Tone()
  *
- * Copyright 2003-2004 Giancarlo Niccolai <gc at niccolai dot ws>
+ * Copyright 2003-2004 Giancarlo Niccolai <gc@niccolai.ws>
  *         Standard xplatform GT Info system,
  *         Graphical object system and event system.
  *         hb_gtInfo() And GTO_* implementation.
@@ -26,18 +26,18 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option )
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.   If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/ ).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -55,7 +55,7 @@
  * Project under the name Harbour.  If you copy code from other
  * Harbour Project or Free Software Foundation releases into a copy of
  * Harbour, as the General Public License permits, the exception does
- * not apply to the code that you add in this way.   To avoid misleading
+ * not apply to the code that you add in this way.  To avoid misleading
  * anyone as to the status of such modified files, you must delete
  * this exception notice from them.
  *
@@ -315,7 +315,7 @@ static PHB_GTWVT hb_gt_wvt_New( PHB_GT pGT, HINSTANCE hInstance, int iCmdShow )
    pWVT->COLORS[ 14 ]      = YELLOW;
    pWVT->COLORS[ 15 ]      = WHITE;
 
-   /* THESE are the default font parameters, if not changed by user */
+   /* These are the default font parameters, if not changed by user */
    pWVT->PTEXTSIZE.x       = WVT_DEFAULT_FONT_WIDTH;
    pWVT->PTEXTSIZE.y       = WVT_DEFAULT_FONT_HEIGHT;
    pWVT->fontWidth         = WVT_DEFAULT_FONT_WIDTH;
@@ -1826,7 +1826,7 @@ static void hb_gt_wvt_FitSize( PHB_GTWVT pWVT )
             else
             {
                /* I did it this way, so that "Courier New" would size and maximize as expected.
-                * "Courier New"  appears to not scale linearily, sometimes by just decreasing the
+                * "Courier New"  appears to not scale linearly, sometimes by just decreasing the
                 * font width by one with some font heights makes it all work out?
                 * This code never seems to get executed with "Lucida Console"
                 * Width scaling with some Heights is an issue with Courier New and Terminal
@@ -2787,7 +2787,7 @@ static HB_BOOL hb_gt_wvt_KeyEvent( PHB_GTWVT pWVT, UINT message, WPARAM wParam, 
 }
 
 /*
- * hb_gt_wvt_TextOut converts col and row to x and y ( pixels ) and calls
+ * Convert col and row to x and y ( pixels ) and calls
  * the Windows function TextOut with the expected coordinates
  */
 static void hb_gt_wvt_TextOut( PHB_GTWVT pWVT, HDC hdc, int col, int row, int iColor, LPCTSTR lpString, UINT cbString )

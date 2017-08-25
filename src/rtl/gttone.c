@@ -1,5 +1,5 @@
 /*
- * Low level tone code common to some GT drivers
+ * Low-level tone code common to some GT drivers
  *
  * Copyright 2006 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  *
@@ -21,9 +21,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -228,7 +228,7 @@ void hb_gt_winapi_tone( double dFrequency, double dDuration )
 
    /*
     * According to the Clipper NG, the duration in 'ticks' is truncated to the
-    * interger portion  ... Depending on the platform, Harbour allows a finer
+    * integer portion  ... Depending on the platform, Harbour allows a finer
     * resolution, but the minimum is 1 tick (for compatibility)
     */
    /* Convert from ticks to seconds */

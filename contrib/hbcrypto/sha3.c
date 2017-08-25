@@ -31,9 +31,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file LICENSE.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -81,7 +81,7 @@
 
    The drawbacks of this implementation are:
     - There is no message queue. The whole message must be ready in a buffer.
-    - It is not optimized for peformance.
+    - It is not optimized for performance.
 
    For a more complete set of implementations, please refer to
    the Keccak Code Package at https://github.com/gvanas/KeccakCodePackage

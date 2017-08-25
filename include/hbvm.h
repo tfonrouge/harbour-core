@@ -14,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -77,7 +77,7 @@ extern HB_EXPORT PHB_SYMB hb_vmProcessDynLibSymbols( PHB_SYMB pSymbols, HB_USHOR
    {
       PHB_SYMB  pModuleSymbols;     /* pointer to module symbol table */
       HB_USHORT uiModuleSymbols;    /* number of symbols on that table */
-      HB_USHORT uiStaticsOffset;    /* ofset of statics base symbol */
+      HB_USHORT uiStaticsOffset;    /* offset of statics base symbol */
       struct _HB_SYMBOLS * pNext;   /* pointer to the next SYMBOLS structure */
       HB_SYMBOLSCOPE hScope;        /* scope collected from all symbols in module used to speed initialization code */
       void *    hDynLib;            /* handler to dynamic library */
@@ -135,7 +135,7 @@ extern HB_EXPORT HB_BOOL   hb_vmIsReady( void );
 #define HB_BREAK_REQUESTED    2     /* break to nearest RECOVER/END sequence */
 #define HB_ENDPROC_REQUESTED  4     /* immediately return from procedure (error handler in macro evaluation) */
 #ifdef _HB_API_INTERNAL_
-#define HB_VMSTACK_REQUESTED  0x100 /* inetrnel flag to signal thread local stack */
+#define HB_VMSTACK_REQUESTED  0x100 /* internal flag to signal thread local stack */
 #endif
 
 /* Public PCode functions */

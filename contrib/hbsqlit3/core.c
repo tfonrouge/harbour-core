@@ -1,5 +1,5 @@
 /*
- * SQLite3 library low level (client api) interface code
+ * SQLite3 library low-level (client API) interface code
  *
  * Copyright 2007-2010 P.Chornyj <myorg63@mail.ru>
  *
@@ -14,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -46,8 +46,8 @@
 
 #include "sqlite3.h"
 
-#include "hbvm.h"
 #include "hbapi.h"
+#include "hbvm.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
 #include "hbapifs.h"
@@ -246,7 +246,7 @@ static void * hb_sqlite3_param( int iParam, int iType, HB_BOOL fError )
 }
 
 /**
-   Callbacs helpers:
+   Callback helpers:
       Compile-Time Authorization Callback
       A Callback To Handle SQLITE_BUSY Errors
       Query Progress Callbacks
@@ -2146,7 +2146,7 @@ HB_FUNC( SQLITE3_MEMORY_HIGHWATER )
 }
 
 /**
-   Test To See If The Library Is Threadsafe
+   Test to see if the library is thread-safe
 
    sqlite3_threadsafe() --> nResult
  */

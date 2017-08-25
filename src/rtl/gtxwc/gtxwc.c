@@ -11,13 +11,13 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.   If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -35,7 +35,7 @@
  * Project under the name Harbour.  If you copy code from other
  * Harbour Project or Free Software Foundation releases into a copy of
  * Harbour, as the General Public License permits, the exception does
- * not apply to the code that you add in this way.   To avoid misleading
+ * not apply to the code that you add in this way.  To avoid misleading
  * anyone as to the status of such modified files, you must delete
  * this exception notice from them.
  *
@@ -2939,7 +2939,7 @@ static void hb_gt_xwc_ProcessKey( PXWND_DEF wnd, XKeyEvent * evt )
       if( i <= 0 )
       {
          /*
-          * This is a temporary hack for Latin-x input see gt_SetKeyCP
+          * This is a temporary hack for Latin-x input see gt_SetKeyCP()
           */
          if( outISO >= 0x0100 && outISO <= 0x0fff && ( outISO & 0x80 ) == 0x80 )
          {
@@ -3525,7 +3525,7 @@ static void hb_gt_xwc_WndProc( PXWND_DEF wnd, XEvent * evt )
  */
 
 /* *********************************************************************** */
-/* collor allocation */
+/* color allocation */
 static int hb_gt_xwc_GetColormapSize( PXWND_DEF wnd )
 {
    XVisualInfo visInfo, *visInfoPtr;
@@ -4685,7 +4685,7 @@ static void hb_gt_xwc_DissConnectX( PXWND_DEF wnd )
       wnd->dpy = NULL;
 
       /* Hack to avoid race condition inside some XLIB library - it looks
-       * in heavy stres MT tests that it can receive some events bound with
+       * in heavy stress MT tests that it can receive some events bound with
        * destroyed objects and executes our error handler.
        */
       s_fIgnoreErrors = HB_TRUE;
@@ -4727,7 +4727,7 @@ static void hb_gt_xwc_SetResizing( PXWND_DEF wnd )
 
    /* with StaticGravity XMoveWindow expects upper left corner of client area
     * and with NorthWestGravity it expect upper left corner of window with
-    * frame and title bar. ConfigureNotify always returns client area possition
+    * frame and title bar. ConfigureNotify always returns client area position
     * so working with NorthWestGravity it's necessary to update cords returned
     * to user in hb_gt_xwc_UpdateWindowCords()
     */

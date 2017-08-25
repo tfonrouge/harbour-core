@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -344,7 +344,7 @@ HB_FUNC( AMQP_SSL_SOCKET_SET_VERIFY_HOSTNAME )
       hb_errRT_BASE( EG_ARG, 2030, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
-/* Attempts to open a socket to hostname on portnumber
+/* Attempts to open a socket to hostname on port number
    amqp_socket_open( pSocket, cHost, nPort ) --> nStatus */
 HB_FUNC( AMQP_SOCKET_OPEN )
 {

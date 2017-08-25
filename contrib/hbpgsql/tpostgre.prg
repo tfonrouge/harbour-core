@@ -1,5 +1,5 @@
 /*
- * PostgreSQL RDBMS low level (client api) interface code.
+ * PostgreSQL RDBMS low-level (client API) interface code.
  *
  * Copyright 2003 Rodrigo Moreno rodrigo_moreno@yahoo.com
  *
@@ -14,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -300,7 +300,7 @@ METHOD TableStruct( cTable ) CLASS TPQserver
             /* Postgres doesn't store ".", but .dbf does, it can cause data width problem */
             nSize := Val( nSize ) + iif( nDec > 0, 1, 0 )
 
-            /* Numeric/Decimal without scale/precision can genarete big values, so, i limit this to 10,5 */
+            /* Numeric/Decimal without scale/precision can generate big values, so, I limit this to 10,5 */
 
             IF nDec > 100
                nDec := 5
@@ -602,7 +602,7 @@ METHOD Refresh( lQuery, lMeta ) CLASS TPQquery
                   /* Postgres don't store ".", but .dbf does, it can cause data width problem */
                   IF nDec > 0
                      nSize++
-                     /* Numeric/Decimal without scale/precision can genarete big values, so, i limit this to 10,5 */
+                     /* Numeric/Decimal without scale/precision can generate big values, so, I limit this to 10,5 */
                      IF nDec > 100
                         nDec := 5
                      ENDIF
@@ -667,7 +667,7 @@ METHOD Refresh( lQuery, lMeta ) CLASS TPQquery
                   nSize := 19
 
                OTHERWISE
-                  /* Unsuported */
+                  /* Unsupported */
                   cType := "K"
                ENDCASE
 

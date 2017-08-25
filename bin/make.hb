@@ -19,9 +19,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA (or visit
- * their website at https://www.gnu.org/).
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * (or visit their website at https://www.gnu.org/licenses/).
  *
  */
 
@@ -141,7 +141,7 @@ STATIC PROCEDURE BuildSingle( aParams, hProjectList )
 
    LOCAL lPassThrough_hbmk2 := .F.
 
-   /* Processing cmdline options */
+   /* Processing command-line options */
 
    DO CASE
    CASE AScanL( aParams, "clean" ) > 0 .AND. ;

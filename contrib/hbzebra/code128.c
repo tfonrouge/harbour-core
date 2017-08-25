@@ -14,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -45,8 +45,6 @@
  */
 
 #include "hbzebra.h"
-#include "hbapiitm.h"
-#include "hbapierr.h"
 
 
 static const unsigned short s_code[] = {
@@ -254,7 +252,7 @@ PHB_ZEBRA hb_zebra_create_code128( const char * szCode, HB_SIZE nLen, int iFlags
 
    /* encode source data */
    /* Warning: digit optimizer works in optimal way with this encoder code. Be careful
-      if you'll change encoder code, digit optimizer canm require adjustment also [Mindaugas] */
+      if you'll change encoder code, digit optimizer can require adjustment also [Mindaugas] */
    for( i = 0; i < iLen; i++ )
    {
       int iCode = _code128_charno( szCode[ i ], iCodeSet );

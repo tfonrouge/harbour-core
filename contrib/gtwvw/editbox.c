@@ -17,9 +17,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -663,8 +663,8 @@ HB_FUNC( WVW_EBISFOCUSED )
 /* wvw_ebEnable( [nWinNum], nEditId, [lEnable] )
  *  enable/disable editbox nEditId on window nWinNum
  * (lEnable defaults to .T., ie. enabling the editbox)
- *  return previous state of the editbox (TRUE:enabled FALSE:disabled)
- * (if nEditId is invalid, this function returns FALSE too)
+ *  return previous state of the editbox (.T.: enabled .F.: disabled)
+ * (if nEditId is invalid, this function returns .F. too)
  */
 HB_FUNC( WVW_EBENABLE )
 {
@@ -912,7 +912,7 @@ HB_FUNC( WVW_EBGETSEL )
  * the start selected text (0-based) is in nstart
  * the end selected text (0-based) is in nend
  * notes: nstart may be > nend (flipped selection)
- * notes: to selet all text: wvw_ebSetSel(nwinnum, nebid, 0, -1)
+ * notes: to select all text: wvw_ebSetSel(nwinnum, nebid, 0, -1)
  * returns .T. if operation successful
  * returns .F. if not (eg. nEBid not valid)
  */

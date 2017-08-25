@@ -14,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -126,9 +126,9 @@ typedef struct
    HPEN      penBlack;                      /* Black pen to draw GDI elements */
    HPEN      penWhiteDim;                   /* White dim pen to draw GDI elements */
    HPEN      penDarkGray;                   /* Dark gray pen to draw GDI elements */
-   HPEN      penGray;                       /* Gray pen equivilant to Clipper White */
+   HPEN      penGray;                       /* Gray pen equivalent to Clipper White */
    HPEN      penNull;                       /* Null pen */
-   HBRUSH    diagonalBrush;                 /* Handle to diaoganl brush to draw scrollbars */
+   HBRUSH    diagonalBrush;                 /* Handle to diagonal brush to draw scrollbars */
    HBRUSH    solidBrush;                    /* Handle to solid brush */
    HBRUSH    whiteBrush;                    /* Wvt specific White colored brush */
 #if ! defined( HB_OS_WIN_CE )
@@ -157,7 +157,7 @@ typedef struct
    COLORREF COLORS[ 16 ];                   /* colors */
 
    HB_BOOL  CaretExist;                     /* HB_TRUE if a caret has been created */
-   HB_BOOL  CaretHidden;                    /* HB_TRUE if a caret has been hiden */
+   HB_BOOL  CaretHidden;                    /* HB_TRUE if a caret has been hidden */
    int      CaretSize;                      /* Height of solid caret */
    int      CaretWidth;                     /* Width of solid caret */
 
@@ -202,7 +202,7 @@ typedef struct
    HB_BOOL  IgnoreWM_SYSCHAR;
 
    HB_BOOL  bMaximized;                     /* Flag is set when window has been maximized */
-   HB_BOOL  bBeingMarked;                   /* Flag to control DOS window like copy operation */
+   HB_BOOL  bBeingMarked;                   /* Flag to control CUI window like copy operation */
    HB_BOOL  bBeginMarked;
 
    HB_BOOL  bResizable;
@@ -280,7 +280,7 @@ typedef struct
    PHB_GT_PARAMS  pPP;                      /* Presentation Parameters */
 
    HB_BOOL   bDeferPaint;                   /* To create pure Windows dialogs */
-   HB_BOOL   bTracking;                     /* To track if mouse has eneter or left the window area */
+   HB_BOOL   bTracking;                     /* To track if mouse has entered or left the window area */
 
    HB_BOOL   bResizing;                     /* To know when it is in resizing mode */
    HB_BOOL   bAlreadySizing;

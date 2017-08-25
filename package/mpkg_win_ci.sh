@@ -5,6 +5,9 @@
 # See LICENSE.txt for licensing terms.
 # ---------------------------------------------------------------
 
+# - Requires bash extensions for curly brace expansion, but using
+#   'sh' anyway to stay in POSIX shell mode with shellcheck.
+
 [ -n "${CI}" ] || [ "$1" = '--force' ] || exit
 
 cd "$(dirname "$0")/.." || exit
@@ -27,19 +30,26 @@ _ROOT="$(realpath '.')"
 
 # Don't remove these markers.
 #hashbegin
-export NGHTTP2_VER='1.24.0'
-export NGHTTP2_HASH_32='d9dfe4fd7ce5a8b12fb7e7d0d82027b077ab068dfac7cede80c61a805517ecd0'
-export NGHTTP2_HASH_64='48791792e6254b1045f8385ecf88c3f18f5eeed2820ec26d790f06b108f90bdd'
+export NGHTTP2_VER='1.25.0'
+export NGHTTP2_HASH_32='f31df4a1cda9455b93e53734aa5cc0e8a7bd258b897fa8cb6f2095cb9992b7d7'
+export NGHTTP2_HASH_64='19c0d29a04f4a1b50696c9088c15811e71ec15d8e69dcbcbbb451e05c27826ce'
 export OPENSSL_VER='1.1.0f'
-export OPENSSL_HASH_32='d58ca17ebf2f7733593fc33a9b77ae9d1511984031ca8facca2658c08f91c993'
-export OPENSSL_HASH_64='e4dae139479565470f759417974203e63c09030e437052cc0b097aadeb70ffdd'
+export OPENSSL_HASH_32='04e359aade8c14ac73bbadf1d8e390d2a5e69a0ddfd0552310a3f7e48bf00eef'
+export OPENSSL_HASH_64='c9bf2cf76b481ab74a78578ac14e4bd50824d5c3d1fb584421a8b0be8fadf597'
 export LIBSSH2_VER='1.8.0'
-export LIBSSH2_HASH_32='f56a11c0c1cd4f0bd567c8ef3fb1c56e95fba8aa81f3a054fbdc033a45f4c4e5'
-export LIBSSH2_HASH_64='48dbb1fb065e5c607003c7fd053f065a2062a546a7e8aeae0262103dc7d8a4c6'
-export CURL_VER='7.55.0'
-export CURL_HASH_32='cb135ce703708d3e4ae026219e2de69010036130d158bd718aace8903151ec7e'
-export CURL_HASH_64='43868d2bfd3b2aaeb51e0142077442ffbd092a56e395576317439c2875297426'
+export LIBSSH2_HASH_32='90230033ad8bc11b628502a623e32e1cdff60e2cf462caf0868d4907abab36c0'
+export LIBSSH2_HASH_64='e0fd25199a3fd3075e50f913eb22171e201ebc8d01309f2f4d0913ab688bbf07'
+export CURL_VER='7.55.1'
+export CURL_HASH_32='37923f7c5cc3061967925fd06c8f9ea796e22b1751696a3bc6c378f9759cd562'
+export CURL_HASH_64='50fc0fda8487b56854884585b27d6453877d4aa2984eb9743a2a581fcb285bbc'
 #hashend
+
+# Temporary hack to enable a custom libcurl patch (1/3)
+if [ "${_BRANCH#*prod*}" != "${_BRANCH}" ]; then
+  CURL_HASH_32='5e4dee7c30c2101f7ec845d11e68f875249ce274beb980a97faade005569d6d0'
+  CURL_HASH_64='12d4caa79ce59a5d1c3fcdbc3177b102374435638667fcc1d3f6e53a46b6bc95'
+  echo "! Mod: Switching to curl-test (hashes)"
+fi
 
 # Install/update MSYS2 packages required for completing the build
 
@@ -102,6 +112,12 @@ unset HB_USER_LDFLAGS
 unset HB_USER_DFLAGS
 
 _HB_USER_CFLAGS=''
+
+# Temporary hack to enable a custom libcurl patch (2/3)
+if [ "${_BRANCH#*prod*}" != "${_BRANCH}" ]; then
+  _HB_USER_CFLAGS="${_HB_USER_CFLAGS} -DHB_CURL_SSH_COMPR"
+  echo "! Mod: Switching to curl-test (CFLAGS: -DHB_CURL_SSH_COMPR)"
+fi
 
 [ "${_BRANCH#*prod*}" != "${_BRANCH}" ] && export HB_BUILD_CONTRIBS='hbrun hbdoc hbformat/utils hbct hbcurl hbhpdf hbmzip hbwin hbtip hbssl hbexpat hbmemio rddsql hbzebra sddodbc hbunix hbmisc hbcups hbtest hbtcpio hbcomio hbcrypto hbnetio hbpipeio hbgzio hbbz2io hbicu'
 export HB_BUILD_STRIP='bin'
@@ -307,7 +323,8 @@ if [ "${_BRANC4}" = 'msvc' ]; then
   [ "${_BRANCH}" = 'msvc2012' ] && _VCVARSALL=' 11.0\VC'
   [ "${_BRANCH}" = 'msvc2013' ] && _VCVARSALL=' 12.0\VC'
   [ "${_BRANCH}" = 'msvc2015' ] && _VCVARSALL=' 14.0\VC'
-  [ "${_BRANCH}" = 'msvc2017' ] && _VCVARSALL='\2017\Community\VC\Auxiliary\Build'
+  # Assume '\<YYYY>\Community\VC\Auxiliary\Build' for anything newer:
+  [ -z "${_VCVARSALL}" ] && _VCVARSALL="\\$(echo "${_BRANCH}" | cut -c 5-8)\Community\VC\Auxiliary\Build"
 
   export _VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio${_VCVARSALL}\vcvarsall.bat"
 

@@ -17,9 +17,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -264,7 +264,7 @@ static int hb_gt_wvw_GetFontDialogUnits( HWND hWnd, HFONT hFont )
  *         nIndex : index of the selected list item (0 based)
  * nListLines: number of lines for list items, default = 3
  *            (will be automatically truncated if it's > Len(aText))
- * nReserved: reserved for future (this parm is now ignored)
+ * nReserved: reserved for future (this parameter is now ignored)
  *
  * nKbdType: WVW_CB_KBD_STANDARD (0): similar to standard windows convention
  *            ENTER/ESC: will kill focus from combobox
@@ -491,8 +491,8 @@ HB_FUNC( WVW_CBISFOCUSED )
 /* wvw_cbEnable( [nWinNum], nComboId, [lEnable] )
  * enable/disable button nComboId on window nWinNum
  *(lEnable defaults to .T., ie. enabling the combobox)
- * return previous state of the combobox (TRUE:enabled FALSE:disabled)
- *(if nComboId is invalid, this function returns FALSE too)
+ * return previous state of the combobox (.T.: enabled .F.: disabled)
+ *(if nComboId is invalid, this function returns .F. too)
  */
 HB_FUNC( WVW_CBENABLE )
 {

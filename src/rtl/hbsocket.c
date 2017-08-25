@@ -14,9 +14,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -2824,8 +2824,8 @@ int hb_socketSetNoDelay( HB_SOCKET sd, HB_BOOL fNoDelay )
 
 #if defined( TCP_NODELAY )
    /*
-    * Turn off the nagle algorithm for the specified socket.
-    * The nagle algorithm says that we should delay sending
+    * Turn off the Nagle algorithm for the specified socket.
+    * The Nagle algorithm says that we should delay sending
     * partial packets in the hopes of getting more data.
     * There are bad interactions between persistent connections and
     * Nagle's algorithm that have severe performance penalties.
@@ -3555,7 +3555,7 @@ PHB_ITEM hb_socketGetHosts( const char * szAddr, int af )
 
       hb_vmUnlock();
 
-      /* gethostbyname() in Windows and OS2 does not accept direct IP
+      /* gethostbyname() in Windows and OS/2 does not accept direct IP
        * addresses
        */
 #if ( defined( HB_OS_WIN ) || defined( HB_OS_OS2 ) ) && \

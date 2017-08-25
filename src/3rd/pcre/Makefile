@@ -31,7 +31,7 @@ C_SOURCES := \
 ifneq ($(HB_HAS_PCRE_LOCAL),)
 
    HB_CFLAGS += -DSUPPORT_UTF -DSUPPORT_UCP
-   # only needed for win/wce, for other platforms this is noop
+   # only needed for win/wce, for other platforms this is no-op
    HB_CFLAGS_STA := -DPCRE_STATIC
 
    ifneq ($(filter $(HB_COMPILER),clang gcc mingw mingw64 sunpro),)
@@ -50,12 +50,6 @@ ifneq ($(HB_HAS_PCRE_LOCAL),)
          endif
       else
          HB_CFLAGS += -xbuiltin=%none
-      endif
-   endif
-
-   ifneq ($(filter $(HB_COMPILER),msvc msvc64 msvcia64 msvcarm),)
-      ifeq ($(filter $(HB_COMPILER_VER),1200 1300 1310 1400 1500 1600),)
-         HB_CFLAGS += -w14146 -w14308 -w14532 -w14533 -w14700 -w14703 -w14789 -w14995 -w14996
       endif
    endif
 

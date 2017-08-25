@@ -15,9 +15,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.txt.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site https://www.gnu.org/).
+ * along with this program; see the file LICENSE.txt.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA (or visit https://www.gnu.org/licenses/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -1342,7 +1342,7 @@ static int hb_compPCodeTraceAssignedUnused( PHB_HFUNC pFunc, HB_SIZE nPos, HB_BY
          if( hb_compPCodeTraceAssignedUnused( pFunc, nPos2, pMap, isLocal, fCanBreak ) )
             return 1;
       }
-      else if( pFunc->pCode[ nPos ] == HB_P_SWITCH ) /* Switch is multiplace jump */
+      else if( pFunc->pCode[ nPos ] == HB_P_SWITCH ) /* Switch is multi-place jump */
       {
          HB_USHORT us, usCount = HB_PCODE_MKUSHORT( pFunc->pCode + nPos + 1 );
 
@@ -1476,7 +1476,7 @@ static void hb_compPCodeEnumAssignedUnused( HB_COMP_DECL, PHB_HFUNC pFunc, PHB_O
                char szFun[ 256 ];
 
                /* FIXME: We calculate line number by simple tracking last HB_P_LINE,
-                  but it can work bad, if line number optimizator is clever enough.
+                  but it can work bad, if line number optimizer is clever enough.
                   To obtain real line number we need one more tree scan or other
                   algorithm. [Mindaugas] */
 
@@ -1600,7 +1600,7 @@ void hb_compPCodeTraceOptimizer( HB_COMP_DECL )
    PHB_HVAR      pVar;
    HB_USHORT     usLocalCount, usIndex;
 
-   /* Many (perhaps ALL) functions of pcode trace optimization dependes on pcodes.
+   /* Many (perhaps ALL) functions of pcode trace optimization depends on pcodes.
       Please, check these functions if new pcode is added, or existing changed.
       Special attention should be paid, if new pcode introduces branching, codeblocks,
       or are related to parameters, local variables. [Mindaugas] */
@@ -1619,7 +1619,7 @@ void hb_compPCodeTraceOptimizer( HB_COMP_DECL )
       return;
 
    /* FIXME: Support for PARAMETER sentence is not implemented.
-             The temporary solution is to disable optmisation at all if PARAMETER is used.  */
+             The temporary solution is to disable optimization at all if PARAMETER is used.  */
    {
       HB_SIZE nPos = 0;
 
