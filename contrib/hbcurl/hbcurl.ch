@@ -1,7 +1,7 @@
 /*
  * libcurl 'easy' API - Harbour header.
  *
- * Copyright 2008-2016 Viktor Szakats (vszakats.net/harbour)
+ * Copyright 2008-2017 Viktor Szakats (vszakats.net/harbour)
  * originally based on:
  * Copyright 2005 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
  *
@@ -65,17 +65,17 @@
 #define HB_CURLOPT_WRITEFUNCTION              11
 #define HB_CURLOPT_READFUNCTION               12
 #define HB_CURLOPT_TIMEOUT                    13
-#define HB_CURLOPT_INFILESIZE                 14
+#define HB_CURLOPT_INFILESIZE                 HB_CURLOPT_INFILESIZE_LARGE
 #define HB_CURLOPT_POSTFIELDS                 15
 #define HB_CURLOPT_REFERER                    16
 #define HB_CURLOPT_FTPPORT                    17
 #define HB_CURLOPT_USERAGENT                  18
 #define HB_CURLOPT_LOW_SPEED_LIMIT            19
 #define HB_CURLOPT_LOW_SPEED_TIME             20
-#define HB_CURLOPT_RESUME_FROM                21
+#define HB_CURLOPT_RESUME_FROM                HB_CURLOPT_RESUME_FROM_LARGE
 #define HB_CURLOPT_COOKIE                     22
 #define HB_CURLOPT_HTTPHEADER                 23
-#define HB_CURLOPT_HTTPPOST                   24
+#define HB_CURLOPT_HTTPPOST                   24  /* deprecated */
 #define HB_CURLOPT_SSLCERT                    25
 #define HB_CURLOPT_KEYPASSWD                  26
 #define HB_CURLOPT_SSLCERTPASSWD              HB_CURLOPT_KEYPASSWD
@@ -110,7 +110,7 @@
 #define HB_CURLOPT_PROGRESSDATA               57
 #define HB_CURLOPT_AUTOREFERER                58
 #define HB_CURLOPT_PROXYPORT                  59
-#define HB_CURLOPT_POSTFIELDSIZE              60
+#define HB_CURLOPT_POSTFIELDSIZE              HB_CURLOPT_POSTFIELDSIZE_LARGE
 #define HB_CURLOPT_HTTPPROXYTUNNEL            61
 #define HB_CURLOPT_INTERFACE                  62
 #define HB_CURLOPT_KRBLEVEL                   63
@@ -163,7 +163,7 @@
 #define HB_CURLOPT_PROXYAUTH                  111
 #define HB_CURLOPT_FTP_RESPONSE_TIMEOUT       112
 #define HB_CURLOPT_IPRESOLVE                  113
-#define HB_CURLOPT_MAXFILESIZE                114
+#define HB_CURLOPT_MAXFILESIZE                HB_CURLOPT_MAXFILESIZE_LARGE
 #define HB_CURLOPT_INFILESIZE_LARGE           115
 #define HB_CURLOPT_RESUME_FROM_LARGE          116
 #define HB_CURLOPT_MAXFILESIZE_LARGE          117
@@ -294,6 +294,7 @@
 #define HB_CURLOPT_REQUEST_TARGET             247
 #define HB_CURLOPT_SOCKS5_AUTH                248
 #define HB_CURLOPT_SSH_COMPRESSION            249
+#define HB_CURLOPT_MIMEPOST                   250
 #define HB_CURLOPT_DOWNLOAD                   1001  /* Harbour special ones */
 #define HB_CURLOPT_XFERINFOBLOCK              1002
 #define HB_CURLOPT_UL_FILE_SETUP              1003
@@ -304,8 +305,8 @@
 #define HB_CURLOPT_DL_BUFF_SETUP              1008
 #define HB_CURLOPT_DL_BUFF_GET                1009
 #define HB_CURLOPT_UL_NULL_SETUP              1010
-#define HB_CURLOPT_HTTPPOST_CONTENT           1013
-#define HB_CURLOPT_HTTPPOST_FORM              1014
+#define HB_CURLOPT_HTTPPOST_CONTENT           1013  /* deprecated */
+#define HB_CURLOPT_HTTPPOST_FORM              1014  /* deprecated */
 #define HB_CURLOPT_DEBUGBLOCK                 1015
 /* Compatibility ones. Please don't use these. */
 #define HB_CURLOPT_UL_FHANDLE_SETUP           HB_CURLOPT_UL_FILE_SETUP
@@ -648,11 +649,36 @@
 #define HB_CURLVERINFO_LIBSSH_VERSION         13
 #define HB_CURLVERINFO_LEN                    13
 
-/* HB_CURLOPT_HTTPPOST_FORM type */
+/* HB_CURLVERINFO_FEATURES bit positions. */
+#define HB_CURL_VERSION_IPV6                  hb_bitShift( 1, 0 )   /* IPv6-enabled */
+#define HB_CURL_VERSION_KERBEROS4             hb_bitShift( 1, 1 )   /* Kerberos V4 auth is supported (deprecated) */
+#define HB_CURL_VERSION_SSL                   hb_bitShift( 1, 2 )   /* SSL options are present */
+#define HB_CURL_VERSION_LIBZ                  hb_bitShift( 1, 3 )   /* libz features are present */
+#define HB_CURL_VERSION_NTLM                  hb_bitShift( 1, 4 )   /* NTLM auth is supported */
+#define HB_CURL_VERSION_GSSNEGOTIATE          hb_bitShift( 1, 5 )   /* Negotiate auth is supported (deprecated) */
+#define HB_CURL_VERSION_DEBUG                 hb_bitShift( 1, 6 )   /* Built with debug capabilities */
+#define HB_CURL_VERSION_ASYNCHDNS             hb_bitShift( 1, 7 )   /* Asynchronous DNS resolves */
+#define HB_CURL_VERSION_SPNEGO                hb_bitShift( 1, 8 )   /* SPNEGO auth is supported */
+#define HB_CURL_VERSION_LARGEFILE             hb_bitShift( 1, 9 )   /* Supports files larger than 2GB */
+#define HB_CURL_VERSION_IDN                   hb_bitShift( 1, 10 )  /* Internationized Domain Names are supported */
+#define HB_CURL_VERSION_SSPI                  hb_bitShift( 1, 11 )  /* Built against Windows SSPI */
+#define HB_CURL_VERSION_CONV                  hb_bitShift( 1, 12 )  /* Character conversions supported */
+#define HB_CURL_VERSION_CURLDEBUG             hb_bitShift( 1, 13 )  /* Debug memory tracking supported */
+#define HB_CURL_VERSION_TLSAUTH_SRP           hb_bitShift( 1, 14 )  /* TLS-SRP auth is supported */
+#define HB_CURL_VERSION_NTLM_WB               hb_bitShift( 1, 15 )  /* NTLM delegation to winbind helper is supported */
+#define HB_CURL_VERSION_HTTP2                 hb_bitShift( 1, 16 )  /* HTTP2 support built-in */
+#define HB_CURL_VERSION_GSSAPI                hb_bitShift( 1, 17 )  /* Built against a GSS-API library */
+#define HB_CURL_VERSION_KERBEROS5             hb_bitShift( 1, 18 )  /* Kerberos V5 auth is supported */
+#define HB_CURL_VERSION_UNIX_SOCKETS          hb_bitShift( 1, 19 )  /* Unix domain sockets support */
+#define HB_CURL_VERSION_PSL                   hb_bitShift( 1, 20 )  /* Mozilla's Public Suffix List, used for cookie domain verification */
+#define HB_CURL_VERSION_HTTPS_PROXY           hb_bitShift( 1, 21 )  /* HTTPS-proxy support built-in */
+#define HB_CURL_VERSION_MULTI_SSL             hb_bitShift( 1, 22 )  /* Multiple SSL backends available */
+
+/* HB_CURLOPT_HTTPPOST_FORM type. */
 #define HB_CURLOPT_HTTPPOST_FORM_CONTENT      1
 #define HB_CURLOPT_HTTPPOST_FORM_FILE         2
 
-/* HB_CURLOPT_DEBUGBLOCK callback modes */
+/* HB_CURLOPT_DEBUGBLOCK callback modes. */
 #define HB_CURLINFO_TEXT                      0
 #define HB_CURLINFO_HEADER_IN                 1
 #define HB_CURLINFO_HEADER_OUT                2
@@ -660,5 +686,29 @@
 #define HB_CURLINFO_DATA_OUT                  4
 #define HB_CURLINFO_SSL_DATA_IN               5
 #define HB_CURLINFO_SSL_DATA_OUT              6
+
+/* curl_global_sslset() return values. */
+#define HB_CURLSSLSET_NOT_IMPLEMENTED         -1  /* Harbour-specific value */
+#define HB_CURLSSLSET_OK                      0
+#define HB_CURLSSLSET_UNKNOWN_BACKEND         1
+#define HB_CURLSSLSET_TOO_LATE                2
+
+/* curl_global_sslset() 1st parameter and
+   hash key of returned 3rd parameter. */
+#define HB_CURLSSLBACKEND_NONE                0
+#define HB_CURLSSLBACKEND_OPENSSL             1
+#define HB_CURLSSLBACKEND_GNUTLS              2
+#define HB_CURLSSLBACKEND_NSS                 3
+#define HB_CURLSSLBACKEND_OBSOLETE4           4
+#define HB_CURLSSLBACKEND_GSKIT               5
+#define HB_CURLSSLBACKEND_POLARSSL            6
+#define HB_CURLSSLBACKEND_WOLFSSL             7
+#define HB_CURLSSLBACKEND_SCHANNEL            8
+#define HB_CURLSSLBACKEND_DARWINSSL           9
+#define HB_CURLSSLBACKEND_AXTLS               10
+#define HB_CURLSSLBACKEND_MBEDTLS             11
+#define HB_CURLSSLBACKEND_LIBRESSL            HB_CURLSSLBACKEND_OPENSSL
+#define HB_CURLSSLBACKEND_BORINGSSL           HB_CURLSSLBACKEND_OPENSSL
+#define HB_CURLSSLBACKEND_CYASSL              HB_CURLSSLBACKEND_WOLFSSL
 
 #endif /* HBCURL_CH_ */

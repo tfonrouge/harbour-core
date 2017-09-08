@@ -6087,6 +6087,8 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          CASE "msvcmips" ; AAdd( hbmk[ _HBMK_aOPTI ], "-machine:mips" ) ; EXIT
          CASE "msvcsh"   ; AAdd( hbmk[ _HBMK_aOPTI ], "-machine:sh5"  ) ; EXIT
          ENDSWITCH
+         /* TODO: migrate to use 'llvm-dlltool' with clang 5 and upper
+                  https://lists.llvm.org/pipermail/llvm-dev/2017-February/110097.html */
          bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_msvc( hbmk, cBin_Lib + " -nologo {FI} -def:{ID} -out:{OL}", cSourceDLL, cTargetLib, cFlags ) }
          cLibPathPrefix := "-libpath:"
          cLibPathSep := " "
@@ -9881,9 +9883,9 @@ STATIC FUNCTION s_getIncludedFiles( hbmk, cFile, cParentDir, lCMode )
          https://vcs.pcre.org/pcre/code/trunk/doc/pcre.txt?view=markup */
 
    IF t_pRegexInclude == NIL
-      /* Switch to non UTF8 CP - otherwise PCRE fails on user files
-       * containing non UTF8 characters. For this expression we do
-       * not need UTF8 or any other fixed encoding.
+      /* Switch to non UTF-8 CP - otherwise PCRE fails on user files
+       * containing non UTF-8 characters. For this expression we do
+       * not need UTF-8 or any other fixed encoding.
        */
       tmp := hb_cdpSelect( "cp437" )
       t_pRegexInclude := hb_regexComp( _HBMK_REGEX_INCLUDE, .F. /* lCaseSensitive */, .T. /* lNewLine */ )
@@ -11249,12 +11251,16 @@ STATIC FUNCTION hbmk_SecToken()
    hb_mutexLock( s_mutexToken )
 
    IF s_cToken == NIL
-      s_cToken := StrZero( hb_rand32(), 10 )
+      s_cToken := "c" + hb_base64Encode( hb_ntos( hb_rand32() ) )
    ENDIF
 
    hb_mutexUnlock( s_mutexToken )
 
    RETURN s_cToken
+
+/* Please open an Issue/Pull Request in case you need additional information
+   accessible via the documented hbmk2 context hash or the plugin API. Also
+   note that plugins have access to HBMK_* envvars for extra information. */
 
 STATIC FUNCTION PlugIn_make_ctx( hbmk, cState, hVars )
    RETURN { ;
@@ -11269,6 +11275,7 @@ STATIC FUNCTION PlugIn_make_ctx( hbmk, cState, hVars )
       "cCPU"          => hbmk[ _HBMK_cCPU ]           , ;
       "cBUILD"        => hbmk[ _HBMK_cBUILD ]         , ;
       "cOUTPUTNAME"   => hbmk[ _HBMK_cPROGNAME ]      , ;
+      hbmk_SecToken() => hbmk                         , ;  /* use an arbitrary, non-guarenteed position for this item */
       "cTARGETNAME"   => hbmk_TARGETNAME( hbmk )      , ;
       "cTARGETTYPE"   => hbmk_TARGETTYPE( hbmk )      , ;
       "lREBUILD"      => hbmk[ _HBMK_lREBUILD ]       , ;
@@ -11289,8 +11296,7 @@ STATIC FUNCTION PlugIn_make_ctx( hbmk, cState, hVars )
       "cCCSUFFIX"     => hbmk[ _HBMK_cCCSUFFIX ]      , ;
       "cCCEXT"        => hbmk[ _HBMK_cCCEXT ]         , ;
       "cWorkDir"      => hbmk[ _HBMK_cWorkDir ]       , ;
-      "nExitCode"     => hbmk[ _HBMK_nExitCode ]      , ;
-      hbmk_SecToken() => hbmk }
+      "nExitCode"     => hbmk[ _HBMK_nExitCode ]      }
 
 STATIC FUNCTION PlugIn_ctx_get_state( ctx )
    RETURN ctx[ "cSTATE" ]
@@ -14642,7 +14648,13 @@ STATIC FUNCTION CompVersionDetect( hbmk, cPath_CompC, lEarly )
       ENDIF
    CASE HBMK_ISCOMP( "gcc|gccarm|gccomf|mingw|mingw64|mingwarm|djgpp" )
       IF ! Empty( cPath_CompC )
-         hb_processRun( '"' + cPath_CompC + '"' + " " + "-dumpversion",, @cStdOutErr, @cStdOutErr )
+         /* Try the new option introduced with gcc 7 first. If that fails, call
+            the old option. Starting with gcc 7 the old option may return the
+            major version only in certain distros:
+            https://bugzilla.redhat.com/show_bug.cgi?id=1441594 */
+         IF hb_processRun( '"' + cPath_CompC + '"' + " " + "-fulldumpversion",, @cStdOutErr, @cStdOutErr ) != 0
+            hb_processRun( '"' + cPath_CompC + '"' + " " + "-dumpversion",, @cStdOutErr, @cStdOutErr )
+         ENDIF
          tmp := hb_cdpSelect( "cp437" )
          DO CASE
          CASE ( tmp1 := hb_AtX( R_( "([0-9]*)\.([0-9]*)\.([0-9]*)" ), cStdOutErr ) ) != NIL
@@ -14654,6 +14666,9 @@ STATIC FUNCTION CompVersionDetect( hbmk, cPath_CompC, lEarly )
                https://bugs.launchpad.net/ubuntu/+source/gcc-4.8/+bug/1360404 */
             tmp1 := hb_ATokens( tmp1, "." )
             cVer := StrZero( Val( tmp1[ 1 ] ), 2 ) + StrZero( Val( tmp1[ 2 ] ), 2 )
+         CASE ( tmp1 := hb_AtX( R_( "([0-9]*)" ), cStdOutErr ) ) != NIL  /* Should not happen */
+            tmp1 := hb_ATokens( tmp1, "." )
+            cVer := StrZero( Val( tmp1[ 1 ] ), 2 ) + "01"
          OTHERWISE
             cVer := "0304"
          ENDCASE
@@ -14685,6 +14700,7 @@ STATIC FUNCTION CompVersionDetect( hbmk, cPath_CompC, lEarly )
             CASE "0703" ; cVer := "0308" ; EXIT
             CASE "0800" ; cVer := "0309" ; EXIT  /* guess right after WWDC2016 */
             CASE "0801" ; cVer := "0309" ; EXIT
+            CASE "0900" ; cVer := "0400" ; EXIT  /* 2017-08 guess */
             ENDSWITCH
          CASE ( tmp1 := hb_AtX( R_( "version [0-9]*\.[0-9]*\.[0-9]*" ), cStdOutErr ) ) != NIL
             tmp1 := hb_ATokens( SubStr( tmp1, Len( "version " ) + 1 ), "." )
@@ -15790,7 +15806,7 @@ STATIC FUNCTION __hb_extern_get_list_hrb( cInputName )
       aExtern := {}
       hExtern := { => }
       FOR EACH cFunction IN hb_hrbGetFunList( hrb, HB_HRB_FUNC_PUBLIC )
-         cFunction := hb_asciiUpper( cFunction )
+         cFunction := hb_asciiLower( cFunction )
          IF ! cFunction $ hExtern
             AAdd( aExtern, cFunction )
             hExtern[ cFunction ] := NIL
@@ -15853,7 +15869,7 @@ STATIC FUNCTION __hb_extern_get_list( hbmk, cInputName, cBin_LibHBX, cOpt_LibHBX
                aExtern := {}
                hExtern := { => }
                FOR EACH tmp IN aResult
-                  tmp[ 2 ] := hb_asciiUpper( tmp[ 2 ] )
+                  tmp[ 2 ] := hb_asciiLower( tmp[ 2 ] )
                   IF ! tmp[ 2 ] $ hExtern
                      AAdd( aExtern, tmp[ 2 ] )
                      hExtern[ tmp[ 2 ] ] := NIL
@@ -15993,8 +16009,8 @@ STATIC FUNCTION __hb_extern_gen( hbmk, aFuncList, cOutputName )
       NEXT
    ENDIF
    FOR EACH tmp IN aExtern
-      IF ! hb_WildMatch( "HB_GT_*_DEFAULT", tmp, .T. ) .AND. ;
-         ! hb_WildMatch( _HB_SELF_PREFIX + "*" + _HB_SELF_SUFFIX, tmp, .T. ) .AND. ;
+      IF ! hb_WildMatchI( "HB_GT_*_DEFAULT", tmp, .T. ) .AND. ;
+         ! hb_WildMatchI( _HB_SELF_PREFIX + "*" + _HB_SELF_SUFFIX, tmp, .T. ) .AND. ;
          AScan( aExclude, {| flt | hb_WildMatchI( flt, tmp, .T. ) } ) == 0
          cExtern += "DYNAMIC " + hb_HGetDef( hDynamic, tmp, tmp ) + cEOL
       ENDIF
@@ -16965,7 +16981,7 @@ STATIC PROCEDURE __hbshell_prompt( aParams, aCommand )
 
    hb_gtInfo( HB_GTI_ICONRES, 1 )
 
-   hb_Scroll()
+   Scroll()
    Set( _SET_SCOREBOARD, .F. )
 
    __hbshell_HistoryLoad()
@@ -17047,7 +17063,7 @@ STATIC PROCEDURE __hbshell_prompt( aParams, aCommand )
             cLine := NIL
          ENDIF
          IF nMaxRow != MaxRow() .OR. nMaxCol != MaxCol()
-            hb_Scroll( nMaxRow, 0 )
+            Scroll( nMaxRow, 0 )
          ENDIF
          LOOP
       ENDIF
@@ -17064,7 +17080,7 @@ STATIC PROCEDURE __hbshell_prompt( aParams, aCommand )
 
       cCommand := AllTrim( cLine )
       cLine := NIL
-      hb_Scroll( nMaxRow, 0 )
+      Scroll( nMaxRow, 0 )
       __hbshell_Info( cCommand )
 
       IF ! Empty( cCommand )
@@ -17085,7 +17101,7 @@ STATIC PROCEDURE __hbshell_prompt( aParams, aCommand )
             ENDIF
 
             IF hbsh[ _HBSH_nRow ] >= MaxRow()
-               hb_Scroll( 3, 0, MaxRow(), MaxCol(), 1 )
+               Scroll( 3, 0, MaxRow(), MaxCol(), 1 )
                hbsh[ _HBSH_nRow ] := MaxRow() - 1
             ENDIF
          ENDIF

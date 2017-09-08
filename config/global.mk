@@ -965,6 +965,7 @@ ifeq ($(HB_COMPILER_VER),)
          HB_COMPILER_VER := $(subst 0703,0308,$(HB_COMPILER_VER))
          HB_COMPILER_VER := $(subst 0800,0309,$(HB_COMPILER_VER))
          HB_COMPILER_VER := $(subst 0801,0309,$(HB_COMPILER_VER))
+         HB_COMPILER_VER := $(subst 0900,0400,$(HB_COMPILER_VER))
       endif
 
    else
@@ -975,18 +976,29 @@ ifeq ($(HB_COMPILER_VER),)
       endif
       _C_VER := $(shell "$(HB_COMP_PATH_VER_DET)" -dumpversion 2>&1)
 
+      # Try new option if the returned version is 1 or 2 character long
+      # (possibly a major version number only)
+      ifneq ($(filter $(call strlen,$(_C_VER)),1 2),)
+         _C_VER := $(shell "$(HB_COMP_PATH_VER_DET)" -dumpfullversion 2>&1)
+      endif
+
       ifeq ($(_C_VER),)
          _C_VER := 3.4.0
       endif
 
       # Convert <0-99>.<0-99>.<n> version number to HB_COMPILER_VER format
+      # Some distros will only return the major version starting with gcc 7.
       _C_VER_MAJOR := $(wordlist 1,1,$(subst ., ,$(_C_VER)))
       _C_VER_MINOR := $(wordlist 2,2,$(subst ., ,$(_C_VER)))
       ifeq ($(call strlen,$(_C_VER_MAJOR)), 1)
          _C_VER_MAJOR := 0$(_C_VER_MAJOR)
       endif
+      ifeq ($(call strlen,$(_C_VER_MINOR)), 0)
+         _C_VER_MINOR := 01
+      else
       ifeq ($(call strlen,$(_C_VER_MINOR)), 1)
          _C_VER_MINOR := 0$(_C_VER_MINOR)
+      endif
       endif
       HB_COMPILER_VER := $(_C_VER_MAJOR)$(_C_VER_MINOR)
 
