@@ -77,6 +77,7 @@
 #include "hbgtwvw.h"
 
 #include "hbinit.h"
+#include "hbapifs.h"
 #include "hbmath.h"
 #include "hbvm.h"
 
@@ -1818,7 +1819,6 @@ BOOL CALLBACK hb_gt_wvw_DlgProcModal( HWND hDlg, UINT message, WPARAM wParam, LP
             if( hb_vmRequestReenter() )
             {
                hb_vmPushDynSym( ( PHB_DYNS ) pFunc );
-
                hb_vmPushNil();
                hbwapi_vmPush_HANDLE( hDlg );
                hb_vmPushNumInt( message );
@@ -1940,7 +1940,7 @@ static void hb_gt_wvwCreateObjects( int nWin )
 
       lb.lbStyle = BS_HATCHED;
       lb.lbColor = RGB( 210, 210, 210 );
-      lb.lbHatch = HS_DIAGCROSS;  /* HS_BDIAGONAL; */
+      lb.lbHatch = HS_DIAGCROSS;  /* HS_BDIAGONAL */
       s_wvw->a.diagonalBrush = CreateBrushIndirect( &lb );
 
       lb.lbStyle = BS_SOLID;
@@ -5372,38 +5372,38 @@ IPicture * hb_gt_wvw_LoadPicture( const char * szImage )
 {
    IPicture * pPicture = NULL;
 
-   LPTSTR lpFree;
-   HANDLE hFile = CreateFile( HB_FSNAMECONV( szImage, &lpFree ), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
-
-   if( lpFree )
-      hb_xfree( lpFree );
-
-   if( hFile != INVALID_HANDLE_VALUE )
+   if( szImage )
    {
-      DWORD nFileSize = GetFileSize( hFile, NULL );
+      PHB_FILE pFile = hb_fileExtOpen( szImage, NULL,
+                                       FO_READ | FO_SHARED | FO_PRIVATE |
+                                       FXO_DEFAULTS | FXO_SHARELOCK,
+                                       NULL, NULL );
 
-      if( nFileSize != INVALID_FILE_SIZE )
+      if( pFile )
       {
-         HGLOBAL hGlobal = GlobalAlloc( GPTR, nFileSize );
+         HB_SIZE nFileSize = ( HB_SIZE ) hb_fileSize( pFile );
 
-         if( hGlobal )
+         if( nFileSize < ( 32 * 1024 * 1024 ) )
          {
-            DWORD nReadByte;
+            HGLOBAL hGlobal = GlobalAlloc( GPTR, ( DWORD ) nFileSize );
 
-            if( ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ) )
+            if( hGlobal )
             {
-               IStream * pStream;
-
-               if( CreateStreamOnHGlobal( hGlobal, FALSE, &pStream ) == S_OK && pStream )
+               if( hb_fileRead( pFile, hGlobal, nFileSize, -1 ) == nFileSize )
                {
-                  OleLoadPicture( pStream, nFileSize, TRUE, HB_ID_REF( IID_IPicture ), ( LPVOID * ) &pPicture );
-                  HB_VTBL( pStream )->Release( HB_THIS( pStream ) );
+                  IStream * pStream;
+
+                  if( CreateStreamOnHGlobal( hGlobal, FALSE, &pStream ) == S_OK && pStream )
+                  {
+                     OleLoadPicture( pStream, nFileSize, TRUE, HB_ID_REF( IID_IPicture ), ( LPVOID * ) &pPicture );
+                     HB_VTBL( pStream )->Release( HB_THIS( pStream ) );
+                  }
                }
+               GlobalFree( hGlobal );
             }
-            GlobalFree( hGlobal );
          }
+         hb_fileClose( pFile );
       }
-      CloseHandle( hFile );
    }
 
    return pPicture;

@@ -651,7 +651,7 @@ static int _qr_dataencode( const char * szCode, HB_SIZE nSize, PHB_BITBUFFER pDa
 
    iLen += 4; /* Mode indicator length */
 
-   /*  Select version */
+   /* Select version */
    iDataLen = 0; /* to pacify warning with some C compilers (MSVS 2010) */
    iVersion = 0; /* to pacify warning */
    for( i = 1; i <= 40; i++ )
@@ -1160,7 +1160,9 @@ static int _qr_mask( PHB_BITBUFFER pBits, int iVersion )
    }
 #ifdef DEBUG_CODE
    HB_TRACE( HB_TR_ALWAYS, ( "mask:%d", iMaskMin ) );
-/* iMaskMin = 0; */
+   #if 0
+   iMaskMin = 0;
+   #endif
    HB_TRACE( HB_TR_ALWAYS, ( "mask applied:%d", iMaskMin ) );
 #endif
    _qr_mask_pattern( pBits, iVersion, iMaskMin );

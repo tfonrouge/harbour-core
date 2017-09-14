@@ -149,7 +149,7 @@ METHOD WvgToolBar:create( oParent, oOwner, aPos, aSize, aPresParams, lVisible )
    ENDIF
 #endif
 
-   ::oParent:AddChild( SELF )
+   ::oParent:AddChild( Self )
 
    ::createControl()
 
@@ -205,7 +205,7 @@ METHOD WvgToolBar:handleEvent( nMessage, aNM )
                IF ::isParentCrt()
                   ::oParent:setFocus()
                ENDIF
-               Eval( ::sl_lbClick, ::aItems[ nObj, 2 ], NIL, Self )
+               Eval( ::sl_lbClick, ::aItems[ nObj ][ 2 ], , Self )
 
             ENDIF
          ENDIF
@@ -284,12 +284,12 @@ METHOD WvgToolBar:addItem( cCaption, xImage, xDisabledImage, xHotImage, cDLL, nS
          hb_vfExists( xImage )
          pBitmap := wvg_PrepareBitmapFromFile( xImage, ::imageWidth, ::imageHeight, .T., ::hWnd )
       ELSE
-         pBitmap := wvg_PrepareBitmapFromResourceName( xImage, ::imageWidth, ::imageHeight, .T., ::hWnd )
+         pBitmap := wvg_PrepareBitmapFromResource( xImage, ::imageWidth, ::imageHeight, .T. )
       ENDIF
       EXIT
 
    CASE "N"
-      pBitmap := wvg_PrepareBitmapFromResourceId( xImage, ::imageWidth, ::imageHeight, .T., ::hWnd )
+      pBitmap := wvg_PrepareBitmapFromResource( xImage, ::imageWidth, ::imageHeight, .T. )
       EXIT
 
    CASE "P"

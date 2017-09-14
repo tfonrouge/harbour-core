@@ -628,7 +628,9 @@ static void set_tmevt( unsigned char * cMBuf, mouseEvent * mEvt )
          break;
    }
    chk_mevtdblck( mEvt );
-   /* printf( "\n\rmouse event: %02x, %02x, %02x\n\r", cMBuf[ 0 ], cMBuf[ 1 ], cMBuf[ 2 ] ); */
+   #if 0
+   printf( "\n\rmouse event: %02x, %02x, %02x\n\r", cMBuf[ 0 ], cMBuf[ 1 ], cMBuf[ 2 ] );
+   #endif
 }
 
 #if defined( HB_HAS_GPM )
@@ -1212,10 +1214,13 @@ static void disp_cursor( InOutBase * ioBase )
             write_ttyseq( ioBase, escseq );
          }
          else if( cv != NULL )
+         {
             /* curses cursor shape set */
-            /* curs_set( ncurs ); */
+            #if 0
+            curs_set( ncurs );
+            #endif
             write_ttyseq( ioBase, cv );
-
+         }
       }
 
       ioBase->lcursor = ioBase->cursor;
@@ -1369,7 +1374,9 @@ static void init_keys( InOutBase * ioBase )
 #endif
 
    /* some harcoded sequences */
-   /* addKeyMap( ioBase, K_ESC, "\033\033" ); */
+   #if 0
+   addKeyMap( ioBase, K_ESC, "\033\033" );
+   #endif
    addKeyMap( ioBase, EXKEY_ENTER, "\r" );
    addKeyMap( ioBase, K_MOUSETERM, "\033[M" );
 
@@ -1610,7 +1617,9 @@ static void set_sig_keys( InOutBase * ioBase, int key_int, int key_brk,
           ioBase->curr_TIO.c_cc[ VSUSP ] != 0 )
          ioBase->curr_TIO.c_lflag |= ISIG;
 
-      /* ioctl( ioBase->base_infd, TIOCSCTTY, 0 ); */
+      #if 0
+      ioctl( ioBase->base_infd, TIOCSCTTY, 0 );
+      #endif
       gt_ttyset( ioBase );
    }
 }
@@ -1867,7 +1876,9 @@ static InOutBase * create_ioBase( char * term, int infd, int outfd, int errfd,
       ioBase->curr_TIO.c_cflag |= CS8 | CREAD;
       ioBase->curr_TIO.c_iflag &= ~( IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON );
       ioBase->curr_TIO.c_oflag &= ~OPOST;
-      /* ioBase->curr_TIO.c_oflag |= ONLCR | OPOST; */
+      #if 0
+      ioBase->curr_TIO.c_oflag |= ONLCR | OPOST;
+      #endif
 
       memset( ioBase->curr_TIO.c_cc, 0, NCCS );
 
@@ -1922,20 +1933,20 @@ static InOutBase * create_ioBase( char * term, int infd, int outfd, int errfd,
    ioBase->attr_mask = ( chtype ) -1;
    if( has_colors() )
    {
-      /*  DOS->CURSES color mapping
+      /* DOS->CURSES color mapping
          DOS              -> curses
          --------------------------------
-         0 black         -> COLOR_BLACK
-         1 blue          -> COLOR_BLUE
-         2 green         -> COLOR_GREEN
-         3 cyan          -> COLOR_CYAN
-         4 red           -> COLOR_RED
-         5 magenta       -> COLOR_MAGENTA
-         6 yellow        -> COLOR_YELLOW
-         7 light gray    -> COLOR_WHITE
+          0 black         -> COLOR_BLACK
+          1 blue          -> COLOR_BLUE
+          2 green         -> COLOR_GREEN
+          3 cyan          -> COLOR_CYAN
+          4 red           -> COLOR_RED
+          5 magenta       -> COLOR_MAGENTA
+          6 yellow        -> COLOR_YELLOW
+          7 light gray    -> COLOR_WHITE
 
-         8 gray          -> BOLD/BLINK BLACK
-         9 light blue    -> BOLD/BLINK BLUE
+          8 gray          -> BOLD/BLINK BLACK
+          9 light blue    -> BOLD/BLINK BLUE
          10 light green   -> BOLD/BLINK GREEN
          11 light cyan    -> BOLD/BLINK CYAN
          12 light red     -> BOLD/BLINK RED
@@ -2520,7 +2531,9 @@ static HB_BOOL hb_gt_crs_Resume( PHB_GT pGT )
       s_ioBase->lcursor = SC_UNDEF;
       wrefresh( s_ioBase->hb_stdscr );
       gt_ttyset( s_ioBase );
-      /* redrawwin( s_ioBase->hb_stdscr ); */
+      #if 0
+      redrawwin( s_ioBase->hb_stdscr );
+      #endif
       gt_refresh( s_ioBase );
    }
 

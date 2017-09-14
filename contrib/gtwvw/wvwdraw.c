@@ -1536,8 +1536,12 @@ HB_FUNC( WVW_DRAWOUTLINE )
             hOldPen = ( HPEN ) SelectObject( hDC, hPen );
       }
       else
-         /* hPen = NULL; */
+      {
+         #if 0
+         hPen = NULL;
+         #endif
          SelectObject( hDC, wvw->a.penBlack );
+      }
 
       hb_gt_wvw_DrawOutline( hDC, iTop, iLeft, iBottom, iRight );
 
@@ -2130,14 +2134,12 @@ HB_FUNC( WVW_DRAWGRIDHORZ )
 
       SelectObject( hDC, wvw->a.gridPen );
 
-      for( i = 0; i < iRows; i++ )
+      for( i = 0; i < iRows; ++i, ++iAtRow )
       {
          int y = ( iAtRow * hb_gt_wvw_LineHeight( wvw_win ) ) + wvw_win->iTBHeight;
 
          MoveToEx( hDC, iLeft, y, NULL );
          LineTo( hDC, iRight, y );
-
-         iAtRow++;
       }
 
       hb_retl( HB_TRUE );
@@ -2182,7 +2184,7 @@ HB_FUNC( WVW_DRAWGRIDVERT )
 
       SelectObject( hDC, wvw->a.gridPen );
 
-      for( i = 1; i <= iTabs; i++ )
+      for( i = 1; i <= iTabs; ++i )
       {
          int iCol = hb_parvni( 4, i );
          int x;
@@ -2359,7 +2361,7 @@ HB_FUNC( WVW_DRAWSTATUSBAR )
 
       HDC hDC = wvw_win->hdc;
 
-      for( i = 0; i < iPanels; i++ )
+      for( i = 0; i < iPanels; ++i )
       {
          iTop    = hb_parvni( 3, iNext + 1 );
          iLeft   = hb_parvni( 3, iNext + 2 );

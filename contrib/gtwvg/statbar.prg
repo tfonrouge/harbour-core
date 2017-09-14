@@ -98,7 +98,7 @@ METHOD WvgStatusBar:create( oParent, oOwner, aPos, aSize, aPresParams, lVisible 
       ::style += SBARS_SIZEGRIP
    ENDIF
 
-   ::oParent:AddChild( SELF )
+   ::oParent:AddChild( Self )
 
    ::createControl()
 
@@ -125,7 +125,7 @@ METHOD WvgStatusBar:handleEvent( nMessage, aNM )
 
    CASE nMessage == HB_GTE_COMMAND
       IF HB_ISEVALITEM( ::sl_lbClick )
-         Eval( ::sl_lbClick, , , self )
+         Eval( ::sl_lbClick, , , Self )
          RETURN EVENT_HANDLED
       ENDIF
 
@@ -184,7 +184,7 @@ METHOD WvgStatusBar:addItem( cCaption, xImage, cDLL, nStyle, cKey, nMode )
 
    LOCAL oPanel := WvgStatusBarPanel():new( cCaption, nStyle, cKey )
 
-   oPanel:oParent := self
+   oPanel:oParent := Self
    oPanel:index := ::numItems + 1
 
    IF wvg_StatusBarCreatePanel( ::hWnd, hb_defaultValue( nMode, 0 ) )

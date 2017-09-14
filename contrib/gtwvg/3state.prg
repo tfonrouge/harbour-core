@@ -95,7 +95,7 @@ METHOD Wvg3State:create( oParent, oOwner, aPos, aSize, aPresParams, lVisible )
 
    ::wvgWindow:create( oParent, oOwner, aPos, aSize, aPresParams, lVisible )
 
-   ::oParent:AddChild( SELF )
+   ::oParent:AddChild( Self )
 
    ::createControl()
 
@@ -129,7 +129,7 @@ METHOD Wvg3State:handleEvent( nMessage, aNM )
          ::editBuffer := wvg_Button_GetCheck( ::hWnd )
 
          IF HB_ISEVALITEM( ::sl_lbClick )
-            Eval( ::sl_lbClick, ::editBuffer, , self )
+            Eval( ::sl_lbClick, ::editBuffer, , Self )
             RETURN EVENT_HANDLED
          ENDIF
       ENDIF

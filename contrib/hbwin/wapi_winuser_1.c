@@ -477,7 +477,7 @@ HB_FUNC( WAPI_LOADBITMAP )
 }
 #endif
 
-/* wapi_LoadImage( [<hInstance>], <cName>, [<nType>],
+/* wapi_LoadImage( [<hInstance>], <cName>|<nID>, [<nType>],
                    [<nWidth>], [<nHeight>], [<nFlags>] ) --> <hImage> */
 HB_FUNC( WAPI_LOADIMAGE )
 {
@@ -736,12 +736,12 @@ HB_FUNC( WAPI_APPENDMENU )
 #if 0
 HB_FUNC( WAPI_GETMENUITEMINFO )
 {
-   /* GetMenuItemInfo(); */
+   GetMenuItemInfo();
 }
 
 HB_FUNC( WAPI_SETMENUITEMINFO )
 {
-   /* SetMenuItemInfo(); */
+   SetMenuItemInfo();
 }
 #endif
 

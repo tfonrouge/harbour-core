@@ -128,7 +128,7 @@ METHOD WvgTreeView:create( oParent, oOwner, aPos, aSize, aPresParams, lVisible )
       ::style += TVS_HASLINES + TVS_LINESATROOT
    ENDIF
 
-   ::oParent:AddChild( SELF )
+   ::oParent:AddChild( Self )
 
    ::createControl()
 
@@ -161,7 +161,7 @@ METHOD WvgTreeView:handleEvent( nMessage, aNM )
 
    CASE HB_GTE_COMMAND
       IF HB_ISEVALITEM( ::sl_lbClick )
-         Eval( ::sl_lbClick, NIL, NIL, self )
+         Eval( ::sl_lbClick, , , Self )
          RETURN EVENT_HANDLED
       ENDIF
       EXIT
@@ -219,7 +219,7 @@ METHOD WvgTreeView:handleEvent( nMessage, aNM )
             IF ::isParentCrt()
                ::oParent:setFocus()
             ENDIF
-            Eval( ::sl_lbClick, NIL, NIL, Self )
+            Eval( ::sl_lbClick, , , Self )
             IF ::isParentCrt()
                ::setFocus()
             ENDIF
@@ -400,7 +400,7 @@ METHOD WvgTreeViewItem:addItem( cCaption )
    LOCAL oItem := WvgTreeViewItem():New()
 
    oItem:hTree   := ::hTree
-   oItem:oParent := self
+   oItem:oParent := Self
    oItem:caption := cCaption
    oItem:oWnd    := ::oWnd
 

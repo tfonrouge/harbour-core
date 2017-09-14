@@ -60,8 +60,8 @@
 #include "hbstack.h"
 
 #if ! defined( HB_MT_VM )
-   #define hb_dynsymGetMemvar( p )     ( ( PHB_ITEM ) ( p )->pMemvar )
-   #define hb_dynsymSetMemvar( p, h )  do { ( p )->pMemvar = ( h ); } while( 0 )
+#  define hb_dynsymGetMemvar( p )     ( ( PHB_ITEM ) ( p )->pMemvar )
+#  define hb_dynsymSetMemvar( p, h )  do { ( p )->pMemvar = ( h ); } while( 0 )
 #endif
 
 #define TABLE_INITHB_VALUE    100
@@ -665,8 +665,8 @@ static void hb_memvarCreateFromDynSymbol( PHB_DYNS pDynVar, int iScope, PHB_ITEM
              */
             pMemvar->type = HB_IT_LOGICAL;
 
-            /* NOTE: PUBLIC variables named CLIPPER and HARBOUR are initialized */
-            /*       to .T., this is normal Clipper behaviour. [vszakats] */
+            /* NOTE: PUBLIC variables named CLIPPER and HARBOUR are initialized
+                     to .T., this is normal Clipper behaviour. [vszakats] */
 
             pMemvar->item.asLogical.value =
                         ( strcmp( pDynVar->pSymbol->szName, "HARBOUR" ) == 0 ||

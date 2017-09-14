@@ -588,7 +588,9 @@ static void hb_gt_sln_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
                         hb_sln_isUTF8( SLang_TT_Write_FD, SLang_TT_Read_FD ) );
 #endif
 #ifdef HB_SLN_UNICODE
-            /* SLsmg_Setlocale = 0; */
+         #if 0
+         SLsmg_Setlocale = 0;
+         #endif
 #endif
             /* initialize a screen handling subsytem */
          if( SLsmg_init_smg() != -1 )
@@ -628,9 +630,9 @@ static void hb_gt_sln_Init( PHB_GT pGT, HB_FHANDLE hFilenoStdin, HB_FHANDLE hFil
             SLtt_Blink_Mode = 1;
             SLtt_Use_Blink_For_ACS = 0;
 #else
-   #ifdef HB_SLN_UNICODE
+#  ifdef HB_SLN_UNICODE
             hb_sln_Is_Unicode = SLsmg_Is_Unicode;
-   #endif
+#  endif
             if( hb_sln_Is_Unicode )
             {
                SLtt_Blink_Mode = 1;

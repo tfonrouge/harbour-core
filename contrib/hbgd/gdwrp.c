@@ -53,12 +53,12 @@
 
 /* NOTE: Do some initialization required by the GD headers. */
 #if defined( HB_OS_WIN )
-   #if ! defined( WIN32 )
-      #define WIN32
-   #endif
-   #if ! defined( BGDWIN32 )
-      #define BGDWIN32
-   #endif
+#  if ! defined( WIN32 )
+#     define WIN32
+#endif
+#  if ! defined( BGDWIN32 )
+#     define BGDWIN32
+#  endif
 #endif
 
 #include "gd.h"
@@ -1811,7 +1811,7 @@ HB_FUNC( GDIMAGECOLORCLOSESTALPHA ) /* int gdImageColorClosestAlpha(gdImagePtr i
       hb_errRT_BASE_SubstR( EG_ARG, 0, NULL, HB_ERR_FUNCNAME, HB_ERR_ARGS_BASEPARAMS );
 }
 
-HB_FUNC( GDIMAGECOLORCLOSESTHWB ) /*  gdImageColorClosestHWB(gdImagePtr im, int r, int g, int b) */
+HB_FUNC( GDIMAGECOLORCLOSESTHWB ) /* gdImageColorClosestHWB(gdImagePtr im, int r, int g, int b) */
 {
    if( hb_isGdImage( 1 ) &&
        HB_ISNUM( 2 ) &&

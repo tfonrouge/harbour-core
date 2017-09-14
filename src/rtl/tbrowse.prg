@@ -547,8 +547,8 @@ METHOD colorRect( aRect, aColors ) CLASS TBrowse
       FOR nRow := aRect[ 1 ] TO aRect[ 3 ]
          ::readRecord( nRow )
          FOR nCol := aRect[ 2 ] TO aRect[ 4 ]
-            ::aCellColors[ nRow, nCol ][ 1 ] := aColors[ 1 ]
-            ::aCellColors[ nRow, nCol ][ 2 ] := aColors[ 2 ]
+            ::aCellColors[ nRow ][ nCol ][ 1 ] := aColors[ 1 ]
+            ::aCellColors[ nRow ][ nCol ][ 2 ] := aColors[ 2 ]
          NEXT
          ::dispRow( nRow )
       NEXT
@@ -881,7 +881,7 @@ METHOD cellValue( nRow, nCol ) CLASS TBrowse
       nCol >= 1 .AND. nCol <= ::colCount .AND. ;
       ::aCellStatus[ nRow ]
 
-      RETURN ::aCellValues[ nRow, nCol ]
+      RETURN ::aCellValues[ nRow ][ nCol ]
    ENDIF
 
    RETURN NIL
@@ -893,7 +893,7 @@ METHOD cellColor( nRow, nCol ) CLASS TBrowse
       nCol >= 1 .AND. nCol <= ::colCount .AND. ;
       ::aCellStatus[ nRow ]
 
-      RETURN ::aCellColors[ nRow, nCol ]
+      RETURN ::aCellColors[ nRow ][ nCol ]
    ENDIF
 
    RETURN NIL
@@ -2537,7 +2537,7 @@ METHOD mRowPos() CLASS TBrowse
       ::doConfigure()
    ENDIF
 
-   _mBrwPos( self, @mRow, @mCol )
+   _mBrwPos( Self, @mRow, @mCol )
 
    RETURN mRow
 
@@ -2550,7 +2550,7 @@ METHOD mColPos() CLASS TBrowse
       ::doConfigure()
    ENDIF
 
-   _mBrwPos( self, @mRow, @mCol )
+   _mBrwPos( Self, @mRow, @mCol )
 
    RETURN mCol
 #endif

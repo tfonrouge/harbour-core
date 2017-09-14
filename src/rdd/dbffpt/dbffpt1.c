@@ -50,13 +50,13 @@
  */
 
 #if defined( HB_FPT_NO_READLOCK )
-   #undef HB_MEMO_SAFELOCK
+#  undef HB_MEMO_SAFELOCK
 #else
 /*#  define HB_MEMO_SAFELOCK */
 #endif
 
 #if defined( __XCC__ )
-   #pragma optimize( none )
+#  pragma optimize( none )
 #endif
 
 #include "hbapi.h"
@@ -516,10 +516,9 @@ static HB_ERRCODE hb_fptWriteGCitems( FPTAREAP pArea, LPMEMOGCTABLE pGCtable, HB
          if( ( pArea->uiMemoVersion == DB_MEMOVER_FLEX ||
                pArea->uiMemoVersion == DB_MEMOVER_CLIP ) &&
              /* TODO: check what FLEX/CL53 exactly does in such situations */
-             /*       Tests show that FLEX/CL53 does not reuse larger blocks
-              *       which can leave 8 or less dummy bytes so such problem
-              *       does not exists. [druzus]
-              */
+             /* Tests show that FLEX/CL53 does not reuse larger blocks
+                which can leave 8 or less dummy bytes so such problem
+                does not exists. [druzus] */
              pGCtable->pGCitems[ i ].ulSize * pArea->ulMemoBlockSize >=
              sizeof( FPTBLOCK ) )
          {
@@ -2400,7 +2399,9 @@ static HB_ERRCODE hb_fptReadFlexItem( FPTAREAP pArea, HB_BYTE ** pbMemoBuf, HB_B
             errCode = EDBF_CORRUPT;
          break;
       default:
-         /* fprintf( stderr, "Unknown FLEX array item: 0x%x = %d\n", usType, usType ); fflush( stderr ); */
+         #if 0
+         fprintf( stderr, "Unknown FLEX array item: 0x%x = %d\n", usType, usType ); fflush( stderr );
+         #endif
          errCode = EDBF_CORRUPT;
          hb_itemClear( pItem );
          break;
