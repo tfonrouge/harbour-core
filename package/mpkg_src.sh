@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This script requires 'GNU tar' tool for compression.
+# This script requires 'GNU tar'.
 
 if [ "$1" = 'zip' ] || [ "$1" = 'ZIP' ]; then
   hb_archbin='zip'
@@ -13,11 +13,9 @@ else
   hb_archbin='tar'
   echo "Warning!!! Cannot find 'GNU tar'"
 fi
+[ -n "${hb_ext}" ] || hb_ext='.tar.gz'
 
 hb_currdir="$(pwd)"
-
-hb_archopt='-czf'
-[ -n "${hb_ext}" ] || hb_ext='.tar.gz'
 
 if [ -f mpkg_ver.sh ]; then
   hb_rootdir='..'
@@ -25,11 +23,12 @@ else
   hb_rootdir=$(dirname "$0")
   hb_rootdir=$(dirname "${hb_rootdir}")
 fi
+
 # shellcheck source=./mpkg_ver.sh
 . "${hb_rootdir}/package/mpkg_ver.sh"
+hb_verfull=$(hb_get_ver)
 
-hb_ver=$(get_hbver "${hb_rootdir}")
-hb_filename="${hb_currdir}/harbour-${hb_ver}.src${hb_ext}"
+hb_filename="${hb_currdir}/harbour-${hb_verfull}.src${hb_ext}"
 rm -f "$hb_filename"
 
 #[ -z "$TZ" ] && export TZ=UTC
@@ -49,7 +48,7 @@ hb_collect_all_tree() {
   find config -type f -exec echo '{}' \;
 }
 
-hb_flst='bin/hb_flst.tmp'
+hb_flist='bin/hb_flist.tmp'
 (
   cd "$hb_rootdir" || exit
   if [ -d '.git' ]; then
@@ -57,16 +56,16 @@ hb_flst='bin/hb_flst.tmp'
   else
     hb_collect_all_tree
   fi
-) > "$hb_rootdir/$hb_flst"
+) > "$hb_rootdir/$hb_flist"
 
 (
   cd "$hb_rootdir" || exit
   if [ "$hb_archbin" = 'zip' ]; then
-    $hb_archbin -X -9 -o -r -q "$hb_filename" . "-i@$hb_flst"
+    $hb_archbin -X -9 -o -r -q "$hb_filename" . "-i@$hb_flist"
   else
-    $hb_archbin $hb_archopt "$hb_filename" --files-from "$hb_flst"
+    $hb_archbin -c --files-from "$hb_flist" | gzip -n > "$hb_filename"
   fi
 )
-rm -f "${hb_rootdir:?}/$hb_flst"
+rm -f "${hb_rootdir:?}/$hb_flist"
 
 cd "$hb_currdir" || exit

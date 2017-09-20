@@ -310,7 +310,7 @@ You can fine-tune the build with these options:
     --with static      - link all binaries with static libs
     --with localzlib   - build local copy of zlib library
     --with localpcre2  - build local copy of pcre2 library
-    --with localpcre   - build local copy of pcre library
+    --with localpcre1  - build local copy of pcre1 library
     --without x11      - do not build components dependent on x11 (gtxwc)
     --without curses   - do not build components dependent on curses (gtcrs)
     --without slang    - do not build components dependent on slang (gtsln)
@@ -363,7 +363,7 @@ to adjust them to your own directories:
 
     HB_WITH_CURSES= (on \*nix systems and DJGPP, auto-detected on both)
     HB_WITH_GPM= (on Linux only)
-    HB_WITH_PCRE2=C:\pcre2
+    HB_WITH_PCRE2=C:\pcre2 (defaults to locally hosted copy if not found)
     HB_WITH_PCRE=C:\pcre (defaults to locally hosted copy if not found)
     HB_WITH_PNG=C:\libpng (defaults to locally hosted copy if not found)
     HB_WITH_SLANG= (on \*nix systems)
@@ -415,7 +415,8 @@ You will need these packages to compile optional core Harbour features:
 Optional, to override locally hosted sources:
 
       for zlib support:          zlib1g-dev
-      for pcre (regex) support:  libpcre3-dev
+      for pcre2 (regex) support: libpcre2-dev
+      for pcre1 (regex) support: libpcre3-dev
 
 ## Linux (.rpm based distros: openSUSE, Fedora, CentOS)
 
@@ -1078,12 +1079,12 @@ Press `<Alt+D>` in the app.
 * gccarm   - GNU C ARM
 
 ### win
-* mingw    - MinGW GNU C 3.4.2 and above
+* mingw    - MinGW GNU C (4.4.0 and above)
 * mingw64  - MinGW GNU C x86-64
 * msvc     - Microsoft Visual C++ (2010 and above)
 * msvc64   - Microsoft Visual C++ x86-64 (2010 and above)
 
-### win (partial support, some features may be missing)
+### win (experimental)
 * clang    - Clang
 * watcom   - Open Watcom C/C++
 * icc      - Intel(R) C/C++
@@ -1093,7 +1094,7 @@ Press `<Alt+D>` in the app.
 * bcc64    - Embarcadero C++ 6.5 and above
 * pocc     - Pelles C 4.5 and above
 * pocc64   - Pelles C x86-64 5.0 and above
-* xcc      - Pelles C for xhb
+* xcc      - Pelles C for xHarbour
 * iccia64  - Intel(R) C/C++ IA-64 (Itanium)
 * msvcia64 - Microsoft Visual C++ IA-64 (Itanium)
 
@@ -1258,17 +1259,15 @@ Supported shells per host platforms:
 
      * Clang/LLVM [multi-platform, free software, open-source]
         * <https://releases.llvm.org/>
-     * MSYS2 [win, free software, open-source]
+     * MinGW-w64 via MSYS2 [win, free software, open-source] (recommended)
         * <https://msys2.github.io/>
+        * Install [instructions](package/RELNOTES.md)
      * MinGW-w64 [win, \*nix, free software, open-source]
-        * <https://mingw-w64.org/>, <https://duckduckgo.com/?q=mingw-w64> (look for MSYS2 or niXman builds)
-          * x86-64:
-            * 64-bit hosted, posix, seh
-          * x86:
-            * 32-bit hosted, posix, dwarf-2
-          * 'multilib' for x86-64 and x86 hosts (select non-native target with `HB_CPU=x86` or `HB_CPU=x86_64`):
-            * 32-bit hosted, posix, sjlj
-            * 64-bit hosted, posix, sjlj
+        * <https://mingw-w64.org/> <https://en.wikipedia.org/wiki/MinGW#MinGW-w64>
+          * 64-bit: threads-posix, seh
+            <https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/>
+          * 32-bit: threads-posix, dwarf-2
+            <https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/>
      * Open Watcom [multi-platform, free software, open-source]
         * <https://github.com/open-watcom/open-watcom-v2>, <https://open-watcom.github.io/open-watcom/>
      * Xcode / Command Line Tools for Xcode [darwin, zero price, proprietary with open-source components]
@@ -1356,7 +1355,7 @@ Supported shells per host platforms:
        * <https://web.archive.org/web/20160427125642/heiner-eichmann.de/autotools/using_gettext.html>
      * [GitHub Guides](https://guides.github.com/)
      * [GitHub Flavored Markdown](https://help.github.com/articles/github-flavored-markdown)
-     * [A Practical Git Introduction](http://marc.helbling.fr/2014/09/practical-git-introduction)
+     * [A Practical Git Introduction](https://github.com/marchelbling/marchelbling.github.io/blob/master/_posts/2014-09-22-practical-git-introduction.md)
 
 * Community forums:
 

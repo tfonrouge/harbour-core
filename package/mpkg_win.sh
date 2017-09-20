@@ -25,10 +25,14 @@ esac
 echo "! Self: $0"
 echo "! Host OS: ${os}"
 
-readonly HB_VS_DEF=34
-readonly HB_VL_DEF=340
-readonly HB_VM_DEF=3.4
-readonly HB_VF_DEF=3.4.0dev
+. ./mpkg_ver.sh
+hb_verfull=$(hb_get_ver)
+hb_vershrt=$(hb_get_ver_majorminor)
+
+readonly HB_VS_DEF="$(echo "${hb_vershrt}" | sed 's|\.||g')"  # xy
+readonly HB_VL_DEF="$(echo "${hb_verfull}" | sed 's|\.||g')"  # xyz
+readonly HB_VM_DEF="${hb_vershrt}"                            # x.y
+readonly HB_VF_DEF="$(hb_verfull)$(hb_get_ver_status)"        # x.y.zrel
 readonly HB_RT_DEF=C:/hb
 
 [ -z "${HB_VS}" ] && HB_VS="${HB_VS_DEF}"
@@ -258,11 +262,11 @@ _vcs_url="$(git ls-remote --get-url | sed 's|.git$||')/"
 sed -e "s|_HB_VER_COMMIT_ID_SHORT_|${_vcs_id_short}|g" \
     -e "s|_HB_VER_ORIGIN_URL_|${_vcs_url}|g" \
     -e "s|_HB_VERSION_|${_hb_ver}|g" \
-    'RELNOTES.md.in' | unix2dos > "${HB_ABSROOT}RELNOTES.md"
+    'RELNOTES.md' | unix2dos > "${HB_ABSROOT}RELNOTES.md"
 touch -c -r "${HB_ABSROOT}README.md" "${HB_ABSROOT}RELNOTES.md"
 
 sed "s|_HB_URL_SRC_|${_vcs_url}archive/${_vcs_id}.tar.gz|g" \
-    'getsrc.sh.in' > "${HB_ABSROOT}getsrc.sh"
+    'getsrc.sh' > "${HB_ABSROOT}getsrc.sh"
 chmod +x "${HB_ABSROOT}getsrc.sh"
 touch -c -r "${HB_ABSROOT}README.md" "${HB_ABSROOT}getsrc.sh"
 
