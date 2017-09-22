@@ -558,8 +558,9 @@ settings are case-sensitive.
    - `HB_BUILD_CONTRIBS=no [<l>]`
 
      Do not build any, or space separated `<l>` list of, contrib packages.
-     Please note it will not prevent building packages which are dependencies
-     of other &ndash; enabled &ndash; packages.
+     Please note that packages which are dependencies of other &ndash;
+     enabled &ndash; packages will still be built, unless their dependents
+     are disabled as well.
 
    - `HB_BUILD_CONTRIBS=[<l>]`
 
@@ -694,6 +695,20 @@ for a cross-build process to succeed.
 >   `> log.txt 2>&1`
 
 ```batchfile
+:: MinGW-w64 Clang/LLVM via MSYS2 (x86 target)
+set PATH=C:\msys64\mingw32\bin;C:\msys64\usr\bin;%PATH%
+set HB_COMPILER=clang
+mingw32-make
+```
+
+```batchfile
+:: MinGW-w64 Clang/LLVM via MSYS2 (x64 target)
+set PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH%
+set HB_COMPILER=clang64
+mingw32-make
+```
+
+```batchfile
 :: MinGW-w64 GCC via MSYS2 (x86 target)
 set PATH=C:\msys64\mingw32\bin;C:\msys64\usr\bin;%PATH%
 mingw32-make
@@ -746,7 +761,7 @@ mingw32-make
 ```
 
 ```batchfile
-:: clang (alpha)
+:: Clang-cl/LLVM (pre-experimental)
 call "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
 set PATH=%ProgramFiles(x86)%\LLVM 3.6.svn;%PATH%
 mingw32-make
@@ -761,6 +776,21 @@ a cross-build. It's recommended to use a 64-bit environment for Windows
 development.
 
 ```batchfile
+:: MinGW-w64 Clang/LLVM via MSYS2 (x86 target)
+set PATH=C:\msys64\mingw32\bin;C:\msys64\usr\bin;%PATH%
+set HB_COMPILER=clang
+mingw32-make
+```
+
+```batchfile
+:: MinGW-w64 Clang/LLVM via MSYS2 (x64 target)
+:: (requires preceding build for x86 target)
+set PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH%
+set HB_COMPILER=clang64
+mingw32-make
+```
+
+```batchfile
 :: MinGW-w64 GCC via MSYS2 (x86 target)
 set PATH=C:\msys64\mingw32\bin;C:\msys64\usr\bin;%PATH%
 mingw32-make
@@ -768,6 +798,7 @@ mingw32-make
 
 ```batchfile
 :: MinGW-w64 GCC via MSYS2 (x64 target)
+:: (requires preceding build for x86 target)
 set PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH%
 mingw32-make
 ```
@@ -871,7 +902,7 @@ mingw32-make
 ```
 
 ```batchfile
-:: clang (alpha)
+:: Clang-cl/LLVM (pre-experimental)
 call "%ProgramFiles%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
 set PATH=%ProgramFiles%\LLVM 3.6.svn;%PATH%
 mingw32-make
@@ -1058,7 +1089,7 @@ Press `<Alt+D>` in the app.
 
 ### linux
 * gcc      - GNU C
-* clang    - Clang
+* clang    - Clang/LLVM
 * watcom   - Open Watcom C/C++
 * icc      - Intel(R) C/C++
 * sunpro   - Sun Studio C/C++
@@ -1066,12 +1097,12 @@ Press `<Alt+D>` in the app.
 
 ### darwin
 * gcc      - GNU C
-* clang    - Clang
+* clang    - Apple Clang/LLVM
 * icc      - Intel(R) C/C++
 
 ### bsd
 * gcc      - GNU C
-* clang    - Clang
+* clang    - Clang/LLVM
 * pcc      - Portable C Compiler (experimental)
 
 ### android
@@ -1081,11 +1112,12 @@ Press `<Alt+D>` in the app.
 ### win
 * mingw    - MinGW GNU C (4.4.0 and above)
 * mingw64  - MinGW GNU C x86-64
+* clang    - Clang/LLVM
+* clang64  - Clang/LLVM x86-64
 * msvc     - Microsoft Visual C++ (2010 and above)
 * msvc64   - Microsoft Visual C++ x86-64 (2010 and above)
 
 ### win (experimental)
-* clang    - Clang
 * watcom   - Open Watcom C/C++
 * icc      - Intel(R) C/C++
 
@@ -1131,7 +1163,7 @@ Press `<Alt+D>` in the app.
 * diab     - Wind River Compiler
 
 ### minix (experimental)
-* clang    - Clang
+* clang    - Clang/LLVM
 * gcc      - GNU C
 
 ### cygwin (experimental)
@@ -1170,8 +1202,9 @@ Press `<Alt+D>` in the app.
        | win      | win/bcc           | x86    (deprecated)
        | win      | win/bcc64         | x86-64 (deprecated)
        | win      | win/clang         | x86
+       | win      | win/clang64       | x86-64
        | win      | win/gcc           | x86
-       | win      | win/icc           | x86
+       | win      | win/icc           | x86    (experimental)
        | win      | win/icc64         | x86-64
        | win      | win/iccia64       | ia64   (deprecated)
        | win      | win/mingw         | x86
@@ -1181,7 +1214,7 @@ Press `<Alt+D>` in the app.
        | win      | win/msvcia64      | ia64   (deprecated)
        | win      | win/pocc          | x86    (deprecated)
        | win      | win/pocc64        | x86-64 (deprecated)
-       | win      | win/watcom        | x86
+       | win      | win/watcom        | x86    (experimental)
        | win      | win/xcc           | x86    (deprecated)
      x | win      | wce/mingwarm      | arm
      x | win      | wce/mingw         | x86    (not fully supported yet)
@@ -1257,19 +1290,20 @@ Supported shells per host platforms:
 
 * C/C++ Compilers/Shells:
 
-     * Clang/LLVM [multi-platform, free software, open-source]
-        * <https://releases.llvm.org/>
      * MinGW-w64 via MSYS2 [win, free software, open-source] (recommended)
         * <https://msys2.github.io/>
-        * Install [instructions](package/RELNOTES.md)
+        * `pacman -S git base-devel msys2-devel mingw-w64-{i686,x86_64}-toolchain`
+     * Clang/LLVM via MSYS2 [multi-platform, free software, open-source]
+        * <https://msys2.github.io/>
+        * MinGW-w64 above + `pacman -S mingw-w64-{i686,x86_64}-clang`
      * MinGW-w64 [win, \*nix, free software, open-source]
         * <https://mingw-w64.org/> <https://en.wikipedia.org/wiki/MinGW#MinGW-w64>
           * 64-bit: threads-posix, seh
             <https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/>
           * 32-bit: threads-posix, dwarf-2
             <https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/>
-     * Open Watcom [multi-platform, free software, open-source]
-        * <https://github.com/open-watcom/open-watcom-v2>, <https://open-watcom.github.io/open-watcom/>
+     * Clang/LLVM [multi-platform, free software, open-source]
+        * <https://releases.llvm.org/>
      * Xcode / Command Line Tools for Xcode [darwin, zero price, proprietary with open-source components]
         * <https://itunes.apple.com/us/app/xcode/id497799835>
         * <https://developer.apple.com/downloads/>
@@ -1291,6 +1325,8 @@ Supported shells per host platforms:
             `tar -xvf cegcc_mingw32ce_cygwin1.7_r1399.tar -h`
 
           * Compiler will be in the `opt\mingw32ce` subdirectory.
+     * Open Watcom [multi-platform, free software, open-source]
+        * <https://github.com/open-watcom/open-watcom-v2>, <https://open-watcom.github.io/open-watcom/>
      * Intel Compiler [multi-platform, commercial, proprietary]
         * <https://software.intel.com/c-compilers>
      * Cygwin [win, free software, open-source]
@@ -1301,7 +1337,7 @@ Supported shells per host platforms:
 * Libraries:
 
      * `HB_WITH_PCRE2`, `HB_WITH_PCRE` - Perl Compatible Regular Expressions [multi-platform, free software, open-source]
-        * <http://pcre.org/>
+        * <https://pcre.org/>
      * `HB_WITH_PNG` - libpng [multi-platform, free software, open-source]
         * <https://github.com/glennrp/libpng>
      * `HB_WITH_WATT` - Watt-32 (TCP/IP sockets) [dos, free software, open-source]
