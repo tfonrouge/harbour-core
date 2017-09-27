@@ -5,15 +5,15 @@
 # See LICENSE.txt for licensing terms.
 # ---------------------------------------------------------------
 
-# TODO: remove bcc*, win/watcom, mingwarm references
+# TODO: remove mingwarm, OS/2, MS-DOS references
 
 cd "$(dirname "$0")" || exit
 
 # - Requires MSYS2 or 'Git for Windows' to run on Windows
-# - Requires 7z in PATH
+# - Requires '7z' in PATH
 # - Adjust target dir, MinGW dirs, set HB_DIR_MINGW_32, HB_DIR_MINGW_64
-#   create required packages beforehand.
-# - Run this from vanilla official source tree only.
+#   create packages to be included beforehand.
+# - Run this from unmodified official source tree only.
 
 # https://en.wikipedia.org/wiki/Uname#Examples
 # https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD
@@ -24,17 +24,14 @@ case "$(uname)" in
   *BSD)    readonly os='bsd';;
 esac
 
-echo "! Self: $0"
-echo "! Host OS: ${os}"
-
 . ./mpkg_ver.sh
-hb_verfull=$(hb_get_ver)
 hb_vershrt=$(hb_get_ver_majorminor)
+hb_verfull=$(hb_get_ver)
 
 readonly HB_VS_DEF="$(echo "${hb_vershrt}" | sed 's|\.||g')"  # xy
 readonly HB_VL_DEF="$(echo "${hb_verfull}" | sed 's|\.||g')"  # xyz
 readonly HB_VM_DEF="${hb_vershrt}"                            # x.y
-readonly HB_VF_DEF="$(hb_verfull)$(hb_get_ver_status)"        # x.y.zrel
+readonly HB_VF_DEF="${hb_verfull}$(hb_get_ver_status)"        # x.y.zrel
 readonly HB_RT_DEF=C:/hb
 
 [ -z "${HB_VS}" ] && HB_VS="${HB_VS_DEF}"
@@ -53,11 +50,13 @@ HB_ABSROOT="${HB_RT}/${HB_DR}"
 _BRANCH="${APPVEYOR_REPO_BRANCH}${TRAVIS_BRANCH}${CI_BUILD_REF_NAME}${GIT_BRANCH}"
 [ -n "${_BRANCH}" ] || _BRANCH="$(git symbolic-ref --short --quiet HEAD)"
 [ -n "${_BRANCH}" ] || _BRANCH='master'
+[ -n "${HB_JOB}" ] || HB_JOB="${_BRANCH}"
+[ -n "${HB_JOB_TO_RELEASE}" ] || HB_JOB_TO_RELEASE="${HB_JOB}"
 
 _SCRIPT="$(realpath 'mpkg.hb')"
 _ROOT="$(realpath '..')"
 
-echo "! Branch: '${_BRANCH}'"
+echo "! Self: $0  Host OS: '${os}'  Branch: '${_BRANCH}'  Job: '${HB_JOB}'"
 
 case "${os}" in
   win)
@@ -75,12 +74,14 @@ esac
 if [ -z "${HB_BASE}" ]; then
   # Auto-detect the base bitness, by default it will be 32-bit, and 64-bit
   # if it's the only one available.
-  if [ -d "../pkg/win/mingw/harbour-${HB_VF}-win-mingw" ]; then
-    # MinGW 32-bit base system
-    _lib_target='32'
+  if   [ -d "../pkg/win/mingw/harbour-${HB_VF}-win-mingw" ]; then
+    _lib_target='32'  # MinGW 32-bit base system
+  elif [ -d "../pkg/win/clang/harbour-${HB_VF}-win-clang" ]; then
+    _lib_target='32'  # LLVM/Clang 32-bit base system
   elif [ -d "../pkg/win/mingw64/harbour-${HB_VF}-win-mingw64" ]; then
-    # MinGW 64-bit base system
-    _lib_target='64'
+    _lib_target='64'  # MinGW 64-bit base system
+  elif [ -d "../pkg/win/clang64/harbour-${HB_VF}-win-clang64" ]; then
+    _lib_target='64'  # LLVM/Clang 64-bit base system
   fi
 else
   _lib_target="${HB_BASE}"
@@ -107,33 +108,44 @@ mkdir -p "${HB_ABSROOT}bin/"
 
 # Copy these first to let 3rd party .dlls with overlapping names be
 # overwritten by selected native target's binaries.
-if ls      ../pkg/wce/mingwarm/harbour-${HB_VF}-wce-mingwarm/bin/*.dll > /dev/null 2>&1; then
-  cp -f -p ../pkg/wce/mingwarm/harbour-${HB_VF}-wce-mingwarm/bin/*.dll "${HB_ABSROOT}bin/"
+if ls      "../pkg/wce/mingwarm/harbour-${HB_VF}-wce-mingwarm/bin/"*.dll > /dev/null 2>&1; then
+  cp -f -p "../pkg/wce/mingwarm/harbour-${HB_VF}-wce-mingwarm/bin/"*.dll "${HB_ABSROOT}bin/"
 fi
 
 if [ "${_lib_target}" = '32' ]; then
-  if ls      ../pkg/win/mingw64/harbour-${HB_VF}-win-mingw64/bin/*.dll > /dev/null 2>&1; then
-    cp -f -p ../pkg/win/mingw64/harbour-${HB_VF}-win-mingw64/bin/*.dll "${HB_ABSROOT}bin/"
+  if ls      "../pkg/win/mingw64/harbour-${HB_VF}-win-mingw64/bin/"*.dll > /dev/null 2>&1; then
+    cp -f -p "../pkg/win/mingw64/harbour-${HB_VF}-win-mingw64/bin/"*.dll "${HB_ABSROOT}bin/"
+  elif ls    "../pkg/win/clang64/harbour-${HB_VF}-win-clang64/bin/"*.dll > /dev/null 2>&1; then
+    cp -f -p "../pkg/win/clang64/harbour-${HB_VF}-win-clang64/bin/"*.dll "${HB_ABSROOT}bin/"
   fi
-  ( cd "../pkg/win/mingw/harbour-${HB_VF}-win-mingw" && cp -f -p -R ./* "${HB_ABSROOT}" )
+  if [ -d    "../pkg/win/mingw/harbour-${HB_VF}-win-mingw" ]; then
+    ( cd     "../pkg/win/mingw/harbour-${HB_VF}-win-mingw" && cp -f -p -R ./* "${HB_ABSROOT}" )
+  elif [ -d  "../pkg/win/clang/harbour-${HB_VF}-win-clang" ]; then
+    ( cd     "../pkg/win/clang/harbour-${HB_VF}-win-clang" && cp -f -p -R ./* "${HB_ABSROOT}" )
+  fi
 elif [ "${_lib_target}" = '64' ]; then
-  if ls      ../pkg/win/mingw/harbour-${HB_VF}-win-mingw/bin/*.dll > /dev/null 2>&1; then
-    cp -f -p ../pkg/win/mingw/harbour-${HB_VF}-win-mingw/bin/*.dll "${HB_ABSROOT}bin/"
+  if ls      "../pkg/win/mingw/harbour-${HB_VF}-win-mingw/bin/"*.dll > /dev/null 2>&1; then
+    cp -f -p "../pkg/win/mingw/harbour-${HB_VF}-win-mingw/bin/"*.dll "${HB_ABSROOT}bin/"
+  elif ls    "../pkg/win/clang/harbour-${HB_VF}-win-clang/bin/"*.dll > /dev/null 2>&1; then
+    cp -f -p "../pkg/win/clang/harbour-${HB_VF}-win-clang/bin/"*.dll "${HB_ABSROOT}bin/"
   fi
-  ( cd "../pkg/win/mingw64/harbour-${HB_VF}-win-mingw64" && cp -f -p -R ./* "${HB_ABSROOT}" )
+  if [ -d    "../pkg/win/mingw64/harbour-${HB_VF}-win-mingw64" ]; then
+    ( cd     "../pkg/win/mingw64/harbour-${HB_VF}-win-mingw64" && cp -f -p -R ./* "${HB_ABSROOT}" )
+  elif [ -d  "../pkg/win/clang64/harbour-${HB_VF}-win-clang64" ]; then
+    ( cd     "../pkg/win/clang64/harbour-${HB_VF}-win-clang64" && cp -f -p -R ./* "${HB_ABSROOT}" )
+  fi
 fi
 
 for dir in \
-  "../pkg/dos/watcom/hb${HB_VL}wa" \
-  "../pkg/os2/watcom/harbour-${HB_VF}-os2-watcom" \
-  "../pkg/wce/mingwarm/harbour-${HB_VF}-wce-mingwarm" \
-  "../pkg/win/bcc/harbour-${HB_VF}-win-bcc" \
-  "../pkg/win/bcc64/harbour-${HB_VF}-win-bcc64" \
   "../pkg/win/mingw/harbour-${HB_VF}-win-mingw" \
   "../pkg/win/mingw64/harbour-${HB_VF}-win-mingw64" \
+  "../pkg/wce/mingwarm/harbour-${HB_VF}-wce-mingwarm" \
+  "../pkg/win/clang/harbour-${HB_VF}-win-clang" \
+  "../pkg/win/clang64/harbour-${HB_VF}-win-clang64" \
   "../pkg/win/msvc/harbour-${HB_VF}-win-msvc" \
   "../pkg/win/msvc64/harbour-${HB_VF}-win-msvc64" \
-  "../pkg/win/watcom/harbour-${HB_VF}-win-watcom"; do
+  "../pkg/os2/watcom/harbour-${HB_VF}-os2-watcom" \
+  "../pkg/dos/watcom/hb${HB_VL}wa"; do
   if [ -d "${dir}" ]; then
   (
     cd "${dir}" || exit
@@ -204,7 +216,8 @@ for _cpu in '' '64'; do
   for files in \
     "${HB_ABSROOT}lib/win/mingw${_cpu}/*-*.*" \
     "${HB_ABSROOT}lib/win/mingw${_cpu}/*_dll*.*" \
-    "${HB_ABSROOT}lib/win/msvc${_cpu}/*.lib"; do
+    "${HB_ABSROOT}lib/win/clang${_cpu}/*-*.*" \
+    "${HB_ABSROOT}lib/win/clang${_cpu}/*_dll*.*"; do
     # shellcheck disable=SC2086
     if ls ${files} > /dev/null 2>&1; then
       "${_mingw_dir}${_mingw_pfx}strip" -p --enable-deterministic-archives -g ${files}
@@ -227,12 +240,14 @@ if [ "${_HB_BUNDLE_3RDLIB}" = 'yes' ]; then
     dir_64=$(echo "${dir_64}" | sed 's|\\|/|g')
     for file in ${dir_32}lib/*.a; do
       if [ -f "${file}" ] && echo "${file}" | grep -q -v 'dll'; then
-        cp -f -p "${file}" "${HB_ABSROOT}lib/win/mingw/"
+        [ -d "${HB_ABSROOT}lib/win/mingw/" ] && cp -f -p "${file}" "${HB_ABSROOT}lib/win/mingw/"
+        [ -d "${HB_ABSROOT}lib/win/clang/" ] && cp -f -p "${file}" "${HB_ABSROOT}lib/win/clang/"
       fi
     done
     for file in ${dir_64}lib/*.a; do
       if [ -f "${file}" ] && echo "${file}" | grep -q -v 'dll'; then
-        cp -f -p "${file}" "${HB_ABSROOT}lib/win/mingw64/"
+        [ -d "${HB_ABSROOT}lib/win/mingw64/" ] && cp -f -p "${file}" "${HB_ABSROOT}lib/win/mingw64/"
+        [ -d "${HB_ABSROOT}lib/win/clang64/" ] && cp -f -p "${file}" "${HB_ABSROOT}lib/win/clang64/"
       fi
     done
     [ -f "${dir_64}COPYING.txt" ] && cp -f -p "${dir_64}COPYING.txt" "${HB_ABSROOT}LICENSE_${name}.txt"
@@ -310,11 +325,11 @@ fi
 
 chmod +x \
   "${HB_ABSROOT}"bin/*.hb
+# shellcheck disable=SC2046
 chmod -x \
   "${HB_ABSROOT}"bin/*.dll \
   "${HB_ABSROOT}"bin/*.exe \
-  "${HB_ABSROOT}"lib/win/mingw/*.a \
-  "${HB_ABSROOT}"lib/win/mingw64/*.a
+  $(find "${HB_ABSROOT}"lib/win -name '*.a')
 
 if [ "${os}" = 'win' ]; then
   find "${HB_ABSROOT%/}" -exec attrib +A -R {} \;
@@ -342,15 +357,17 @@ cd "${HB_RT}" || exit
   echo 'tests/*'
 ) >> "${_ROOT}/_hbfiles"
 
-_pkgdate=
+_pkgsuffix=
 if [ "${_BRANCH#*prod*}" != "${_BRANCH}" ]; then
   case "${os}" in
-    bsd|mac) _pkgdate="$(TZ=UTC stat -f '-%Sm' -t '%Y%m%d-%H%M' "${HB_ABSROOT}README.md")";;
-    *)       _pkgdate="$(       stat -c '%Y' "${HB_ABSROOT}README.md" | TZ=UTC awk '{print "-" strftime("%Y%m%d-%H%M", $1)}')";;
+    bsd|mac) _pkgsuffix="$(TZ=UTC stat -f '-%Sm' -t '%Y%m%d-%H%M' "${HB_ABSROOT}README.md")";;
+    *)       _pkgsuffix="$(       stat -c '%Y' "${HB_ABSROOT}README.md" | TZ=UTC awk '{print "-" strftime("%Y%m%d-%H%M", $1)}')";;
   esac
+elif [ "${HB_JOB}" != "${HB_JOB_TO_RELEASE}" ]; then
+  _pkgsuffix="-${HB_JOB}"
 fi
 
-_pkgname="${_ROOT}/harbour-${HB_VF}-win${_pkgdate}.7z"
+_pkgname="${_ROOT}/harbour-${HB_VF}-win${_pkgsuffix}.7z"
 
 rm -f "${_pkgname}"
 (
@@ -376,6 +393,7 @@ cd - || exit
 (
   set +x
   if [ "${_BRANCH#*prod*}" != "${_BRANCH}" ] && \
+     [ "${HB_JOB}" = "${HB_JOB_TO_RELEASE}" ] && \
      [ -n "${PUSHOVER_USER}" ] && \
      [ -n "${PUSHOVER_TOKEN}" ]; then
     # https://pushover.net/api
@@ -383,7 +401,7 @@ cd - || exit
       --form-string "user=${PUSHOVER_USER}" \
       --form-string "token=${PUSHOVER_TOKEN}" \
       --form-string "title=${GITHUB_SLUG}" \
-      --form-string "message=Build ready: ${_BRANCH}" \
+      --form-string "message=Build ready: ${_BRANCH} / ${HB_JOB}" \
       --form-string 'html=1' \
       --form-string 'priority=1' \
       https://api.pushover.net/1/messages.json
@@ -391,7 +409,7 @@ cd - || exit
     echo "! Push notification: Build ready."
   fi
 
-  if [ "${_BRANCH#*master*}" != "${_BRANCH}" ] && \
+  if [ "${HB_JOB}" = "${HB_JOB_TO_RELEASE}" ] && \
      [ -n "${GITHUB_TOKEN}" ]; then
 
     # Create tag update JSON request

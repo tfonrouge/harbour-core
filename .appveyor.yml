@@ -35,6 +35,16 @@ environment:
     secure: lOea8Uey+GRt36n5eNjICxD7AlzmxAgQ/V+/DG1yuD5jNJtSFPbfBQOei7VgZPXB
   HB_CODESIGN_KEY_PASS:
     secure: gI5Z9engdQmJel5UEuxRTsdRSvXSmixs5IGgMbTjxBxYYat+bCXE139J4Uz84F+D
+  matrix:
+    - HB_JOB: clang
+    - HB_JOB: mingw
+    - HB_JOB: msvc2017
+  HB_JOB_TO_RELEASE: mingw
+  HB_CI_THREADS: 4
+  MSYS2_FC_CACHE_SKIP: yes
+matrix:
+  allow_failures:
+    - HB_JOB: msvc2017
 
 #init:
 #  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
@@ -43,11 +53,9 @@ environment:
 
 build_script:
   - set PATH=C:\msys64\usr\bin;%PATH%
-  - set HB_CI_THREADS=4
-  - set MSYS2_FC_CACHE_SKIP=yes
   - pacman --noconfirm --noprogressbar -S --needed mc
-  - pacman --noconfirm --noprogressbar -S -yu -u
-  - pacman --noconfirm --noprogressbar -S -yu -u
+  - if not "%HB_JOB:~0,4%" == "msvc" pacman --noconfirm --noprogressbar -S -yu -u
+  - if not "%HB_JOB:~0,4%" == "msvc" pacman --noconfirm --noprogressbar -S -yu -u
   - sh -c ./package/mpkg_win_ci.sh
 
 artifacts:

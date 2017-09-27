@@ -22,7 +22,9 @@ esac
 _BRANCH="${APPVEYOR_REPO_BRANCH}${TRAVIS_BRANCH}${CI_BUILD_REF_NAME}${GIT_BRANCH}"
 [ -n "${_BRANCH}" ] || _BRANCH="$(git symbolic-ref --short --quiet HEAD)"
 [ -n "${_BRANCH}" ] || _BRANCH='master'
-_BRANC4="$(echo "${_BRANCH}" | cut -c -4)"
+[ -n "${HB_JOB}" ] || HB_JOB="${_BRANCH}"
+[ -n "${HB_JOB_TO_RELEASE}" ] || HB_JOB_TO_RELEASE="${HB_JOB}"
+HB_JOB4="$(echo "${HB_JOB}" | cut -c -4)"
 
 [ -n "${HB_CI_THREADS}" ] || HB_CI_THREADS=4
 
@@ -83,7 +85,7 @@ esac
 if [ "${os}" != 'win' ]; then
 
   # msvc only available on Windows
-  [ "${_BRANC4}" != 'msvc' ] || exit
+  [ "${HB_JOB4}" != 'msvc' ] || exit
 
   # Create native build for host OS
   make -j "${HB_CI_THREADS}" HB_BUILD_DYN=no HB_BUILD_CONTRIBS=hbdoc
@@ -126,7 +128,7 @@ export _HB_BUILD_PKG_ARCHIVE='no'
 
 # can disable to save time/space
 
-[ "${_BRANC4}" = 'msvc' ] || export _HB_BUNDLE_3RDLIB='yes'
+[ "${HB_JOB4}" = 'msvc' ] || export _HB_BUNDLE_3RDLIB='yes'
 export HB_INSTALL_3RDDYN='yes'
 export HB_BUILD_CONTRIB_DYN='yes'
 export HB_BUILD_POSTRUN='"./hbmk2 --version" "./hbrun --version" "./hbtest -noenv" "./hbspeed --noenv --stdout"'
@@ -150,13 +152,21 @@ CODESIGN_KEY="$(realpath './package')/vszakats.p12"
 )
 [ -f "${CODESIGN_KEY}" ] || unset CODESIGN_KEY
 
-# mingw
+# mingw/clang
 
-if [ "${_BRANC4}" != 'msvc' ]; then
+if [ "${HB_JOB4}" != 'msvc' ]; then
 
   # LTO is broken as of mingw 6.1.0
 # [ "${_BRANCH#*prod*}" != "${_BRANCH}" ] && _HB_USER_CFLAGS="${_HB_USER_CFLAGS} -flto -ffat-lto-objects"
   [ "${HB_BUILD_MODE}" = 'cpp' ] && export HB_USER_LDFLAGS="${HB_USER_LDFLAGS} -static-libstdc++"
+
+  if [ "${HB_JOB#*clang*}" = "${HB_JOB}" ]; then
+    HB_COMP_BASE=mingw
+    HB_COMP_TOOL=gcc
+  else
+    HB_COMP_BASE=clang
+    HB_COMP_TOOL=clang
+  fi
 
   if [ "${os}" = 'win' ]; then
     readonly _msys_mingw32='/mingw32'
@@ -166,13 +176,13 @@ if [ "${_BRANC4}" != 'msvc' ]; then
     if [ -d "${HB_DIR_MINGW_64}" ]; then
       # Use the same toolchain for both targets
       export HB_DIR_MINGW_32="${HB_DIR_MINGW_64}"
-      _build_info_32='BUILD-mingw.txt'
+      _build_info_32="BUILD-${HB_COMP_BASE}.txt"
       _build_info_64=/dev/null
     else
       export HB_DIR_MINGW_32="${_msys_mingw32}/bin/"
       export HB_DIR_MINGW_64="${_msys_mingw64}/bin/"
-      _build_info_32='BUILD-mingw32.txt'
-      _build_info_64='BUILD-mingw64.txt'
+      _build_info_32="BUILD-${HB_COMP_BASE}32.txt"
+      _build_info_64="BUILD-${HB_COMP_BASE}64.txt"
     fi
     export HB_PFX_MINGW_32=
     export HB_PFX_MINGW_64=
@@ -185,10 +195,10 @@ if [ "${_BRANC4}" != 'msvc' ]; then
     export HB_PFX_MINGW_64='x86_64-w64-mingw32-'
     export HB_DIR_MINGW_32=
     export HB_DIR_MINGW_64=
-    HB_DIR_MINGW_32="$(dirname "$(which ${HB_PFX_MINGW_32}gcc)")"/
-    HB_DIR_MINGW_64="$(dirname "$(which ${HB_PFX_MINGW_64}gcc)")"/
-    _build_info_32='BUILD-mingw32.txt'
-    _build_info_64='BUILD-mingw64.txt'
+    HB_DIR_MINGW_32="$(dirname "$(which ${HB_PFX_MINGW_32}${HB_COMP_TOOL})")"/
+    HB_DIR_MINGW_64="$(dirname "$(which ${HB_PFX_MINGW_64}${HB_COMP_TOOL})")"/
+    _build_info_32="BUILD-${HB_COMP_BASE}32.txt"
+    _build_info_64="BUILD-${HB_COMP_BASE}64.txt"
     _bin_make='make'
 
     export HB_BUILD_3RDEXT='no'
@@ -246,14 +256,14 @@ if [ "${_BRANC4}" != 'msvc' ]; then
   export HB_CCPREFIX="${HB_PFX_MINGW_32}"
   [ "${HB_BUILD_MODE}" != 'cpp' ] && export HB_USER_CFLAGS="${HB_USER_CFLAGS} -fno-asynchronous-unwind-tables"
   [ "${os}" = 'win' ] && export PATH="${HB_DIR_MINGW_32}:${_ori_path}"
-  ${HB_CCPREFIX}gcc -v 2>&1 | tee "${_build_info_32}"
+  ${HB_CCPREFIX}${HB_COMP_TOOL} -v 2>&1 | tee "${_build_info_32}"
   if which osslsigncode > /dev/null 2>&1; then
     export HB_CODESIGN_KEY="${CODESIGN_KEY}"
   else
     unset HB_CODESIGN_KEY
   fi
   # shellcheck disable=SC2086
-  ${_bin_make} install ${HB_MKFLAGS} HB_COMPILER=mingw HB_CPU=x86 || exit 1
+  ${_bin_make} install ${HB_MKFLAGS} "HB_COMPILER=${HB_COMP_BASE}" HB_CPU=x86 || exit 1
 
   export HB_WITH_CURL="${HB_DIR_CURL_64}include"
   export HB_WITH_OPENSSL="${HB_DIR_OPENSSL_64}include"
@@ -293,19 +303,19 @@ if [ "${_BRANC4}" != 'msvc' ]; then
   [ -n "${_libdir}" ] && export HB_BUILD_LIBPATH="${_libdir}"
   export HB_CCPREFIX="${HB_PFX_MINGW_64}"
   [ "${os}" = 'win' ] && export PATH="${HB_DIR_MINGW_64}:${_ori_path}"
-  ${HB_CCPREFIX}gcc -v 2>&1 | tee "${_build_info_64}"
+  ${HB_CCPREFIX}${HB_COMP_TOOL} -v 2>&1 | tee "${_build_info_64}"
   if which osslsigncode > /dev/null 2>&1; then
     export HB_CODESIGN_KEY="${CODESIGN_KEY}"
   else
     unset HB_CODESIGN_KEY
   fi
   # shellcheck disable=SC2086
-  ${_bin_make} install ${HB_MKFLAGS} HB_COMPILER=mingw64 HB_CPU=x86_64 || exit 1
+  ${_bin_make} install ${HB_MKFLAGS} "HB_COMPILER=${HB_COMP_BASE}64" HB_CPU=x86_64 || exit 1
 fi
 
 # msvc
 
-if [ "${_BRANC4}" = 'msvc' ]; then
+if [ "${HB_JOB4}" = 'msvc' ]; then
 
   export PATH="${_ori_path}"
 
@@ -318,13 +328,13 @@ if [ "${_BRANC4}" = 'msvc' ]; then
 
 # export _HB_MSVC_ANALYZE='yes'
 
-  [ "${_BRANCH}" = 'msvc2008' ] && _VCVARSALL=' 9.0\VC'
-  [ "${_BRANCH}" = 'msvc2010' ] && _VCVARSALL=' 10.0\VC'
-  [ "${_BRANCH}" = 'msvc2012' ] && _VCVARSALL=' 11.0\VC'
-  [ "${_BRANCH}" = 'msvc2013' ] && _VCVARSALL=' 12.0\VC'
-  [ "${_BRANCH}" = 'msvc2015' ] && _VCVARSALL=' 14.0\VC'
-  # Assume '\<YYYY>\Community\VC\Auxiliary\Build' for anything newer:
-  [ -z "${_VCVARSALL}" ] && _VCVARSALL="\\$(echo "${_BRANCH}" | cut -c 5-8)\Community\VC\Auxiliary\Build"
+  [ "${HB_JOB}" = 'msvc2008' ] && _VCVARSALL=' 9.0\VC'
+  [ "${HB_JOB}" = 'msvc2010' ] && _VCVARSALL=' 10.0\VC'
+  [ "${HB_JOB}" = 'msvc2012' ] && _VCVARSALL=' 11.0\VC'
+  [ "${HB_JOB}" = 'msvc2013' ] && _VCVARSALL=' 12.0\VC'
+  [ "${HB_JOB}" = 'msvc2015' ] && _VCVARSALL=' 14.0\VC'
+  # Assume '\<YEAR>\Community\VC\Auxiliary\Build' for anything newer:
+  [ -z "${_VCVARSALL}" ] && _VCVARSALL="\\$(echo "${HB_JOB}" | cut -c 5-8)\Community\VC\Auxiliary\Build"
 
   export _VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio${_VCVARSALL}\vcvarsall.bat"
 
@@ -338,8 +348,8 @@ EOF
   fi
 
   # 64-bit target not supported by these MSVC versions
-  [ "${_BRANCH}" = 'msvc2008' ] && _VCVARSALL=
-  [ "${_BRANCH}" = 'msvc2010' ] && _VCVARSALL=
+  [ "${HB_JOB}" = 'msvc2008' ] && _VCVARSALL=
+  [ "${HB_JOB}" = 'msvc2010' ] && _VCVARSALL=
 
   if [ -n "${_VCVARSALL}" ]; then
     cat << EOF > _make.bat
@@ -353,8 +363,11 @@ fi
 
 # packaging
 
-[ "${_BRANC4}" = 'msvc' ] || "$(dirname "$0")/mpkg_win.sh"
+"$(dirname "$0")/mpkg_win.sh"
 
 # documentation
 
-"$(dirname "$0")/upd_doc.sh" "${_BRANCH}"
+if [ "${_BRANCH#*master*}" != "${_BRANCH}" ] && \
+   [ "${HB_JOB}" = "${HB_JOB_TO_RELEASE}" ]; then
+  "$(dirname "$0")/upd_doc.sh"
+fi

@@ -264,7 +264,7 @@ HB_FUNC( WVW_ADDTOOLTIPEX )  /* changed by MAG */
          ti.hwnd     = wvw_win->hWnd;
          ti.uId      = ( UINT_PTR ) wvw_win->hWnd;
          ti.hinst    = GetModuleHandle( NULL );
-         ti.lpszText = ( LPTSTR ) HB_PARSTRDEF( 3, &hText, NULL );  /* FIXME: drops const */
+         ti.lpszText = ( LPTSTR ) HB_UNCONST( HB_PARSTRDEF( 3, &hText, NULL ) );
 
          hb_retl( ( HB_BOOL ) SendMessage( wvw->hWndTT, TTM_ADDTOOL, 0, ( LPARAM ) &ti ) );
 
@@ -1190,7 +1190,7 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
 
          if( HB_ISNUM( 3 ) )
             hDlg = CreateDialogIndirect( GetModuleHandle( NULL ),
-                                         ( LPDLGTEMPLATE ) hb_parc( 1 ),
+                                         ( LPCDLGTEMPLATE ) hb_parc( 1 ),
                                          hb_parl( 2 ) ? wvw_zer->hWnd : NULL,
                                          hbwapi_par_raw_DLGPROC( 3 ) );
          else
@@ -1218,7 +1218,7 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
 
                case 2:
                   hDlg = CreateDialogIndirect( GetModuleHandle( NULL ),
-                                               ( LPDLGTEMPLATE ) hb_parc( 1 ),
+                                               ( LPCDLGTEMPLATE ) hb_parc( 1 ),
                                                hb_parl( 2 ) ? wvw_zer->hWnd : NULL,
                                                ( DLGPROC ) hb_gt_wvw_DlgProcMLess );
                   break;
@@ -1316,7 +1316,7 @@ HB_FUNC( WVW_CREATEDIALOGMODAL )
 
             case 2:
                iResult = DialogBoxIndirectParam( GetModuleHandle( NULL ),
-                                                 ( LPDLGTEMPLATE ) hb_parc( 1 ),
+                                                 ( LPCDLGTEMPLATE ) hb_parc( 1 ),
                                                  hParent,
                                                  ( DLGPROC ) hb_gt_wvw_DlgProcModal,
                                                  ( LPARAM ) ( DWORD ) iIndex + 1 );
