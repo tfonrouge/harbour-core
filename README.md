@@ -1,6 +1,6 @@
 # Welcome to Harbour
 [![License](https://img.shields.io/badge/license-GPLv2%20%2B%20Library%20Exception-blue.svg)](LICENSE.txt "License")
-[![Download](https://img.shields.io/badge/download-snapshot_3.4.0dev-ff4500.svg)](https://github.com/vszakats/harbour-core/releases "Download snapshot release")
+[![Download](https://img.shields.io/badge/download-snapshot_binary_(3.4)-ff4500.svg)](https://github.com/vszakats/harbour-core/releases "Download snapshot release")
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 [![PayPal Donate](https://img.shields.io/badge/PayPal-Donate_Now-ff4500.svg?colorA=00457c)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BPSZQYKXMQJYG "Donate Now")
 <br />
@@ -100,7 +100,7 @@ Download source archive from any of these URLs and unpack:
 
 #### Mac (using Homebrew :beer:)
 
-    brew install https://raw.githubusercontent.com/vszakats/harbour-core/master/package/harbour@3.4.rb --HEAD
+    brew install https://raw.githubusercontent.com/vszakats/harbour-core/master/package/harbour-vszakats.rb --HEAD
 
 ### Follow commits using:
 
@@ -767,6 +767,18 @@ set PATH=%ProgramFiles(x86)%\LLVM 3.6.svn;%PATH%
 mingw32-make
 ```
 
+```batchfile
+:: Intel(R) C++ (x86 target)
+call "%ProgramFiles(x86)%\Intel\Compiler\11.1\054\bin\ia32\iclvars_ia32.bat"
+mingw32-make
+```
+
+```batchfile
+:: Intel(R) C++ (x64 target)
+call "%ProgramFiles(x86)%\Intel\Compiler\11.1\054\bin\intel64\iclvars_intel64.bat"
+mingw32-make
+```
+
 ## on Windows 32-bit hosts
 
 Same as 64-bit Windows, with the difference that you will have to change
@@ -843,19 +855,6 @@ mingw32-make
 set PATH=C:\mingwce\opt\mingw32ce\bin;C:\cygwin\bin;%PATH%
 :: optional:
 set CYGWIN=nodosfilewarning
-mingw32-make
-```
-
-```batchfile
-:: Intel(R) C++
-call "%ProgramFiles%\Intel\Compiler\C++\10.1.014\IA32\Bin\iclvars.bat"
-mingw32-make
-```
-
-```batchfile
-:: Intel(R) C++ for Windows IA-64 Itanium
-:: (requires preceding build for native target)
-call "%ProgramFiles%\Intel\Compiler\C++\10.1.025\Itanium\Bin\iclvars.bat"
 mingw32-make
 ```
 
@@ -1122,6 +1121,7 @@ Press `<Alt+D>` in the app.
 * clang-cl64 - LLVM/Clang-cl x86-64
 * watcom   - Open Watcom C/C++
 * icc      - Intel(R) C/C++
+* icc64    - Intel(R) C/C++ x86-64
 
 ### win (deprecated)
 * bcc      - Borland/CodeGear/Embarcadero C++ 5.5 and above
@@ -1180,103 +1180,96 @@ Press `<Alt+D>` in the app.
 
 # Platform Matrix
 
- &nbsp;| host<br />platform | target<br />platform/compiler | target CPU
- :---- | :------- | :---------------- | :---------------------------------------
-       | linux    | linux/gcc         | (CPU cross-builds possible)
-       | linux    | linux/clang       | (CPU cross-builds possible)
-       | linux    | linux/icc         | (CPU cross-builds possible: x86, x86-64, ia64)
-       | linux    | linux/sunpro      | (CPU cross-builds possible: x86, x86-64)
-       | linux    | linux/open64      | (CPU cross-builds possible: x86-64, ia64, ...)
-     x | linux    | wce/mingwarm      | arm
-     x | linux    | wce/mingw         | x86
-     x | linux    | win/mingw         | x86
-     x | linux    | win/mingw64       | x86-64
-     x | linux    | win/watcom        | x86
-     x | linux    | win/bcc           | x86    (requires WINE) (deprecated)
-     x | linux    | win/bcc64         | x86-64 (requires WINE) (deprecated)
-     x | linux    | os2/watcom        | x86
-     x | linux    | dos/watcom        | x86
-     x | linux    | dos/djgpp         | x86
-     x | linux    | android/gcc       | x86
-     x | linux    | android/gccarm    | arm
-     x | linux    | vxworks/gcc       | (CPU cross-builds possible: x86, arm, mips, ppc)
-     x | linux    | vxworks/diab      | (CPU cross-builds possible: x86, arm, mips, ppc, sparc)
-       | win      | win/bcc           | x86    (deprecated)
-       | win      | win/bcc64         | x86-64 (deprecated)
-       | win      | win/clang         | x86
-       | win      | win/clang64       | x86-64
-       | win      | win/gcc           | x86
-       | win      | win/icc           | x86    (experimental)
-       | win      | win/icc64         | x86-64
-       | win      | win/iccia64       | ia64   (deprecated)
-       | win      | win/mingw         | x86
-       | win      | win/mingw64       | x86-64
-       | win      | win/msvc          | x86
-       | win      | win/msvc64        | x86-64
-       | win      | win/clang-cl      | x86    (experimental)
-       | win      | win/clang-cl64    | x86-64 (experimental)
-       | win      | win/msvcia64      | ia64   (deprecated)
-       | win      | win/pocc          | x86    (deprecated)
-       | win      | win/pocc64        | x86-64 (deprecated)
-       | win      | win/watcom        | x86    (experimental)
-       | win      | win/xcc           | x86    (deprecated)
-     x | win      | wce/mingwarm      | arm
-     x | win      | wce/mingw         | x86    (not fully supported yet)
-     x | win      | wce/poccarm       | arm    (deprecated)
-     x | win      | wce/msvcarm       | arm
-     x | win      | wce/msvc          | x86    (not supported yet)
-     x | win      | dos/djgpp         | x86    (on Windows x86 hosts only)
-     x | win      | dos/watcom        | x86
-     x | win      | os2/watcom        | x86
-     x | win      | linux/watcom      | x86
-     x | win      | android/gcc       | x86
-     x | win      | android/gccarm    | arm
-     x | win      | vxworks/gcc       | (CPU cross-builds possible: x86, arm, mips, ppc)
-     x | win      | vxworks/diab      | (CPU cross-builds possible: x86, arm, mips, ppc, sparc)
-     x | win      | symbian/gcc       | arm    (deprecated)
-     x | win      | cygwin/gcc        | x86
-       | os2      | os2/gcc           | x86
-       | os2      | os2/watcom        | x86
-     x | os2      | win/watcom        | x86
-     x | os2      | dos/watcom        | x86
-     x | os2      | linux/watcom      | x86
-       | darwin   | darwin/clang      | (CPU cross-builds possible: x86, x86-64, unibin)
-       | darwin   | darwin/gcc        | (CPU cross-builds possible: x86, x86-64, ppc, ppc64, unibin)
-       | darwin   | darwin/icc        | (CPU cross-builds possible: x86, x86-64)
-     x | darwin   | wce/mingwarm      | arm
-     x | darwin   | wce/mingw         | x86
-     x | darwin   | win/mingw         | x86
-     x | darwin   | win/mingw64       | x86-64
-     x | darwin   | dos/djgpp         | x86
-     x | darwin   | android/gcc       | x86
-     x | darwin   | android/gccarm    | arm
-       | bsd      | bsd/gcc           | (CPU cross-builds possible)
-       | bsd      | bsd/clang         | (CPU cross-builds possible)
-       | bsd      | bsd/pcc           | (experimental)
-     x | bsd      | wce/mingwarm      | arm
-     x | bsd      | wce/mingw         | x86
-     x | bsd      | win/mingw         | x86
-     x | bsd      | dos/djgpp         | x86
-       | hpux     | hpux/gcc          | (CPU cross-builds possible)
-       | qnx      | qnx/gcc           | (CPU cross-builds possible - not tested)
-       | beos     | beos/gcc          | x86
-     x | hpux     | wce/mingwarm      | arm
-     x | hpux     | wce/mingw         | x86
-     x | hpux     | win/mingw         | x86
-     x | hpux     | dos/djgpp         | x86
-       | minix    | minix/clang       | x86
-       | minix    | minix/gcc         | x86
-       | aix      | aix/gcc           | (CPU cross-builds possible: ppc, ppc64)
-       | sunos    | sunos/gcc         | (CPU cross-builds possible)
-       | sunos    | sunos/sunpro      | (CPU cross-builds possible: x86, x86-64, sparc32, sparc64)
-     x | sunos    | wce/mingwarm      | arm
-     x | sunos    | wce/mingw         | x86
-     x | sunos    | win/mingw         | x86
-     x | sunos    | dos/djgpp         | x86
-     x | sunos    | vxworks/gcc       | (CPU cross-builds possible: x86, arm, mips, ppc)
-     x | sunos    | vxworks/diab      | (CPU cross-builds possible: x86, arm, mips, ppc, sparc)
-
-> Leading **x** marks cross-platform scenarios.
+ host<br />platform | target<br />platform/compiler | target CPU
+ :------- | :---------------- | :---------------------------------------
+ linux    | linux/gcc         | (CPU cross-builds possible)
+ linux    | linux/clang       | (CPU cross-builds possible)
+ linux    | linux/icc         | (CPU cross-builds possible: x86, x86-64, ia64)
+ linux    | linux/sunpro      | (CPU cross-builds possible: x86, x86-64)
+ linux    | linux/open64      | (CPU cross-builds possible: x86-64, ia64, ...)
+ linux    | wce/mingwarm      | arm
+ linux    | wce/mingw         | x86
+ linux    | win/mingw         | x86
+ linux    | win/mingw64       | x86-64
+ linux    | win/watcom        | x86
+ linux    | os2/watcom        | x86
+ linux    | dos/watcom        | x86
+ linux    | dos/djgpp         | x86
+ linux    | android/gcc       | x86
+ linux    | android/gccarm    | arm
+ linux    | vxworks/gcc       | (CPU cross-builds possible: x86, arm, mips, ppc)
+ linux    | vxworks/diab      | (CPU cross-builds possible: x86, arm, mips, ppc, sparc)
+ win      | win/clang         | x86
+ win      | win/clang64       | x86-64
+ win      | win/mingw         | x86
+ win      | win/mingw64       | x86-64
+ win      | win/msvc          | x86
+ win      | win/msvc64        | x86-64
+ win      | wce/mingwarm      | arm
+ win      | wce/msvcarm       | arm
+ win      | dos/djgpp         | x86    (on Windows x86 hosts only)
+ win      | dos/watcom        | x86
+ win      | os2/watcom        | x86
+ win      | linux/watcom      | x86
+ win      | android/gcc       | x86
+ win      | android/gccarm    | arm
+ win      | vxworks/gcc       | (CPU cross-builds possible: x86, arm, mips, ppc)
+ win      | vxworks/diab      | (CPU cross-builds possible: x86, arm, mips, ppc, sparc)
+ win      | cygwin/gcc        | x86
+ win      | win/clang-cl      | x86    (experimental)
+ win      | win/clang-cl64    | x86-64 (experimental)
+ win      | win/icc           | x86    (experimental)
+ win      | win/icc64         | x86-64 (experimental)
+ win      | win/watcom        | x86    (experimental)
+ win      | win/bcc           | x86    (deprecated)
+ win      | win/bcc64         | x86-64 (deprecated)
+ win      | win/iccia64       | ia64   (deprecated)
+ win      | win/msvcia64      | ia64   (deprecated)
+ win      | win/pocc          | x86    (deprecated)
+ win      | win/pocc64        | x86-64 (deprecated)
+ win      | wce/poccarm       | arm    (deprecated)
+ win      | win/xcc           | x86    (deprecated)
+ win      | symbian/gcc       | arm    (deprecated)
+ os2      | os2/gcc           | x86
+ os2      | os2/watcom        | x86
+ os2      | win/watcom        | x86
+ os2      | dos/watcom        | x86
+ os2      | linux/watcom      | x86
+ darwin   | darwin/clang      | (CPU cross-builds possible: x86, x86-64, unibin)
+ darwin   | darwin/gcc        | (CPU cross-builds possible: x86, x86-64, ppc, ppc64, unibin)
+ darwin   | darwin/icc        | (CPU cross-builds possible: x86, x86-64)
+ darwin   | wce/mingwarm      | arm
+ darwin   | wce/mingw         | x86
+ darwin   | win/mingw         | x86
+ darwin   | win/mingw64       | x86-64
+ darwin   | dos/djgpp         | x86
+ darwin   | android/gcc       | x86
+ darwin   | android/gccarm    | arm
+ bsd      | bsd/gcc           | (CPU cross-builds possible)
+ bsd      | bsd/clang         | (CPU cross-builds possible)
+ bsd      | bsd/pcc           | (experimental)
+ bsd      | wce/mingwarm      | arm
+ bsd      | wce/mingw         | x86
+ bsd      | win/mingw         | x86
+ bsd      | dos/djgpp         | x86
+ hpux     | hpux/gcc          | (CPU cross-builds possible)
+ qnx      | qnx/gcc           | (CPU cross-builds possible - not tested)
+ beos     | beos/gcc          | x86
+ hpux     | wce/mingwarm      | arm
+ hpux     | wce/mingw         | x86
+ hpux     | win/mingw         | x86
+ hpux     | dos/djgpp         | x86
+ minix    | minix/clang       | x86
+ minix    | minix/gcc         | x86
+ aix      | aix/gcc           | (CPU cross-builds possible: ppc, ppc64)
+ sunos    | sunos/gcc         | (CPU cross-builds possible)
+ sunos    | sunos/sunpro      | (CPU cross-builds possible: x86, x86-64, sparc32, sparc64)
+ sunos    | wce/mingwarm      | arm
+ sunos    | wce/mingw         | x86
+ sunos    | win/mingw         | x86
+ sunos    | dos/djgpp         | x86
+ sunos    | vxworks/gcc       | (CPU cross-builds possible: x86, arm, mips, ppc)
+ sunos    | vxworks/diab      | (CPU cross-builds possible: x86, arm, mips, ppc, sparc)
 
 Supported shells per host platforms:
 
@@ -1310,7 +1303,7 @@ Supported shells per host platforms:
         * <https://releases.llvm.org/>
      * Xcode / Command Line Tools for Xcode [darwin, zero price, proprietary with open-source components]
         * <https://itunes.apple.com/us/app/xcode/id497799835>
-        * <https://developer.apple.com/downloads/>
+        * <https://developer.apple.com/downloads/> (needs login)
      * MS Windows SDK [zero price, proprietary]
         * <https://developer.microsoft.com/windows/downloads/sdk-archive/>
      * MS Visual C++ Build Tools [win, zero price, proprietary]
@@ -1422,7 +1415,7 @@ Supported shells per host platforms:
   * [How to contribute](.github/CONTRIBUTING.md)
   * [Source code](https://github.com/vszakats/harbour-core)
   * [Issues](https://github.com/vszakats/harbour-core/issues)
-  * [Localization](https://www.transifex.com/projects/p/harbour/) (Resource [hbmk2-vszakats](https://www.transifex.com/projects/p/harbour/resource/hbmk2-vszakats/))
+  * [Localization](https://www.transifex.com/harbour/harbour/) (Resource [hbmk2-vszakats](https://www.transifex.com/harbour/harbour/hbmk2-vszakats/) (needs login))
   * Documents:
      * [hbmk2 documentation](utils/hbmk2/doc/hbmk2.en.md)
      * [hbrun documentation](contrib/hbrun/doc/hbrun.en.md)
@@ -1431,11 +1424,11 @@ Supported shells per host platforms:
      * CA-Cl*pper 5.3 [online documentation](https://harbour.github.io/ng/c53g01c/menu.html)
      * Harbour [online documentation](https://harbour.github.io/doc/)
      * Harbour [internal documents](doc/)
-     * [Harbour for Beginners (by Alexander Kresin)](https://www.kresin.ru/en/hrbfaq_3.html)
-     * [Harbour Wiki (by Pete D)](https://github.com/Petewg/V-harbour-core/wiki)
+     * [Harbour for Beginners - by Alexander Kresin](https://www.kresin.ru/en/hrbfaq_3.html)
+     * [Harbour Wiki - by Pete D](https://github.com/Petewg/V-harbour-core/wiki)
+     * [Harbour Magazine - by José Luis Sánchez](https://medium.com/harbour-magazine)
      * [Wikipedia](https://en.wikipedia.org/wiki/Harbour_compiler)
      * [Stack Overflow](https://stackoverflow.com/questions/tagged/clipper)
-     * [Medium](https://medium.com/harbour-magazine)
 
 
 # Guarantees and Liability
