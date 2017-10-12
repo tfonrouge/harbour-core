@@ -3,7 +3,7 @@
 
 -o${hb_targetname}
 
--w3 -es2
+-w3 -es2 -gc3
 
 -hbx=${hb_name}
 
