@@ -26,6 +26,9 @@
 
 #define CR_LF                   ( Chr( 13 ) + Chr( 10 ) )
 
+#define HB_TK_INIT  "{{"
+#define HB_TK_END   "}}"
+
 THREAD STATIC t_cResult, t_nStatusCode, t_aHeader, t_aSessionData
 
 MEMVAR server, get, post, cookie, session, httpd
@@ -194,7 +197,9 @@ METHOD Run( hConfig ) CLASS UHttpd
       "PrivateKeyFilename"   => "", ;
       "CertificateFilename"  => "", ;
       "RequestFilter"        => hb_noop(), ;
-      "FirewallFilter"       => "0.0.0.0/0" }
+      "FirewallFilter"       => "0.0.0.0/0", ;
+      "HB_TK_INIT"           => HB_TK_INIT, ;
+      "HB_TK_END"            => HB_TK_END }
 
    FOR EACH xValue IN hConfig
       IF ! xValue:__enumKey $ ::hConfig .OR. ! ValType( xValue ) == ValType( ::hConfig[ xValue:__enumKey ] )
@@ -575,6 +580,10 @@ STATIC FUNCTION ProcessConnection( oServer )
          aServer[ "SERVER_ADDR" ] := aI[ 2 ]
          aServer[ "SERVER_PORT" ] := aI[ 3 ]
       ENDIF
+
+      /* harbour token delimiter */
+      aServer[ "HB_TK_INIT" ] := oServer:hConfig[ "HB_TK_INIT" ]
+      aServer[ "HB_TK_END" ]  := oServer:hConfig[ "HB_TK_END" ]
 
       /* Firewall */
       nLen := IPAddr2Num( aServer[ "REMOTE_ADDR" ] )
@@ -1636,11 +1645,11 @@ STATIC FUNCTION compile_buffer( cTpl, nStart, aCode )
 
    LOCAL nI, nS, nE, cTag, cParam
 
-   DO WHILE ( nS := hb_At( "{{", cTpl, nStart ) ) > 0
+   DO WHILE ( nS := hb_At( MEMVAR->server[ "HB_TK_INIT" ], cTpl, nStart ) ) > 0
       IF nS > nStart
          AAdd( aCode, { "txt", SubStr( cTpl, nStart, nS - nStart ) } )
       ENDIF
-      IF ( nE := hb_At( "}}", cTpl, nS ) ) > 0
+      IF ( nE := hb_At( MEMVAR->server[ "HB_TK_END" ], cTpl, nS ) ) > 0
          IF ( nI := hb_At( " ", cTpl, nS, nE ) ) == 0
             nI := nE
          ENDIF
@@ -1657,10 +1666,10 @@ STATIC FUNCTION compile_buffer( cTpl, nStart, aCode )
          CASE "if"
             AAdd( aCode, { "if", cParam, {}, {} } )
             nI := compile_buffer( cTpl, nE + 2, ATail( aCode )[ 3 ] )
-            IF SubStr( cTpl, nI, 8 ) == "{{else}}"
+            IF SubStr( cTpl, nI, 8 ) == MEMVAR->server[ "HB_TK_INIT" ] + "else" + MEMVAR->server[ "HB_TK_END" ]
                nI := compile_buffer( cTpl, nI + 8, ATail( aCode )[ 4 ] )
             ENDIF
-            IF SubStr( cTpl, nI, 9 ) == "{{endif}}"
+            IF SubStr( cTpl, nI, 9 ) == MEMVAR->server[ "HB_TK_INIT" ] + "endif" + MEMVAR->server[ "HB_TK_END" ]
                nStart := nI + 9
             ELSE
                Break( nI )
@@ -1670,7 +1679,7 @@ STATIC FUNCTION compile_buffer( cTpl, nStart, aCode )
          CASE "loop"
             AAdd( aCode, { "loop", cParam, {} } )
             nI := compile_buffer( cTpl, nE + 2, ATail( aCode )[ 3 ] )
-            IF SubStr( cTpl, nI, 11 ) == "{{endloop}}"
+            IF SubStr( cTpl, nI, 11 ) == MEMVAR->server[ "HB_TK_INIT" ] + "endloop" + MEMVAR->server[ "HB_TK_END" ]
                nStart := nI + 11
             ELSE
                Break( nI )
