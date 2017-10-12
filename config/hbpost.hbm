@@ -16,7 +16,7 @@
 -harden
 {HB_BUILD_PKG='yes'}-vcsts
 
-${hb_prefix}/package/harbour.hbc{hbdyn}
+${hb_prefix}/package/harbour.hbc{hbdyn&!__HB_3RD_DYN}
 
 # code signing
 "{win&HB_CODESIGN_KEY_PASS}-sign=${HB_CODESIGN_KEY}"
@@ -27,14 +27,12 @@ ${hb_prefix}/package/harbour.hbc{hbdyn}
 
 #{win&allmsvc&hb_comp_ver>'1600'}-cflag=-sdl
 {win&allmsvc&hb_comp_ver>'1700'&_HB_MSVC_ANALYZE='yes'}-cflag=-analyze
-{win&allmingw&hb_comp_ver>'0407'}-ldflag=-static-libgcc
-{win&allmingw&hb_comp_ver>'0407'}-dflag=-static-libgcc
-#{win&allmingw&hb_comp_ver>'0407'&lngcpp}-ldflag=-static-libstdc++
-#{win&((allmingw&hb_comp_ver>'0401')|allclang)}-cflag=-Wstrict-overflow=4
+{win&(allclang|(allmingw&hb_comp_ver>'0407'))}-ldflag=-static-libgcc
+{win&(allclang|(allmingw&hb_comp_ver>'0407'))}-dflag=-static-libgcc
+#{win&(allclang|(allmingw&hb_comp_ver>'0407'))&lngcpp}-ldflag=-static-libstdc++
+#{win&(allclang|(allmingw&hb_comp_ver>'0401'))}-cflag=-Wstrict-overflow=4
 {((linux|darwin)&gcc)|(!win&clang)}-cflag=-D_FORTIFY_SOURCE=2
 {(linux|darwin)&((gcc&hb_comp_ver>'0408')|(clang&hb_comp_ver>'0304'))}-cflag=-fstack-protector-strong
-
-{allwin}-winuni
 
 {HB_BUILD_DEBUG}-prgflag=-l-
 {HB_BUILD_DEBUG}-debug
@@ -49,12 +47,13 @@ ${hb_prefix}/package/harbour.hbc{hbdyn}
 # dynamic lib creation settings
 {hbdyn}-shared
 {hbdyn}-implib=${hb_lib}/${hb_outputname}_dll
+{hbdyn&win&(allmingw|allclang)}-implib=${hb_lib}/${hb_outputname}
 {hbdyn&unix&!android&!cygwin}-ln=${hb_dynprefix}${hb_outputname}${hb_dynext}
 {hbdyn&unix&!darwin&!android&!cygwin}-ln=${hb_dynprefix}${hb_outputname}${hb_dynext}.${hb_major}.${hb_minor}
 {hbdyn&unix&darwin}-ln=${hb_dynprefix}${hb_outputname}.${hb_major}.${hb_minor}${hb_dynext}
 {hbdyn&android}-lharbour
 {hbdyn&android}-lm
-{hbdyn&(allwin|cygwin)}-lhbmaindllp
+{hbdyn&(allwin|cygwin)&!__HB_3RD_DYN}-lhbmaindllp
 {hbdyn}-depimplib-
 
 "{hbdyn&darwin}-dflag=-install_name '${hb_dynprefix}${hb_outputname}${hb_dynext}'"
@@ -63,15 +62,16 @@ ${hb_prefix}/package/harbour.hbc{hbdyn}
 "{hbdyn&android}-dflag=-Wl,-soname,${hb_dynprefix}${hb_outputname}${hb_dynext} -Wl,--no-undefined -Wl,-z,noexecstack"
 "{hbdyn&linux&!android}-dflag=-Wl,-soname,${hb_dynprefix}${hb_outputname}${hb_dynext}.${hb_major}.${hb_minor}"
 "{hbdyn&sunos}-dflag=-Wl,-h,${hb_dynprefix}${hb_outputname}${hb_dynext}.${hb_major}.${hb_minor}"
-"{hbdyn&win&(allmingw|allclang)}-dflag=-Wl,--major-image-version,${hb_major}"
-"{hbdyn&win&(allmingw|allclang)}-dflag=-Wl,--minor-image-version,${hb_minor}"
+"{hbdyn&win&(allmingw|allclang)&!__HB_3RD_DYN}-dflag=-Wl,--major-image-version,${hb_major}"
+"{hbdyn&win&(allmingw|allclang)&!__HB_3RD_DYN}-dflag=-Wl,--minor-image-version,${hb_minor}"
 
 # output name tweaks for dynamic libs
 # NOTE: We're altering previously set output name value here
 {hbdyn&unix&!darwin&!android&!cygwin}-o${hb_outputname}${hb_dynext}.${hb_major}.${hb_minor}.${hb_release}
 {hbdyn&unix&darwin}-o${hb_outputname}.${hb_major}.${hb_minor}.${hb_release}${hb_dynext}
 {hbdyn&unix&(cygwin|android)}-o${hb_outputname}${hb_dynext}
-{hbdyn&!unix&allwin}-o${hb_outputname}-${hb_major}${hb_minor}${hb_dynsuffix}
+{hbdyn&!unix&allwin&!__HB_3RD_DYN}-o${hb_outputname}-${hb_major}${hb_minor}${hb_dynsuffix}
+{hbdyn&!unix&allwin&__HB_3RD_DYN}-o${hb_outputname}${hb_dynsuffix}
 {hbdyn&!unix&!allwin}-o${hb_outputname}${hb_dynsuffix}
 
 # output dir (in sync with GNU Make)

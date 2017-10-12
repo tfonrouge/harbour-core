@@ -3,7 +3,7 @@
 [![Download](https://img.shields.io/badge/download-snapshot_binary_(3.4)-ff4500.svg)](https://github.com/vszakats/harbour-core/releases "Download snapshot release")
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 [![PayPal Donate](https://img.shields.io/badge/PayPal-Donate_Now-ff4500.svg?colorA=00457c)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BPSZQYKXMQJYG "Donate Now")
-<br />
+<br>
 [![Build Status](https://api.travis-ci.org/vszakats/harbour-core.svg?branch=master)](https://travis-ci.org/vszakats/harbour-core)
 [![Build Status](https://ci.appveyor.com/api/projects/status/1kx6w3y6qasymah3/branch/master?svg=true)](https://ci.appveyor.com/project/vsz/harbour-core/branch/master)
 [![Coverity Status](https://scan.coverity.com/projects/3208/badge.svg)](https://scan.coverity.com/projects/3208)
@@ -77,9 +77,10 @@ and a collection of libraries and bindings for popular APIs.
 ### Harbour live source repository
 
 You will need Git version control software installed on your system
-and to issue this command:
+and to issue this command (remove the `--depth` option to clone the
+complete history &mdash; useful for development):
 
-    git clone https://github.com/vszakats/harbour-core.git harbour-core
+    git clone --depth=10 https://github.com/vszakats/harbour-core.git harbour-core
 
 You can get subsequent updates using this command:
 
@@ -113,8 +114,8 @@ Download source archive from any of these URLs and unpack:
 For all platforms you will need:
 
 * Supported ANSI C compiler
-* GNU Make (3.81 recommended, minimum 3.79 required, see also platform details)
-* Harbour sources (2.0.0 or upper)
+* GNU Make (3.81 or upper)
+* Harbour sources
 
 ## on Windows hosts
 
@@ -129,9 +130,9 @@ Platform specific prerequisites:
    different versions of the same compiler in `PATH` at the same time. For the
    list of supported compilers,
    look up [Supported Platforms and C Compilers](#supported-platforms-and-c-compilers).
-3. A native build of GNU Make 3.81 or upper is required. It is usually named
+3. A native build of GNU Make is required. It is usually named
    `mingw32-make.exe`. It's distributed in MSYS2, mingw-w64 packages. You can
-   find some links [here](#external-links).
+   find download links [here](#external-links).
    Unpack it to your `PATH` or Harbour source root directory, and run it as
    `mingw32-make`.
 
@@ -194,10 +195,10 @@ You should see `Hello, world!` on screen.
 
 > You can override default (host) architecture by adding
 > values below to `HB_USER_CFLAGS`, `HB_USER_LDFLAGS` envvars,
-> you can use multiple values:<br />
-> <br />
-> Intel 32-bit: `-arch i386`<br />
-> Intel 64-bit: `-arch x86_64`<br />
+> you can use multiple values:<br>
+> <br>
+> Intel 32-bit: `-arch i386`<br>
+> Intel 64-bit: `-arch x86_64`<br>
 
 ## on FreeBSD hosts
 
@@ -255,7 +256,7 @@ To test it, type:
 
 You should see `Hello, world!` on screen.
 
-> For sunpro on Solaris:<br />
+> For sunpro on Solaris:<br>
 > If you have any GNU binutils stuff installed, do make sure `/usr/ccs/bin`
 > (the location of the native Sun C compilation system tools) come *before*
 > the GNU binutils components in your `$PATH`.
@@ -338,7 +339,7 @@ See: [How to Build](#how-to-build)
 
 # How to Enable Optional Components
 
-Certain Harbour parts &ndash; typically contrib packages &ndash; depend on
+Certain Harbour parts &mdash; typically contrib packages &mdash; depend on
 3rd party components. To make these Harbour parts built, you need to tell
 Harbour where to find the headers for these 3rd party components.
 
@@ -352,7 +353,7 @@ packages and for a few packages on \*nix which are not available via
 official package managers (e.g. ADS Client).
 
 Note that Harbour is tuned to use 3rd party **binary** packages in their
-default, unmodified &ndash; "vanilla" &ndash; install layout created by their
+default, unmodified &mdash; "vanilla" &mdash; install layout created by their
 official/mainstream install kits. If you manually move, rename, delete, add
 files under the 3rd party packages' root directory, or use a source package,
 the default Harbour build process (especially Windows implib generation)
@@ -477,89 +478,26 @@ settings are case-sensitive.
 
 ## General
 
-   - `HB_INSTALL_PREFIX`
+   - `HB_BUILD_VERBOSE=yes`
 
-     Target root directory to install Harbour files.
-     On \*nix systems the default is set to `/usr/local/`
-     or `$(PREFIX)` if specified, and
-     `/usr/local/harbour-<arch>-<comp>` for cross-builds.
-     It's always set to `./pkg/<arch>/<comp>` when
-     `HB_BUILD_PKG` is set to `yes`. On non-\*nix systems,
-     you must set it to a valid directory when using
-     `install`. Use absolute paths only.
-     You have to use path format native to your shell.
-     F.e. to specify `C:\dir` on Windows.
-
-   - `HB_USER_PRGFLAGS`        User Harbour compiler options
-   - `HB_USER_CFLAGS`          User C compiler options
-   - `HB_USER_RESFLAGS`        User resource compiler options (on win, wce, os2)
-   - `HB_USER_LDFLAGS`         User linker options for executables
-   - `HB_USER_AFLAGS`          User linker options for libraries
-   - `HB_USER_DFLAGS`          User linker options for dynamic libraries
-
-   Set these only if auto-detection doesn't suit your purpose:
+     Enable verbose build output. Redirect it to file by appending this to
+     the build command: `> log.txt 2>&1`<br>
+     Default: `no`
 
    - `HB_PLATFORM`             Override platform auto-detection
    - `HB_COMPILER`             Override C compiler auto-detection
 
+     Set these only if auto-detection doesn't suit your purpose.
+
      See this for possible values:
-     [Supported Platforms and C Compilers](#supported-platforms-and-c-compilers)
+     [Supported Platforms and C Compilers](#supported-platforms-and-c-compilers)<br>
      See also: `HB_CC*` settings.
-
-## Special
-
-   - `HB_BUILD_DYN=no`
-
-     Create Harbour dynamic libraries. Default: `yes`
-
-   - `HB_BUILD_CONTRIB_DYN=yes`
-
-     Create contrib dynamic libraries. Default: `no`,
-     except Windows and darwin platforms, where it's `yes`.
-
-   - `HB_BUILD_PKG=yes`
-
-     Create release package. Default: `no`
-     Requires `clean install` in root source dir.
-
-   - `HB_BUILD_SHARED=yes`
-
-     Create Harbour executables in shared mode.
-     Default: `yes` when `HB_INSTALL_PREFIX` points
-     to a \*nix system location, otherwise `no`.
-
-   - `HB_BUILD_DEBUG=yes`
-
-     Create debug build. Default: `no`
-
-   - `HB_BUILD_STRIP=[all|bin|lib|no]`
-
-     Strip symbols and debug information from binaries.
-     Default: `no`
-
-   - `HB_BUILD_OPTIM=no`
-
-     Enable C compiler optimizations. Default: `yes`
-
-   - `HB_BUILD_PARTS=[all|compiler|lib]`
-
-     Build only specific part of Harbour.
-
-   - `HB_BUILD_NOGPLLIB=yes`
-
-     Disable components dependent on GPL 3rd party code, to allow using
-     Harbour for nonfree/proprietary projects. Default: `no`
-
-   - `HB_BUILD_3RDEXT=no`
-
-     Enable auto-detection of 3rd party components on default system
-     locations. Default: `yes`
 
    - `HB_BUILD_CONTRIBS=no [<l>]`
 
      Do not build any, or space separated `<l>` list of, contrib packages.
-     Please note that packages which are dependencies of other &ndash;
-     enabled &ndash; packages will still be built, unless their dependents
+     Please note that packages which are dependencies of other &mdash;
+     enabled &mdash; packages will still be built, unless their dependents
      are disabled as well.
 
    - `HB_BUILD_CONTRIBS=[<l>]`
@@ -572,10 +510,100 @@ settings are case-sensitive.
      Build space separated <l> list of additional `.hbp`
      projects.
 
+   - `HB_BUILD_STRIP=[all|bin|lib|no]`
+
+     Strip symbols and debug information from binaries.
+     Default: `no`
+
+   - `HB_BUILD_3RDEXT=no`
+
+     Enable auto-detection of 3rd party components on default system
+     locations. Default: `yes`
+
+   - `HB_BUILD_NOGPLLIB=yes`
+
+     Disable components dependent on GPL 3rd party code, to allow using
+     Harbour for nonfree/proprietary projects. Default: `no`
+
+   - `HB_CCPATH=[<dir>/]`
+
+     Used with non-\*nix gcc family compilers (and sunpro) to specify path
+     to compiler/linker/archive tool to help them run from \*nix hosts as
+     cross-build tools. Ending slash must be added.
+
+   - `HB_CCPREFIX=[<prefix>]`
+
+     Used with gcc compiler family to specify compiler/linker/archive tool
+     name prefix.
+
+   - `HB_CCSUFFIX=[<suffix>]`
+
+     Used with gcc compiler family to specify compiler/linker tool name
+     suffix &mdash; usually version number.
+
+   - `HB_INSTALL_PREFIX`
+
+     Target root directory to install Harbour files.
+     On \*nix systems the default is set to `/usr/local/`
+     or `$(PREFIX)` if specified, and
+     `/usr/local/harbour-<arch>-<comp>` for cross-builds.
+     It's always set to `./pkg/<arch>/<comp>` when
+     `HB_BUILD_PKG` is set to `yes`. On non-\*nix systems,
+     you must set it to a valid directory when using
+     `install`. Use absolute paths only.
+     You have to use path format native to your shell.
+     E.g. to specify `C:\dir` on Windows.
+
+     > WARNING:
+     >
+     > Harbour is fully functionaly on all platforms, without installing it
+     > to any other directory. On \*nix systems, if you must install, please
+     > use a stable installer package instead.
+
+## For Harbour development
+
+   - `HB_USER_PRGFLAGS`        User Harbour compiler options
+   - `HB_USER_CFLAGS`          User C compiler options
+   - `HB_USER_RESFLAGS`        User resource compiler options (on win, wce, os2)
+   - `HB_USER_LDFLAGS`         User linker options for executables
+   - `HB_USER_AFLAGS`          User linker options for libraries
+   - `HB_USER_DFLAGS`          User linker options for dynamic libraries
+
+   - `HB_BUILD_DEBUG=yes`
+
+     Create debug build. Default: `no`
+
+   - `HB_BUILD_OPTIM=no`
+
+     Enable C compiler optimizations. Default: `yes`
+
+   - `HB_BUILD_PKG=yes`
+
+     Create release package. Default: `no`
+     Requires `clean install` in root source dir.
+
+   - `HB_BUILD_DYN=no`
+
+     Create Harbour dynamic libraries. Default: `yes`
+
+   - `HB_BUILD_CONTRIB_DYN=yes`
+
+     Create contrib dynamic libraries. Default: `no`,
+     except Windows and darwin platforms, where it's `yes`.
+
+   - `HB_BUILD_SHARED=yes`
+
+     Create Harbour executables in shared mode.
+     Default: `yes` when `HB_INSTALL_PREFIX` points
+     to a \*nix system location, otherwise `no`.
+   - `HB_BUILD_PARTS=[all|compiler|lib]`
+
+     Build only specific part of Harbour.
+
    - `HB_BUILD_NAME=[<name>]`
 
      Create named build. This allows keeping multiple builds in parallel for
-     any given platform/compiler. F.e. debug / release.
+     any given platform/compiler. E.g. debug / release.
 
      > In current implementation it's appended to compiler directory name, so
      > all file-system/platform name rules and limits apply. (Back)slashes will
@@ -595,7 +623,7 @@ settings are case-sensitive.
    - `HB_INSTALL_IMPLIB=no`
 
      Copy import libraries created for external .dll dependencies to the
-     library install directory in `install` build phase. Default: `yes`<br />
+     library install directory in `install` build phase. Default: `yes`<br>
      For Windows and OS/2 targets only. Please note that this feature doesn't
      work with all possible binary distributions of 3rd party packages.
      We test only the official/mainstream ones. Also note that the generated
@@ -605,14 +633,6 @@ settings are case-sensitive.
 
      Copy dynamic libraries of external .dll dependencies to the dynamic
      library directory in `install` build phase. Default: `no`
-
-   - `HB_SRC_ROOTPATH=<dir>`
-
-     When using GNU Make older than 3.81, you shall set the root directory
-     of Harbour source tree as an absolute path. If not set, some build
-     functionality may fail, like detection of 3rd party packages with
-     locally hosted sources.
-     With newer make versions, this variable is ignored.
 
    - `HB_REBUILD_EXTERN=yes`
 
@@ -629,25 +649,9 @@ settings are case-sensitive.
 
      Set default build mode to C++ or C. Default: `c`
 
-     This option is meant for testing Harbour code base for issues revealed
+     This option serves only to test Harbour code base for issues revealed
      by stricter C++ compiler rules and/or for C/C++ interoperability issues.
-     Do not use it for production builds.
-
-   - `HB_CCPATH=[<dir>/]`
-
-     Used with non-\*nix gcc family compilers (and sunpro) to specify path
-     to compiler/linker/archive tool to help them run from \*nix hosts as
-     cross-build tools. Ending slash must be added.
-
-   - `HB_CCPREFIX=[<prefix>]`
-
-     Used with gcc compiler family to specify compiler/linker/archive tool
-     name prefix.
-
-   - `HB_CCSUFFIX=[<suffix>]`
-
-     Used with gcc compiler family to specify compiler/linker tool name
-     suffix &ndash; usually version number.
+     C++ mode is deprecated and not supported for production use.
 
    - `HB_BUILD_POSTRUN_HOST=[<l>]`
 
@@ -662,10 +666,10 @@ settings are case-sensitive.
 
 ## Cross-builds
 
-You can build Harbour for target platforms different from host platform. F.e.
+You can build Harbour for target platforms different from host platform. E.g.
 you can create Windows build on \*nix systems, Linux builds on Windows systems,
 etc. It's also possible to build targets for different from host CPU
-architectures. F.e. you can create Windows 64-bit build on 32-bit Windows
+architectures. E.g. you can create Windows 64-bit build on 32-bit Windows
 platform, or Linux x86-64 build on x86 hosts, or Linux MIPS build on x86 host,
 etc.
 
@@ -992,7 +996,7 @@ For all platforms you will need two things:
 
 * Supported ANSI C compiler
 
-    Your compiler of choice has to be placed in the `PATH` &ndash; and
+    Your compiler of choice has to be placed in the `PATH` &mdash; and
     configured appropriately according to instructions.
     If you use official Harbour binary distribution on Windows, you already
     have MinGW compiler embedded in the installation, which will automatically
@@ -1095,8 +1099,8 @@ Press `<Alt+D>` in the app.
 * open64   - Open64 C/C++
 
 ### darwin
-* gcc      - GNU C
 * clang    - Apple LLVM/Clang
+* gcc      - GNU C
 * icc      - Intel(R) C/C++
 
 ### bsd
@@ -1109,10 +1113,10 @@ Press `<Alt+D>` in the app.
 * gccarm   - GNU C ARM
 
 ### win
-* mingw    - MinGW GNU C (4.4.0 and above)
-* mingw64  - MinGW GNU C x86-64
 * clang    - LLVM/Clang
 * clang64  - LLVM/Clang x86-64
+* mingw    - MinGW GNU C (4.4.0 and above, 6.x or newer recommended)
+* mingw64  - MinGW GNU C x86-64
 * msvc     - Microsoft Visual C++ (2010 and above)
 * msvc64   - Microsoft Visual C++ x86-64 (2010 and above)
 
@@ -1180,7 +1184,7 @@ Press `<Alt+D>` in the app.
 
 # Platform Matrix
 
- host<br />platform | target<br />platform/compiler | target CPU
+ host<br>platform | target<br>platform/compiler | target CPU
  :------- | :---------------- | :---------------------------------------
  linux    | linux/gcc         | (CPU cross-builds possible)
  linux    | linux/clang       | (CPU cross-builds possible)
@@ -1287,22 +1291,22 @@ Supported shells per host platforms:
 
 * C/C++ Compilers/Shells:
 
-     * MinGW-w64 via MSYS2 [win, free software, open-source] (recommended)
-        * <https://msys2.github.io/>
-        * `pacman -S git base-devel msys2-devel mingw-w64-{i686,x86_64}-toolchain`
      * LLVM/Clang via MSYS2 [multi-platform, free software, open-source]
         * <https://msys2.github.io/>
         * MinGW-w64 above + `pacman -S mingw-w64-{i686,x86_64}-clang`
+     * LLVM/Clang [multi-platform, free software, open-source]
+        * <https://releases.llvm.org/>
+     * MinGW-w64 via MSYS2 [win, free software, open-source] (recommended)
+        * <https://msys2.github.io/>
+        * `pacman -S git base-devel msys2-devel mingw-w64-{i686,x86_64}-toolchain`
      * MinGW-w64 [win, \*nix, free software, open-source]
         * <https://mingw-w64.org/> <https://en.wikipedia.org/wiki/MinGW#MinGW-w64>
           * 64-bit: threads-posix, seh
             <https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/>
           * 32-bit: threads-posix, dwarf-2
             <https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/>
-     * LLVM/Clang [multi-platform, free software, open-source]
-        * <https://releases.llvm.org/>
      * Xcode / Command Line Tools for Xcode [darwin, zero price, proprietary with open-source components]
-        * <https://itunes.apple.com/us/app/xcode/id497799835>
+        * <https://itunes.apple.com/app/xcode/id497799835>
         * <https://developer.apple.com/downloads/> (needs login)
      * MS Windows SDK [zero price, proprietary]
         * <https://developer.microsoft.com/windows/downloads/sdk-archive/>
@@ -1318,7 +1322,7 @@ Supported shells per host platforms:
             installed and be in `PATH` for the Cygwin runtime (`cygwin1.dll`).
           * Unpack using these commands:
 
-            `bzip2 -d cegcc_mingw32ce_cygwin1.7_r1399.tar.bz2`<br />
+            `bzip2 -d cegcc_mingw32ce_cygwin1.7_r1399.tar.bz2`<br>
             `tar -xvf cegcc_mingw32ce_cygwin1.7_r1399.tar -h`
 
           * Compiler will be in the `opt\mingw32ce` subdirectory.
@@ -1374,7 +1378,7 @@ Supported shells per host platforms:
      * deb (Ubuntu): <https://packages.ubuntu.com/>
      * rpm (Fedora): <https://apps.fedoraproject.org/packages/>
      * pacman (Arch Linux): <https://www.archlinux.org/packages/>
-     * Homebrew: <http://braumeister.org/>
+     * Homebrew: <http://formulae.brew.sh/>
      * MSYS2: <https://github.com/Alexpux/MINGW-packages>
 
 * Documentation:
@@ -1424,9 +1428,9 @@ Supported shells per host platforms:
      * CA-Cl*pper 5.3 [online documentation](https://harbour.github.io/ng/c53g01c/menu.html)
      * Harbour [online documentation](https://harbour.github.io/doc/)
      * Harbour [internal documents](doc/)
-     * [Harbour for Beginners - by Alexander Kresin](https://www.kresin.ru/en/hrbfaq_3.html)
-     * [Harbour Wiki - by Pete D](https://github.com/Petewg/V-harbour-core/wiki)
-     * [Harbour Magazine - by José Luis Sánchez](https://medium.com/harbour-magazine)
+     * [Harbour for Beginners](https://www.kresin.ru/en/hrbfaq_3.html) &mdash; by Alexander Kresin
+     * [Harbour Wiki](https://github.com/Petewg/V-harbour-core/wiki) &mdash; by Pete D
+     * [Harbour Magazine](https://medium.com/harbour-magazine) &mdash; by José Luis Sánchez
      * [Wikipedia](https://en.wikipedia.org/wiki/Harbour_compiler)
      * [Stack Overflow](https://stackoverflow.com/questions/tagged/clipper)
 
@@ -1452,5 +1456,5 @@ Supported shells per host platforms:
    a subjective decision. If you don't like it, use what fits you best.
 
 ---
-This document Copyright &copy;&nbsp;2009&ndash;present Viktor Szakats (vszakats.net/harbour)<br />
+This document Copyright &copy;&nbsp;2009&ndash;present Viktor Szakats (vszakats.net/harbour)<br>
 [![Creative Commons Attribution-ShareAlike 4.0](https://mirrors.creativecommons.org/presskit/buttons/80x15/svg/by-sa.svg)](https://creativecommons.org/licenses/by-sa/4.0/)

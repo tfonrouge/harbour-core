@@ -49,6 +49,7 @@
 
 #define _HB_PP_INTERNAL
 
+#include "hbapi.h"
 #include "hbpp.h"
 #include "hbdate.h"
 
@@ -1604,7 +1605,7 @@ static int hb_pp_tokenStr( PHB_PP_TOKEN pToken, PHB_MEM_BUFFER pBuffer,
       if( iq == 0 && fQuote )
       {
          /* generate string with 'e' prefix before opening '"' and quote
-            control characters inside, f.e.:
+            control characters inside, e.g.:
                e"line1\nline2"
           */
 

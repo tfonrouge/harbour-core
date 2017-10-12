@@ -5,11 +5,15 @@
 # See LICENSE.txt for licensing terms.
 # ---------------------------------------------------------------
 
-# for Linux Amazon
+# for Amazon Linux
 
 set -x; cat /etc/*-release; ulimit -a; df -h
 
-yum install -y gcc git rpm-build findutils \
+# librabbitmq-devel: version 0.2, too old to be supported
+# not currently offered: firebird-devel freeimage-devel libmariadb-devel ocilib-devel pcre2-devel
+# not offered: qt5-devel
+
+yum install -y gcc64 git rpm-build findutils \
   bzip2-devel \
   cairo-devel \
   cups-devel \
@@ -27,15 +31,13 @@ yum install -y gcc git rpm-build findutils \
   lzo-devel \
   minizip-devel \
   openssl-devel \
+  ocilib-devel \
+  pcre-devel \
   pcre2-devel \
   postgresql-devel \
+  qt5-devel \
   sqlite-devel \
   unixODBC-devel
-
-# qt5-devel: not currently offered
-# librabbitmq-devel: version 0.2, too old to be supported
-# ocilib-devel: not currently offered
-# pcre2-devel: not currently offered
 
 ./package/mpkg_rpm.sh
 

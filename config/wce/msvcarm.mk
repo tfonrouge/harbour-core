@@ -19,18 +19,12 @@ CFLAGS += -nologo
 
 ifeq ($(HB_COMPILER),msvcarm)
    CFLAGS += -D_M_ARM -DARM -D_ARM_
-else
-ifeq ($(HB_COMPILER),msvcsh)
+else ifeq ($(HB_COMPILER),msvcsh)
    CFLAGS += -D_M_SH -DSHx
-else
-ifeq ($(HB_COMPILER),msvcmips)
+else ifeq ($(HB_COMPILER),msvcmips)
    CFLAGS += -D_M_MRX000=4000 -DMIPS -D_MIPS_
-else
-ifeq ($(HB_COMPILER),msvc)
+else ifeq ($(HB_COMPILER),msvc)
    CFLAGS += -D_M_IX86 -D_X86_
-endif
-endif
-endif
 endif
 
 # MSVS 2005 SP1 also supports it, but we only enable it for 2008 and upper.
@@ -94,7 +88,8 @@ endif
 LDFLAGS += $(LIBPATHS)
 
 AR := lib.exe
-AR_RULE = $(AR) $(ARFLAGS) $(HB_AFLAGS) $(HB_USER_AFLAGS) -nologo -out:$(LIB_DIR)/$@ $(^F)
+AR_RULE = $(AR) $(ARFLAGS) $(HB_AFLAGS) $(HB_USER_AFLAGS) \
+   -nologo -out:$(LIB_DIR)/$@ $(^F)
 
 DY := $(LD)
 DFLAGS += -nologo -dll -subsystem:windowsce -nodefaultlib:oldnames.lib $(LIBPATHS)
@@ -109,7 +104,9 @@ endef
 define create_dynlib
    $(if $(wildcard __dyn__.tmp),@$(RM) __dyn__.tmp,)
    $(foreach file,$^,$(dynlib_object))
-   $(DY) $(DFLAGS) $(HB_USER_DFLAGS) $(DY_OUT)"$(subst /,$(DIRSEP),$(DYN_DIR)/$@)" -implib:"$(IMP_FILE)" @__dyn__.tmp $(DLIBS)
+   $(DY) $(DFLAGS) $(HB_USER_DFLAGS) \
+      $(DY_OUT)"$(subst /,$(DIRSEP),$(DYN_DIR)/$@)" \
+      -implib:"$(IMP_FILE)" @__dyn__.tmp $(DLIBS)
 endef
 
 DY_RULE = $(create_dynlib)

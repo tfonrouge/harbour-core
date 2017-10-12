@@ -129,7 +129,7 @@
         Show error if nothing is found
      3. If HB_COMPILER is set to one of them, select it.
         (TODO: handle multiple installations of the same compiler.
-        F.e. embedded mingw and one in PATH, or two versions of MSVC)
+        E.g. embedded mingw and one in PATH, or two versions of MSVC)
      4. If HB_COMPILER is set, but not to one of them, show warning and
         use the highest one on the priority list.
      5. If HB_COMPILER is not set,
@@ -311,7 +311,8 @@ EXTERNAL hbmk_KEYW
 #define _HBMK_SHELL             "__HBSCRIPT__HBSHELL"
 
 #define _HBMK_IMPLIB_EXE_SUFF   "_exe"
-#define _HBMK_IMPLIB_DLL_SUFF   "_dll"
+#define _HBMK_IMPLIB_DLL_SUFFH  "_dll"  /* Harbour convention (there is no general convention for this) */
+#define _HBMK_IMPLIB_DLL_SUFFG  ".dll"  /* GNU (Cygwin/MinGW) convention */
 
 #define _HBMK_TARGENAME_ADHOC   ".adhoc."
 
@@ -767,7 +768,7 @@ STATIC PROCEDURE hbmk_local_entry( ... )
    /* Ugly hack to force GTCGI for command-line output on
       systems having a '--gttrm' option in the HARBOUR envvar.
       This may be the case when wanting to set a default
-      GTTRM flag, f.e. 'exclr=2' to enable Cl*pper compatible
+      GTTRM flag, e.g. 'exclr=2' to enable Cl*pper compatible
       high colors. [vszakats] */
    IF hb_argCheck( "gt" )
       hb_gtSelect( hb_gtCreate( _HBMK_GT_DEF_ ) )
@@ -4606,6 +4607,10 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          cLibPrefix := "-l"
          cLibExt := ""
          cObjExt := ".o"
+         IF hbmk[ _HBMK_cPLAT ] == "win" .AND. ! hbmk[ _HBMK_lSHARED ]
+            cLibModePrefix :=       "-Wl,-Bstatic" + " "
+            cLibModeSuffix := " " + "-Wl,-Bdynamic"
+         ENDIF
          IF hbmk[ _HBMK_cPLAT ] == "darwin"
             cBin_Lib := "libtool"
             cOpt_Lib := "-static -no_warning_for_no_symbols {FA} -o {OL} {LO}"
@@ -4834,11 +4839,11 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
             cLibLibExt := ".a"
          ENDIF
          IF hbmk[ _HBMK_cPLAT ] == "win"
-            cImpLibExt := cLibLibExt
+            cImpLibExt := ".dll" + cLibLibExt
             IF HBMK_ISCOMP( "clang|clang64" ) .AND. hbmk[ _HBMK_cCOMPVer ] >= "0500"
-               bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_gcc( hbmk, "llvm-dlltool" + " {FI} -d {ID} -l {OL}", cSourceDLL, cTargetLib, cFlags ) }
+               bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_gcc( hbmk, "llvm-dlltool" + " {FI} -d {ID} -l {OL}", cSourceDLL, cTargetLib, cFlags, cImpLibExt ) }
             ELSE
-               bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_gcc( hbmk, hbmk[ _HBMK_cCCPREFIX ] + "dlltool" + hbmk[ _HBMK_cCCSUFFIX ] + " {FI} -d {ID} -l {OL}", cSourceDLL, cTargetLib, cFlags ) }
+               bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_gcc( hbmk, hbmk[ _HBMK_cCCPREFIX ] + "dlltool" + hbmk[ _HBMK_cCCSUFFIX ] + " {FI} -d {ID} -l {OL}", cSourceDLL, cTargetLib, cFlags, cImpLibExt ) }
             ENDIF
          ENDIF
          IF HBMK_ISCOMP( "clang|clang64" ) .AND. ! hbmk[ _HBMK_cPLAT ] == "darwin"
@@ -4878,6 +4883,19 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
             IF hbmk[ _HBMK_lIMPLIB ]
                AAdd( hbmk[ _HBMK_aOPTL ], "-Wl,--out-implib,{OI}" )
                AAdd( hbmk[ _HBMK_aOPTD ], "-Wl,--out-implib,{OI}" )
+            ENDIF
+
+            IF ! hbmk[ _HBMK_cPLAT ] == "wce"
+               IF hbmk[ _HBMK_lGUI ]
+                  AAdd( hbmk[ _HBMK_aOPTL ], "-mwindows" )
+#ifdef HARBOUR_SUPPORT
+                  IF ! l_lNOHBLIB
+                     l_cCMAIN := "hb_forceLinkMainWin"
+                  ENDIF
+#endif
+               ELSE
+                  AAdd( hbmk[ _HBMK_aOPTL ], "-mconsole" )
+               ENDIF
             ENDIF
          ENDIF
          IF hbmk[ _HBMK_lSTATICFULL ] .AND. ! hbmk[ _HBMK_cPLAT ] == "darwin"
@@ -4984,7 +5002,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          ENDIF
 
 #ifdef HARBOUR_SUPPORT
-         IF ! HBMK_ISPLAT( "beos|vxworks" )
+         IF ! HBMK_ISPLAT( "win|beos|vxworks" )
             AAdd( l_aLIBSYS, "m" )
          ENDIF
          IF ! Empty( cLIB_BASE_PCRE ) .AND. ! hb_vfExists( _HBLIB_FULLPATH( cLIB_BASE_PCRE ) )
@@ -5069,7 +5087,8 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
 
          IF hbmk[ _HBMK_cPLAT ] == "win"
             IF hbmk[ _HBMK_lWINUNI ]
-               AAdd( hbmk[ _HBMK_aOPTC ], "-DUNICODE" )
+               AAdd( hbmk[ _HBMK_aOPTC ], "-DUNICODE" )  /* for Win32 API */
+               AAdd( hbmk[ _HBMK_aOPTC ], "-D_UNICODE" )  /* for C runtime */
             ENDIF
 
             l_aLIBSYS := ArrayAJoin( { l_aLIBSYS, l_aLIBSYSCORE, l_aLIBSYSMISC } )
@@ -5104,8 +5123,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
             ENDIF
          ENDIF
 
-      CASE ( hbmk[ _HBMK_cPLAT ] == "win" .AND. hbmk[ _HBMK_cCOMP ] == "gcc" ) .OR. ;
-           ( hbmk[ _HBMK_cPLAT ] == "win" .AND. hbmk[ _HBMK_cCOMP ] == "mingw" ) .OR. ;
+      CASE ( hbmk[ _HBMK_cPLAT ] == "win" .AND. hbmk[ _HBMK_cCOMP ] == "mingw" ) .OR. ;
            ( hbmk[ _HBMK_cPLAT ] == "win" .AND. hbmk[ _HBMK_cCOMP ] == "mingw64" ) .OR. ;
            ( hbmk[ _HBMK_cPLAT ] == "win" .AND. hbmk[ _HBMK_cCOMP ] == "tcc" ) .OR. ;
            ( hbmk[ _HBMK_cPLAT ] == "wce" .AND. hbmk[ _HBMK_cCOMP ] == "mingw" ) .OR. ;
@@ -5122,7 +5140,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          cLibPrefix := "-l"
          cLibExt := ""
          cObjExt := ".o"
-         IF hbmk[ _HBMK_lSTATICFULL ]
+         IF ! hbmk[ _HBMK_lSHARED ]
             cLibModePrefix :=       "-Wl,-Bstatic" + " "
             cLibModeSuffix := " " + "-Wl,-Bdynamic"
          ENDIF
@@ -5280,8 +5298,8 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          cLibPathPrefix := "-L"
          cLibPathSep := " "
          cLibLibExt := ".a"
-         cImpLibExt := cLibLibExt
-         bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_gcc( hbmk, hbmk[ _HBMK_cCCPREFIX ] + "dlltool" + hbmk[ _HBMK_cCCSUFFIX ] + hbmk[ _HBMK_cCCEXT ] + " {FI} -d {ID} -l {OL}", cSourceDLL, cTargetLib, cFlags ) }
+         cImpLibExt := ".dll" + cLibLibExt
+         bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_gcc( hbmk, hbmk[ _HBMK_cCCPREFIX ] + "dlltool" + hbmk[ _HBMK_cCCSUFFIX ] + hbmk[ _HBMK_cCCEXT ] + " {FI} -d {ID} -l {OL}", cSourceDLL, cTargetLib, cFlags, cImpLibExt ) }
          IF hbmk[ _HBMK_cCOMP ] == "tcc"
             cBin_Lib := "tiny_libmaker.exe"
          ELSE
@@ -5371,7 +5389,8 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
             AAdd( hbmk[ _HBMK_aOPTL ], "-o{OE}" )
          ENDIF
          IF hbmk[ _HBMK_lWINUNI ]
-            AAdd( hbmk[ _HBMK_aOPTC ], "-DUNICODE" )
+            AAdd( hbmk[ _HBMK_aOPTC ], "-DUNICODE" )  /* for Win32 API */
+            AAdd( hbmk[ _HBMK_aOPTC ], "-D_UNICODE" )  /* for C runtime */
          ENDIF
          IF hbmk[ _HBMK_cPLAT ] == "wce"
             AAdd( l_aLIBSYS, "mmtimer" )
@@ -5427,7 +5446,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
             hbmk[ _HBMK_cCOMPVer ] := CompVersionDetect( hbmk, cBin_CompC, .F. )
          ENDIF
          cOpt_CompC := "-c"
-         IF hbmk[ _HBMK_lSTATICFULL ]
+         IF ! hbmk[ _HBMK_lSHARED ]
             cLibModePrefix :=       "-Wl,-Bstatic" + " "
             cLibModeSuffix := " " + "-Wl,-Bdynamic"
          ENDIF
@@ -5558,7 +5577,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
             hbmk[ _HBMK_cCOMPVer ] := CompVersionDetect( hbmk, cBin_CompC, .F. )
          ENDIF
          cOpt_CompC := "-c"
-         IF hbmk[ _HBMK_lSTATICFULL ]
+         IF ! hbmk[ _HBMK_lSHARED ]
             cLibModePrefix :=       "-Wl,-Bstatic" + " "
             cLibModeSuffix := " " + "-Wl,-Bdynamic"
          ENDIF
@@ -5816,7 +5835,8 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          ENDIF
          IF hbmk[ _HBMK_cPLAT ] == "win"
             IF hbmk[ _HBMK_lWINUNI ]
-               AAdd( hbmk[ _HBMK_aOPTC ], "-DUNICODE" )
+               AAdd( hbmk[ _HBMK_aOPTC ], "-DUNICODE" )  /* for Win32 API */
+               AAdd( hbmk[ _HBMK_aOPTC ], "-D_UNICODE" )  /* for C runtime */
             ENDIF
          ENDIF
          DO CASE
@@ -5929,7 +5949,8 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
             cLibBCC_CRTL := "cw32mt" + cLibExt
          ENDIF
          IF hbmk[ _HBMK_lWINUNI ]
-            AAdd( hbmk[ _HBMK_aOPTC ], "-DUNICODE" )
+            AAdd( hbmk[ _HBMK_aOPTC ], "-DUNICODE" )  /* for Win32 API */
+            AAdd( hbmk[ _HBMK_aOPTC ], "-D_UNICODE" )  /* for C runtime */
          ENDIF
          IF _HBMODE_IS_XHB( hbmk[ _HBMK_nHBMODE ] )
             /* Adding weird hack for xHarbour to make it possible to force ST C mode. */
@@ -6195,7 +6216,8 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
             AAdd( hbmk[ _HBMK_aOPTD ], "-implib:{OI}" )
          ENDIF
          IF hbmk[ _HBMK_lWINUNI ]
-            AAdd( hbmk[ _HBMK_aOPTC ], "-DUNICODE" )
+            AAdd( hbmk[ _HBMK_aOPTC ], "-DUNICODE" )  /* for Win32 API */
+            AAdd( hbmk[ _HBMK_aOPTC ], "-D_UNICODE" )  /* for C runtime */
          ENDIF
          IF hbmk[ _HBMK_cPLAT ] == "wce"
             AAdd( l_aLIBSYS, "winmm" )
@@ -6301,7 +6323,8 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          cOpt_SymLst := "-symbols {LI}"
          cLibHBX_Regex := R_( "SECT[0-9A-Z][0-9A-Z ].*[Ee]xternal.*_?HB_FUN_([A-Z0-9_]*)[\s]" )
          IF hbmk[ _HBMK_lWINUNI ]
-            AAdd( hbmk[ _HBMK_aOPTC ], "-DUNICODE" )
+            AAdd( hbmk[ _HBMK_aOPTC ], "-DUNICODE" )  /* for Win32 API */
+            AAdd( hbmk[ _HBMK_aOPTC ], "-D_UNICODE" )  /* for C runtime */
          ENDIF
          IF hbmk[ _HBMK_cPLAT ] == "wce"
             AAdd( l_aLIBSYS, "winmm" )
@@ -6712,7 +6735,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          IF l_cIMPLIBNAME == NIL
             /* By default add default suffix to avoid collision with static lib
                with the same name. */
-            l_cIMPLIBNAME := cName + _HBMK_IMPLIB_DLL_SUFF
+            l_cIMPLIBNAME := cName + hbmk_IMPSUFFIX( hbmk )
          ENDIF
          IF hbmk[ _HBMK_lIMPLIB ] .AND. HBMK_ISPLAT( "win|os2|dos" )
             l_cLIBSELF := l_cIMPLIBNAME
@@ -7629,7 +7652,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
       /* Process build-time configuration */
 
       /* FIXME: This does not work well when doing cross-platform
-                build f.e. on a 32-bit *nix system to 64-bit target
+                build e.g. on a 32-bit *nix system to 64-bit target
                 where the 64-bit target does not happen to provide
                 64-bit flavor of gpm lib. This is the case when
                 building 64-bit target on a 32-bit *buntu 10.10
@@ -8208,7 +8231,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
                   "{LO}" => ArrayToList( ArrayJoin( l_aOBJ, hbmk[ _HBMK_aOBJUSER ] ),, nOpt_Esc, nOpt_FNF, cObjPrefix ), ;
                   "{LS}" => ArrayToList( ArrayJoin( ListDirExt( hbmk[ _HBMK_aRESSRC ], hbmk[ _HBMK_cWorkDir ], cResExt ), hbmk[ _HBMK_aRESCMP ] ),, nOpt_Esc, nOpt_FNF, cResPrefix ), ;
                   "{LA}" => ArrayToList( l_aOBJA,, nOpt_Esc, nOpt_FNF ), ;
-                  "{LL}" => ArrayToList( l_aLIB,, nOpt_Esc, nOpt_FNF, hb_defaultValue( cLibModePrefix, "" ) + hb_defaultValue( cLibPrefix, "" ), cLibModeSuffix ), ;
+                  "{LL}" => hb_defaultValue( cLibModePrefix, "" ) + ArrayToList( l_aLIB,, nOpt_Esc, nOpt_FNF, cLibPrefix ) + hb_defaultValue( cLibModeSuffix, "" ), ;
                   "{LB}" => ArrayToList( l_aLIBA,, nOpt_Esc, nOpt_FNF ), ;
                   "{LF}" => iif( Empty( hbmk[ _HBMK_aOPTLPOST ] ), "", " " + ArrayToList( hbmk[ _HBMK_aOPTLPOST ] ) ), ;
                   "{IM}" => ArrayToList( hbmk[ _HBMK_aDEF ],, nOpt_Esc, nOpt_FNF, cDefPrefix ), ;
@@ -8359,7 +8382,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
                   "{TU}" => hb_ntos( Int( ( Max( hbmk[ _HBMK_tVCSTS ], hb_SToT( "19700101000000" ) ) - hb_SToT( "19700101000000" ) ) * 86400 ) ), ;
                   "{LO}" => tmp, ;
                   "{LS}" => ArrayToList( ArrayJoin( ListDirExt( hbmk[ _HBMK_aRESSRC ], hbmk[ _HBMK_cWorkDir ], cResExt ), hbmk[ _HBMK_aRESCMP ] ),, nOpt_Esc, nOpt_FNF, cResPrefix ), ;
-                  "{LL}" => ArrayToList( l_aLIB,, nOpt_Esc, nOpt_FNF, hb_defaultValue( cLibModePrefix, "" ) + hb_defaultValue( cLibPrefix, "" ), cLibModeSuffix ), ;
+                  "{LL}" => hb_defaultValue( cLibModePrefix, "" ) + ArrayToList( l_aLIB,, nOpt_Esc, nOpt_FNF, cLibPrefix ) + hb_defaultValue( cLibModeSuffix, "" ), ;
                   "{LB}" => ArrayToList( l_aLIBA,, nOpt_Esc, nOpt_FNF ), ;
                   "{LF}" => iif( Empty( hbmk[ _HBMK_aOPTDPOST ] ), "", " " + ArrayToList( hbmk[ _HBMK_aOPTDPOST ] ) ), ;
                   "{IM}" => ArrayToList( hbmk[ _HBMK_aDEF ],, nOpt_Esc, nOpt_FNF, cDefPrefix ), ;
@@ -9243,7 +9266,7 @@ STATIC FUNCTION CheckParamLib( hbmk, cLibName, lHBC, aParam )
       ELSE
          /* Do not ignore such option, because it may be required in some cases
             where an arbitrary, non-standard library name needs to be forced,
-            f.e. one that doesn't have a `lib` prefix in its filename and still
+            e.g. one that doesn't have a `lib` prefix in its filename and still
             using it with gcc/mingw/clang. Anyhow the best practice would be to
             name all libs in-line with the C compilers' naming conventions. */
          _hbmk_OutErr( hbmk, hb_StrFormat( I_( "Warning: Non-portable parameter: %1$s. Use '%2$s' option(s) instead." ), ParamToString( aParam ), cSuggestion ) )
@@ -9638,13 +9661,20 @@ STATIC PROCEDURE DoInstCopy( hbmk )
                IF hb_DirBuild( hb_FNameDir( cDestFileName ) )
                   ++nCopied
                   IF cLink != NIL
-                     hb_vfErase( cDestFileName )
-                     IF hb_vfLinkSym( cLink, cDestFileName ) == F_ERROR
-                        _hbmk_OutErr( hbmk, hb_StrFormat( I_( "Warning: Copying symbolic link %1$s to %2$s failed with %3$d." ), cInstFile, cDestFileName, FError() ) )
-                     ELSEIF hbmk[ _HBMK_lInfo ]
-                        _hbmk_OutStd( hbmk, hb_StrFormat( I_( "Copied symbolic link %1$s to %2$s" ), cInstFile, cDestFileName ) )
+
+                     IF hb_vfExists( cLink ) .OR. hbmk[ _HBMK_lInfo ]
+                        IF hb_vfExists( cLink )
+                           hb_vfErase( cDestFileName )
+                        ENDIF
+                        IF hb_vfLinkSym( cLink, cDestFileName ) == F_ERROR
+                           _hbmk_OutErr( hbmk, hb_StrFormat( I_( "Warning: Copying symbolic link %1$s to %2$s failed with %3$d." ), cInstFile, cDestFileName, FError() ) )
+                        ELSEIF hbmk[ _HBMK_lInfo ]
+                           _hbmk_OutStd( hbmk, hb_StrFormat( I_( "Copied symbolic link %1$s to %2$s" ), cInstFile, cDestFileName ) )
+                        ENDIF
                      ENDIF
-                  ELSE
+
+                  ELSEIF hb_vfExists( cInstFile ) .OR. hbmk[ _HBMK_lInfo ]
+
                      IF hbmk_hb_vfCopyFile( cInstFile, cDestFileName ) == F_ERROR
                         _hbmk_OutErr( hbmk, hb_StrFormat( I_( "Warning: Copying %1$s to %2$s failed with %3$d." ), cInstFile, cDestFileName, FError() ) )
                      ELSE
@@ -9780,7 +9810,7 @@ STATIC FUNCTION CompileCLoop( hbmk, aTO_DO, cBin_CompC, cOpt_CompC, hReplace, cO
          /* Delete output file in case of compile error.
             (only if we know for sure what is the output filename, that is when we
              specified it on the command-line)
-            This is to protect against compiler bugs (f.e. gcc with -pipe option)
+            This is to protect against compiler bugs (e.g. gcc with -pipe option)
             when dummy or wrong object file is left on the disk, and misleading
             next incremental build pass. [vszakats] */
          IF lOutputSpecified
@@ -11791,7 +11821,7 @@ STATIC FUNCTION ListCookLib( hbmk, aLIB, aLIBA, array, cPrefix, cExtNew )
          IF Empty( hb_FNameDir( cLibName ) )
             cLibNameCooked := cLibName
 #if 0
-            /* Do not attempt to strip this as it can be valid for libs which have double lib prefixes (f.e. libpng) */
+            /* Do not attempt to strip this as it can be valid for libs which have double lib prefixes (e.g. libpng) */
             IF hb_LeftEq( cLibNameCooked, "lib" )
                cLibNameCooked := SubStr( cLibNameCooked, Len( "lib" ) + 1 )
             ENDIF
@@ -12380,9 +12410,9 @@ STATIC FUNCTION HBC_ProcessOne( hbmk, cFileName, nNestingLevel )
                ELSE
                   IF CheckParamLib( hbmk, cItem, .T., _PAR_NEW_HBC() )
                      IF _IS_AUTOLIBSYSPRE( cItem )
-                        AAddNewNotEmpty( hbmk[ _HBMK_aLIBUSERSYSPRE ], cItem )
+                        AAddNotEmpty( hbmk[ _HBMK_aLIBUSERSYSPRE ], cItem )
                      ELSE
-                        AAddNewNotEmpty( hbmk[ _HBMK_aLIBUSER ], cItem )
+                        AAddNotEmpty( hbmk[ _HBMK_aLIBUSER ], cItem )
                      ENDIF
                   ENDIF
                ENDIF
@@ -14584,7 +14614,7 @@ STATIC FUNCTION win_implib_copy( hbmk, cSourceDLL, cTargetLib )
          ordinary .dlls, like with every other compiler.
          [vszakats] */
 
-STATIC FUNCTION win_implib_command_gcc( hbmk, cCommand, cSourceDLL, cTargetLib, cFlags )
+STATIC FUNCTION win_implib_command_gcc( hbmk, cCommand, cSourceDLL, cTargetLib, cFlags, cImpLibExt )
 
    LOCAL nResult
 
@@ -14639,7 +14669,7 @@ STATIC FUNCTION win_implib_command_gcc( hbmk, cCommand, cSourceDLL, cTargetLib, 
             RETURN nResult
          ENDIF
       ENDIF
-   ELSEIF hb_vfExists( tmp := FN_CookLib( cSourceDLL, "lib", ".dll.a" ) )  /* use "lib<dllname>.dll.a" implibs, if there are any */
+   ELSEIF hb_vfExists( tmp := FN_CookLib( cSourceDLL, "lib", cImpLibExt ) )  /* use "lib<dllname>.dll.a" implibs, if there are any */
       cSourceDLL := tmp
    ENDIF
 
@@ -14871,7 +14901,7 @@ STATIC FUNCTION NumberOfCPUs()
       cCPU := GetEnv( "NUMBER_OF_PROCESSORS" )
    #else
       /* Disabled after reports of slow and eventually
-         stalled builds on some systems (f.e. Windows 7) */
+         stalled builds on some systems (e.g. Windows 7) */
       cCPU := "1"
    #endif
    #elif defined( __PLATFORM__BSD )
@@ -15243,9 +15273,21 @@ STATIC FUNCTION hbmk_DYNSUFFIX( hbmk )
 
 /* Return standard dynamic lib implib name suffix used by Harbour */
 STATIC FUNCTION hbmk_IMPSUFFIX( hbmk, cDL_Version_Alter )
-   RETURN iif( hbmk[ _HBMK_nHBMODE ] == _HBMODE_NATIVE, ;
-      _HBMK_IMPLIB_DLL_SUFF, ;
-      cDL_Version_Alter + hbmk_DYNSUFFIX( hbmk ) )
+
+   IF hbmk[ _HBMK_nHBMODE ] == _HBMODE_NATIVE .OR. cDL_Version_Alter == NIL
+      IF HBMK_ISPLAT( "win" ) .AND. ;
+         HBMK_ISCOMP( "mingw|mingw64|clang|clang64" )
+         IF cDL_Version_Alter == NIL  /* use */
+            RETURN ""
+         ELSE  /* generate */
+            RETURN _HBMK_IMPLIB_DLL_SUFFG
+         ENDIF
+      ELSE
+         RETURN _HBMK_IMPLIB_DLL_SUFFH
+      ENDIF
+   ENDIF
+
+   RETURN cDL_Version_Alter + hbmk_DYNSUFFIX( hbmk )
 
 #endif
 
@@ -15291,6 +15333,7 @@ FUNCTION hbmk_KEYW( hbmk, cFileName, cKeyword, cValue, cOperator )
    CASE "hb20"     ; RETURN hbmk[ _HBMK_nHBMODE ] == _HBMODE_HB20
    CASE "hb30"     ; RETURN hbmk[ _HBMK_nHBMODE ] == _HBMODE_HB30
    CASE "hb32"     ; RETURN hbmk[ _HBMK_nHBMODE ] == _HBMODE_HB32
+   CASE "msys2"    ; RETURN cKeyword == hbmk[ _HBMK_cPKGM ] .AND. HBMK_ISCOMP( "mingw|mingw64|clang|clang64" )
    ENDSWITCH
 
    IF cKeyword == hbmk_CPU( hbmk ) .OR. ;
@@ -15372,7 +15415,7 @@ STATIC PROCEDURE ParseCOMPPLATCPU( hbmk, cString, nMainTarget )
    in a non-standard (non-system) location. This is required because setting
    standard envvars (as LD_LIBRARY_PATH, DYLD_LIBRARY_PATH,
    DYLD_FALLBACK_LIBRARY_PATH) doesn't work if an executable is executed via
-   any executable that is SIP protected (f.e. via the `/usr/bin/env` tool),
+   any executable that is SIP protected (e.g. via the `/usr/bin/env` tool),
    since El Capitan.
    Note that by default, in non-standard installations shared executables are
    not enabled, but with a `HB_BUILD_CONTRIB_DYN=yes` setting, shared libs
@@ -16792,7 +16835,7 @@ FUNCTION hbshell_ext_load( cName )
                IF ! Empty( hbsh[ _HBSH_hbmk ][ _HBMK_aLIBUSER ] ) .OR. ;
                   ! Empty( hbsh[ _HBSH_hbmk ][ _HBMK_aLIBUSERGT ] )
                   /* NOTE: Hack. We detect if the .hbc had defined any libs to load.
-                           (f.e. there will not be any libs if the .hbc was skipped due
+                           (e.g. there will not be any libs if the .hbc was skipped due
                            to filters)
                      TODO: In the future the .hbc should specify a list of dynamic libs
                            to load, and we should load those, if any. */
@@ -17170,7 +17213,11 @@ STATIC PROCEDURE __hbshell_prompt( aParams, aCommand )
 
       hb_DispOutAt( nMaxRow, 0, cPrompt := cDomain + "." )
 
-      GetList := { Get():New( nMaxRow, Len( cPrompt ), {| v | iif( PCount() == 0, cLine, cLine := v ) }, "cLine", "@KS" + hb_ntos( nMaxCol - Len( cPrompt ) + 1 ) ) }
+      GetList := { ;
+         Get():New( nMaxRow, Len( cPrompt ), ;
+            {| v | iif( PCount() == 0, cLine, cLine := v ) }, ;
+            "cLine", ;
+            "@KS" + hb_ntos( nMaxCol - Len( cPrompt ) + 1 ) ) }
       ATail( GetList ):display()
 
       SetCursor( iif( ReadInsert(), SC_INSERT, SC_NORMAL ) )
@@ -18855,7 +18902,7 @@ STATIC PROCEDURE ShowHelp( hbmk, lMore, lLong )
       { "-hbdyn"             , S_( "create dynamic library" ) }, ;
       { "-hbdyn"             , H_( "create dynamic library (without linked Harbour VM)" ) }, ;
       { "-hbdynvm"           , H_( "create dynamic library (with linked Harbour VM)" ) }, ;
-      { "-strip[-]"          , I_( "strip (or don't) debugging (and other extra) information from target binary. They are included by default by certain C compilers, f.e.: gcc*, clang*, mingw*, djgpp." ) } }
+      { "-strip[-]"          , I_( "strip (or don't) debugging (and other extra) information from target binary. They are included by default by certain C compilers, e.g.: gcc*, clang*, mingw*, djgpp." ) } }
 
    LOCAL aLst_Opt_Help := { ;
       { "-help"              , I_( "more help" ) } }
@@ -18884,7 +18931,7 @@ STATIC PROCEDURE ShowHelp( hbmk, lMore, lLong )
       { "-beep[-]"           , I_( "enable (or disable) single beep on successful exit, double beep on failure" ) }, ;
       { "-ignore[-]"         , I_( "ignore errors when running compiler tools (default: off)" ) }, ;
       { "-hbcppmm[-]"        , H_( "override standard C++ memory management functions with Harbour ones" ) }, ;
-      { "-winuni[-]"         , I_( "select between UNICODE (WIDE) and ANSI Windows API usage for C/C++ input files (default: ANSI) (Windows only. For WinCE it is always set to UNICODE)" ) }, ;
+      { "-winuni[-]"         , I_( "select between UNICODE (WIDE) and ANSI Windows API and C runtime usage for C/C++ input files (default: ANSI) (Windows only. For WinCE it is always set to UNICODE)" ) }, ;
       { "-nohblib[-]"        , H_( "do not use static core Harbour libraries when linking (default in -hbdyn mode or when neither .prg nor object files are specified as input)" ) }, ;
       { "-nodefgt[-]"        , H_( "do not link default GTs (effective in -static mode)" ) }, ;
       { "-nolibgrouping[-]"  , I_( "disable library grouping on gcc based compilers" ) }, ;
@@ -19188,8 +19235,8 @@ STATIC PROCEDURE ShowHelp( hbmk, lMore, lLong )
       { "${hb_dynprefix}"      , I_( "dynamic library prefix" ) }, ;
       { "${hb_dynsuffix}"      , I_( "dynamic library suffix" ) }, ;
       { "${hb_dynext}"         , I_( "dynamic library extension" ) }, ;
-      { "${hb_ver}"            , hb_StrFormat( I_( "Harbour version in hexadecimal triple byte format. F.e.: %1$s" ), MacroGet( hbmk, "hb_ver" ) ) }, ;
-      { "${hb_verstr}"         , hb_StrFormat( I_( "Harbour version in human readable format <major>.<minor>.<release><status>. F.e.: %1$s" ), MacroGet( hbmk, "hb_verstr" ) ) }, ;
+      { "${hb_ver}"            , hb_StrFormat( I_( "Harbour version in hexadecimal triple byte format. E.g.: %1$s" ), MacroGet( hbmk, "hb_ver" ) ) }, ;
+      { "${hb_verstr}"         , hb_StrFormat( I_( "Harbour version in human readable format <major>.<minor>.<release><status>. E.g.: %1$s" ), MacroGet( hbmk, "hb_verstr" ) ) }, ;
       { "${hb_major}"          , I_( "Harbour major version number" ) }, ;
       { "${hb_minor}"          , I_( "Harbour minor version number" ) }, ;
       { "${hb_release}"        , I_( "Harbour release version number" ) }, ;
@@ -19483,7 +19530,7 @@ STATIC PROCEDURE ShowHelp( hbmk, lMore, lLong )
       I_( e"Options accepting macro variables also support command substitution. " + ;
          e"Enclose command inside ``, and, if the command contains space, also " + ;
          e"enclose in double quotes. Standard output of the command will be used " + ;
-         e"as the value. F.e. \"-cflag=`wx-config --cflags`\", or " + ;
+         e"as the value. E.g. \"-cflag=`wx-config --cflags`\", or " + ;
          e"ldflags={unix&gcc}\"`wx-config --libs`\"." ), ;
       I_( "When multiple build target type selection options (-hblib, -hbdyn, etc.) are specified, " + ;
          "the first one will be significant, the rest will be silently ignored." ), ;

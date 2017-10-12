@@ -1,21 +1,27 @@
--stop{hbdyn}
+-stop{hbdyn&!(HB_BUILD_3RD_DYN='yes')} -env:__HB_3RD_DYN=yes{hbdyn}
 
 -hblib
 -inc
 
--o${hb_targetname}
+-o${hb_name}
 
 -warn=low
 -cpp=no
 -pic
 
+loadlibrary.c
 xmlparse.c
 xmlrole.c
 xmltok.c
 
+-cflag=-DNDEBUG{!debug}
 -cflag=-DHAVE_EXPAT_CONFIG_H
 # needed to have <expat_config.h> found:
 -I.
+
+# Use Harbour core arc4random implementation only when building static lib.
+# This way the dynamic lib won't depend on Harbour dynlib.
+-cflag=-DHB_FORCE_ARC4RANDOM{!hbdyn}
 
 {hblib}-cflag=-DXML_STATIC
 {bcc}-cflag=-w-8057

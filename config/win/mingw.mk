@@ -1,5 +1,7 @@
 ifeq ($(HB_COMPILER_VER),)
-   $(info ! Warning: HB_COMPILER_VER variable empty. Either stop manually setting HB_COMPILER to let auto-detection detect it, or set HB_COMPILER_VER manually according to your C compiler version (f.e. 0406 for 4.6.x).)
+   $(info ! Warning: HB_COMPILER_VER variable empty. Either stop manually setting \
+      HB_COMPILER to let auto-detection detect it, or set HB_COMPILER_VER manually \
+      according to your C compiler version (e.g. 0406 for 4.6.x).)
 endif
 
 ifeq ($(HB_BUILD_MODE),cpp)
@@ -22,14 +24,12 @@ CFLAGS += -I. -I$(HB_HOST_INC) -c
 ifeq ($(filter $(HB_COMPILER_VER),0209 0304 0400 0401 0402 0403 0404 0405 0406 0407 0408),)
    #CFLAGS += -fstack-protector-strong
    #SYSLIBS += ssp
-else
-ifeq ($(filter $(HB_COMPILER_VER),0209 0304 0400),)
+else ifeq ($(filter $(HB_COMPILER_VER),0209 0304 0400),)
    # too weak
    #CFLAGS += -fstack-protector
    # too slow
    #CFLAGS += -fstack-protector-all
    #SYSLIBS += ssp
-endif
 endif
 
 ifneq ($(HB_COMPILER_VER),)
@@ -155,9 +155,14 @@ LDFLAGS += $(LIBPATHS)
 
 ifneq ($(HB_CODESIGN_KEY),)
    define create_exe_signed
-      $(LD) $(LDFLAGS) $(HB_LDFLAGS) $(HB_USER_LDFLAGS) $(LD_OUT)$(subst /,$(DIRSEP),$(BIN_DIR)/$@) $(^F) $(LDLIBS) $(LDSTRIP)
+      $(LD) $(LDFLAGS) $(HB_LDFLAGS) $(HB_USER_LDFLAGS) \
+         $(LD_OUT)$(subst /,$(DIRSEP),$(BIN_DIR)/$@) $(^F) \
+         $(LDLIBS) $(LDSTRIP)
       @$(ECHO) $(ECHOQUOTE)! Code signing: $(subst /,$(DIRSEP),$(BIN_DIR)/$@)$(ECHOQUOTE)
-      @osslsigncode sign -h sha256 -pkcs12 $(HB_CODESIGN_KEY) -pass "$(HB_CODESIGN_KEY_PASS)" -ts $(HB_SIGN_TIMEURL) -in $(subst /,$(DIRSEP),$(BIN_DIR)/$@) -out $(subst /,$(DIRSEP),$(BIN_DIR)/$@)-signed
+      @osslsigncode sign -h sha256 -pkcs12 $(HB_CODESIGN_KEY) \
+         -pass "$(HB_CODESIGN_KEY_PASS)" -ts $(HB_SIGN_TIMEURL) \
+         -in $(subst /,$(DIRSEP),$(BIN_DIR)/$@) \
+         -out $(subst /,$(DIRSEP),$(BIN_DIR)/$@)-signed
       @$(CP) $(subst /,$(DIRSEP),$(BIN_DIR)/$@)-signed $(subst /,$(DIRSEP),$(BIN_DIR)/$@)
       @$(RM) $(subst /,$(DIRSEP),$(BIN_DIR)/$@)-signed
    endef
@@ -174,7 +179,9 @@ endef
 define create_library
    $(if $(wildcard __lib__.tmp),@$(RM) __lib__.tmp,)
    $(foreach file,$^,$(library_object))
-   ( $(AR) rcs $(ARFLAGS) $(HB_AFLAGS) $(HB_USER_AFLAGS) $(LIB_DIR)/$@ @__lib__.tmp $(ARSTRIP) ) || ( $(RM) $(subst /,$(DIRSEP),$(LIB_DIR)/$@) && $(FALSE) )
+   ( $(AR) rcs $(ARFLAGS) $(HB_AFLAGS) $(HB_USER_AFLAGS) \
+      $(LIB_DIR)/$@ @__lib__.tmp $(ARSTRIP) ) \
+      || ( $(RM) $(subst /,$(DIRSEP),$(LIB_DIR)/$@) && $(FALSE) )
 endef
 
 AR_RULE = $(create_library)
@@ -193,9 +200,16 @@ ifneq ($(HB_CODESIGN_KEY),)
    define create_dynlib_signed
       $(if $(wildcard __dyn__.tmp),@$(RM) __dyn__.tmp,)
       $(foreach file,$^,$(dynlib_object))
-      $(DY) $(DFLAGS) $(HB_USER_DFLAGS) $(DY_OUT)$(DYN_DIR)/$@ __dyn__.tmp $(DEF_FILE) $(DLIBS) -Wl,--out-implib,$(IMP_FILE),--output-def,$(DYN_DIR)/$(basename $@).def -Wl,--major-image-version,$(HB_VER_MAJOR) -Wl,--minor-image-version,$(HB_VER_MINOR) $(DYSTRIP)
+      $(DY) $(DFLAGS) $(HB_USER_DFLAGS) \
+         $(DY_OUT)$(DYN_DIR)/$@ __dyn__.tmp $(DEF_FILE) $(DLIBS) \
+         -Wl,--out-implib,$(IMP_FILE),--output-def,$(DYN_DIR)/$(basename $@).def \
+         -Wl,--major-image-version,$(HB_VER_MAJOR) \
+         -Wl,--minor-image-version,$(HB_VER_MINOR) $(DYSTRIP)
       @$(ECHO) $(ECHOQUOTE)! Code signing: $(DYN_DIR)/$@$(ECHOQUOTE)
-      @osslsigncode sign -h sha256 -pkcs12 $(HB_CODESIGN_KEY) -pass $(HB_CODESIGN_KEY_PASS) -ts $(HB_SIGN_TIMEURL) -in $(DYN_DIR)/$@ -out $(DYN_DIR)/$@-signed
+      @osslsigncode sign -h sha256 -pkcs12 $(HB_CODESIGN_KEY) \
+         -pass $(HB_CODESIGN_KEY_PASS) -ts $(HB_SIGN_TIMEURL) \
+         -in $(DYN_DIR)/$@ \
+         -out $(DYN_DIR)/$@-signed
       @$(CP) $(DYN_DIR)/$@-signed $(DYN_DIR)/$@
       @$(RM) $(DYN_DIR)/$@-signed
    endef
@@ -204,7 +218,11 @@ else
    define create_dynlib
       $(if $(wildcard __dyn__.tmp),@$(RM) __dyn__.tmp,)
       $(foreach file,$^,$(dynlib_object))
-      $(DY) $(DFLAGS) $(HB_USER_DFLAGS) $(DY_OUT)$(DYN_DIR)/$@ __dyn__.tmp $(DEF_FILE) $(DLIBS) -Wl,--out-implib,$(IMP_FILE),--output-def,$(DYN_DIR)/$(basename $@).def -Wl,--major-image-version,$(HB_VER_MAJOR) -Wl,--minor-image-version,$(HB_VER_MINOR) $(DYSTRIP)
+      $(DY) $(DFLAGS) $(HB_USER_DFLAGS) \
+         $(DY_OUT)$(DYN_DIR)/$@ __dyn__.tmp $(DEF_FILE) $(DLIBS) \
+         -Wl,--out-implib,$(IMP_FILE),--output-def,$(DYN_DIR)/$(basename $@).def \
+         -Wl,--major-image-version,$(HB_VER_MAJOR) \
+         -Wl,--minor-image-version,$(HB_VER_MINOR) $(DYSTRIP)
    endef
    DY_RULE = $(create_dynlib)
 endif

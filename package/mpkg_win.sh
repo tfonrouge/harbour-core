@@ -215,9 +215,9 @@ for _cpu in '' '64'; do
   [ "${_cpu}"  = '64' ] && _mingw_pfx="${HB_PFX_MINGW_64}"
   for files in \
     "${HB_ABSROOT}lib/win/mingw${_cpu}/*-*.*" \
-    "${HB_ABSROOT}lib/win/mingw${_cpu}/*_dll*.*" \
+    "${HB_ABSROOT}lib/win/mingw${_cpu}/*.dll.*" \
     "${HB_ABSROOT}lib/win/clang${_cpu}/*-*.*" \
-    "${HB_ABSROOT}lib/win/clang${_cpu}/*_dll*.*"; do
+    "${HB_ABSROOT}lib/win/clang${_cpu}/*.dll.*"; do
     # shellcheck disable=SC2086
     if ls ${files} > /dev/null 2>&1; then
       "${_mingw_dir}${_mingw_pfx}strip" -p --enable-deterministic-archives -g ${files}
@@ -239,16 +239,12 @@ if [ "${_HB_BUNDLE_3RDLIB}" = 'yes' ]; then
     eval dir_64="\$$(echo "HB_DIR_${name}_64" | tr '[:lower:]' '[:upper:]' 2> /dev/null)"
     dir_64=$(echo "${dir_64}" | sed 's|\\|/|g')
     for file in ${dir_32}lib/*.a; do
-      if [ -f "${file}" ] && echo "${file}" | grep -q -v 'dll'; then
-        [ -d "${HB_ABSROOT}lib/win/mingw/" ] && cp -f -p "${file}" "${HB_ABSROOT}lib/win/mingw/"
-        [ -d "${HB_ABSROOT}lib/win/clang/" ] && cp -f -p "${file}" "${HB_ABSROOT}lib/win/clang/"
-      fi
+      [ -d "${HB_ABSROOT}lib/win/mingw/" ] && cp -f -p "${file}" "${HB_ABSROOT}lib/win/mingw/"
+      [ -d "${HB_ABSROOT}lib/win/clang/" ] && cp -f -p "${file}" "${HB_ABSROOT}lib/win/clang/"
     done
     for file in ${dir_64}lib/*.a; do
-      if [ -f "${file}" ] && echo "${file}" | grep -q -v 'dll'; then
-        [ -d "${HB_ABSROOT}lib/win/mingw64/" ] && cp -f -p "${file}" "${HB_ABSROOT}lib/win/mingw64/"
-        [ -d "${HB_ABSROOT}lib/win/clang64/" ] && cp -f -p "${file}" "${HB_ABSROOT}lib/win/clang64/"
-      fi
+      [ -d "${HB_ABSROOT}lib/win/mingw64/" ] && cp -f -p "${file}" "${HB_ABSROOT}lib/win/mingw64/"
+      [ -d "${HB_ABSROOT}lib/win/clang64/" ] && cp -f -p "${file}" "${HB_ABSROOT}lib/win/clang64/"
     done
     [ -f "${dir_64}COPYING.txt" ] && cp -f -p "${dir_64}COPYING.txt" "${HB_ABSROOT}LICENSE_${name}.txt"
     [ -f "${dir_64}LICENSE.txt" ] && cp -f -p "${dir_64}LICENSE.txt" "${HB_ABSROOT}LICENSE_${name}.txt"
@@ -276,13 +272,13 @@ _vcs_id="$(git rev-parse --verify HEAD)"
 _vcs_id_short="$(git rev-parse --verify --short HEAD)"
 _vcs_url="$(git ls-remote --get-url | sed 's|.git$||')/"
 
-sed -e "s|_HB_VER_COMMIT_ID_SHORT_|${_vcs_id_short}|g" \
-    -e "s|_HB_VER_ORIGIN_URL_|${_vcs_url}|g" \
-    -e "s|_HB_VERSION_|${_hb_ver}|g" \
+sed -e "s|{HB_VER_COMMIT_ID_SHORT}|${_vcs_id_short}|g" \
+    -e "s|{HB_VER_ORIGIN_URL}|${_vcs_url}|g" \
+    -e "s|{HB_VERSION}|${_hb_ver}|g" \
     'RELNOTES.md' | unix2dos > "${HB_ABSROOT}RELNOTES.md"
 touch -c -r "${HB_ABSROOT}README.md" "${HB_ABSROOT}RELNOTES.md"
 
-sed "s|_HB_URL_SRC_|${_vcs_url}archive/${_vcs_id}.tar.gz|g" \
+sed "s|{HB_URL_SRC}|${_vcs_url}archive/${_vcs_id}.tar.gz|g" \
     'getsrc.sh' > "${HB_ABSROOT}getsrc.sh"
 chmod +x "${HB_ABSROOT}getsrc.sh"
 touch -c -r "${HB_ABSROOT}README.md" "${HB_ABSROOT}getsrc.sh"
@@ -367,9 +363,13 @@ if [ "${_BRANCH#*prod*}" != "${_BRANCH}" ]; then
 elif [ "${HB_JOB}" != "${HB_JOB_TO_RELEASE}" ]; then
   _pkgprefix="_"  # to avoid getting deployed
   _pkgsuffix="-${HB_JOB}"
+elif [ "${os}" != 'win' ]; then
+  _pkgsuffix="-built-on-${os}"
 fi
 
 _pkgname="${_ROOT}/${_pkgprefix}harbour-${HB_VF}-win${_pkgsuffix}.7z"
+
+echo "! Package: '$(basename "${_pkgname}")'"
 
 rm -f "${_pkgname}"
 (
@@ -385,8 +385,8 @@ touch -c -r "${HB_ABSROOT}README.md" "${_pkgname}"
 
 # <filename>: <size> bytes <YYYY-MM-DD> <HH:MM>
 case "${os}" in
-  bsd|mac) stat -f '%N: %z bytes %Sm' -t '%Y-%m-%d %H:%M' "${_pkgname}";;
-  *)       stat -c '%n: %s bytes %y' "${_pkgname}";;
+  bsd|mac) TZ=UTC stat -f '%N: %z bytes %Sm' -t '%Y-%m-%d %H:%M' "${_pkgname}";;
+  *)       TZ=UTC stat -c '%n: %s bytes %y' "${_pkgname}";;
 esac
 openssl dgst -sha256 "${_pkgname}"
 
@@ -403,7 +403,7 @@ cd - || exit
       --form-string "user=${PUSHOVER_USER}" \
       --form-string "token=${PUSHOVER_TOKEN}" \
       --form-string "title=${GITHUB_SLUG}" \
-      --form-string "message=Build ready: ${_BRANCH} / ${HB_JOB}" \
+      --form-string "message=Build ready: ${_BRANCH} / ${HB_JOB} / ${os}" \
       --form-string 'html=1' \
       --form-string 'priority=1' \
       https://api.pushover.net/1/messages.json
@@ -411,16 +411,18 @@ cd - || exit
     echo "! Push notification: Build ready."
   fi
 
-  if [ "${HB_JOB}" = "${HB_JOB_TO_RELEASE}" ] && \
-     [ -n "${GITHUB_TOKEN}" ]; then
-
-    # Create tag update JSON request
-    # https://developer.github.com/v3/git/refs/#update-a-reference
-    jq -nc ".sha = \"${_vcs_id}\" | .force = true" \
-    | curl -sS \
-      -H "Authorization: token ${GITHUB_TOKEN}" \
-      -d @- \
-      -X PATCH "https://api.github.com/repos/${GITHUB_SLUG}/git/refs/tags/v${HB_VF_DEF}"
+  if [ "${HB_JOB}" = "${HB_JOB_TO_RELEASE}" ]; then
+    if [ -n "${GITHUB_TOKEN}" ]; then
+      # Create tag update JSON request
+      # https://developer.github.com/v3/git/refs/#update-a-reference
+      jq -nc ".sha = \"${_vcs_id}\" | .force = true" \
+      | curl -sS \
+        -H "Authorization: token ${GITHUB_TOKEN}" \
+        -d @- \
+        -X PATCH "https://api.github.com/repos/${GITHUB_SLUG}/git/refs/tags/v${HB_VF_DEF}"
+    else
+      echo '! Warning: GITHUB_TOKEN is empty. GitHub tag update skipped.'
+    fi
   fi
 
   if [ -n "${VIRUSTOTAL_APIKEY}" ]; then
