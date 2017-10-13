@@ -199,7 +199,9 @@ METHOD Run( hConfig ) CLASS UHttpd
       "RequestFilter"        => hb_noop(), ;
       "FirewallFilter"       => "0.0.0.0/0", ;
       "HB_TK_INIT"           => HB_TK_INIT, ;
-      "HB_TK_END"            => HB_TK_END }
+      "HB_TK_END"            => HB_TK_END, ;
+      "DBCLOSEALL"           => .T. ;
+   }
 
    FOR EACH xValue IN hConfig
       IF ! xValue:__enumKey $ ::hConfig .OR. ! ValType( xValue ) == ValType( ::hConfig[ xValue:__enumKey ] )
@@ -585,6 +587,8 @@ STATIC FUNCTION ProcessConnection( oServer )
       aServer[ "HB_TK_INIT" ] := oServer:hConfig[ "HB_TK_INIT" ]
       aServer[ "HB_TK_END" ]  := oServer:hConfig[ "HB_TK_END" ]
 
+      aServer[ "DBCLOSEALL" ] := oServer:hConfig[ "DBCLOSEALL" ]
+
       /* Firewall */
       nLen := IPAddr2Num( aServer[ "REMOTE_ADDR" ] )
       hb_HHasKey( oServer:aFirewallFilter, nLen, @nErr )
@@ -703,8 +707,9 @@ STATIC FUNCTION ProcessConnection( oServer )
                   cBuf := Eval( oServer:hConfig[ "RequestFilter" ], oConnection, cRequest )
                ENDIF
                ProcessRequest( oServer )
-               Eval( oServer:hConfig[ "Trace" ], "after ProcessRequest(), dbCloseAll()" )
-               //dbCloseAll()
+               IF server[ "DBCLOSEALL" ] = .T.
+                  dbCloseAll()
+               ENDIF
             ENDIF
          ENDIF /* request header ok */
 
@@ -775,8 +780,9 @@ STATIC PROCEDURE ProcessRequest( oServer )
          USetStatusCode( 500 )
          UAddHeader( "Connection", "close" )
       END SEQUENCE
-      Eval( oServer:hConfig[ "Trace" ], "-> dbCloseAll()" )
-      //dbCloseAll()
+      IF server[ "DBCLOSEALL" ] = .T.
+         dbCloseAll()
+      ENDIF
       // Unlock session
       IF t_aSessionData != NIL
          session := NIL
