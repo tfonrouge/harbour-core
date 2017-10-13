@@ -703,7 +703,8 @@ STATIC FUNCTION ProcessConnection( oServer )
                   cBuf := Eval( oServer:hConfig[ "RequestFilter" ], oConnection, cRequest )
                ENDIF
                ProcessRequest( oServer )
-               dbCloseAll()
+               Eval( oServer:hConfig[ "Trace" ], "after ProcessRequest(), dbCloseAll()" )
+               //dbCloseAll()
             ENDIF
          ENDIF /* request header ok */
 
@@ -774,7 +775,8 @@ STATIC PROCEDURE ProcessRequest( oServer )
          USetStatusCode( 500 )
          UAddHeader( "Connection", "close" )
       END SEQUENCE
-      dbCloseAll()
+      Eval( oServer:hConfig[ "Trace" ], "-> dbCloseAll()" )
+      //dbCloseAll()
       // Unlock session
       IF t_aSessionData != NIL
          session := NIL
