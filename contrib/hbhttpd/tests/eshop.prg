@@ -5,7 +5,7 @@ REQUEST __HBEXTERN__HBSSL__
 
 REQUEST DBFCDX
 
-MEMVAR server, get, post, cookie, session
+MEMVAR server, cookie, session
 
 #define _FN_PKEY  "private.pem"
 #define _FN_CERT  "example.crt"
@@ -151,10 +151,10 @@ STATIC FUNCTION proc_login()
    IF server[ "REQUEST_METHOD" ] == "POST"
       dbUseArea( .T., , "users", "users", .T., .T. )
       ordSetFocus( "user" )
-      cUser := PadR( hb_HGetDef( post, "user", "" ), 16 )
+      cUser := PadR( hb_HGetDef( server[ "QUERY_BODY_LIST" ], "user", "" ), 16 )
       USessionStart()
       IF ! Empty( cUser ) .AND. dbSeek( cUser, .F. ) .AND. ! Deleted() .AND. ;
-            PadR( hb_HGetDef( post, "password", "" ), 16 ) == FIELD->PASSWORD
+            PadR( hb_HGetDef( server[ "QUERY_BODY_LIST" ], "password", "" ), 16 ) == FIELD->PASSWORD
          session[ "user" ] := cUser
          URedirect( "main" )
       ELSE
@@ -163,7 +163,7 @@ STATIC FUNCTION proc_login()
       ENDIF
       dbCloseArea()
    ELSE
-      IF "err" $ get
+      IF "err" $ server[ "QUERY_HEADER_LIST" ]
          RETURN { "errtext" => "Invalid user name or password!" }
       ENDIF
       RETURN { => }
@@ -203,8 +203,8 @@ STATIC FUNCTION proc_shopping()
    dbUseArea( .T., , "items", "items", .T., .T. )
    ordSetFocus( "code" )
 
-   IF "add" $ get
-      cCode := PadR( get[ "add" ], 16 )
+   IF "add" $ server[ "QUERY_HEADER_LIST" ]
+      cCode := PadR( server[ "QUERY_HEADER_LIST" ][ "add" ], 16 )
       IF items->( dbSeek( cCode ) ) .AND. carts->( FLock() )
          IF ! carts->( dbSeek( session[ "user" ] + cCode ) )
             carts->( dbAppend() )
@@ -231,8 +231,8 @@ STATIC FUNCTION proc_shopping()
    oW:AddColumn( 103, "Price",       "PRICE" )
    oW:AddColumn( 104, "",            {|| ULink( "Add to cart", "?add=" + RTrim( FIELD->CODE ) ) }, .T. )
    oW:nPageSize := 10
-   IF "_pos" $ get
-      oW:nPos := Val( get[ "_pos" ] )
+   IF "_pos" $ server[ "QUERY_HEADER_LIST" ]
+      oW:nPos := Val( server[ "QUERY_HEADER_LIST" ][ "_pos" ] )
    ENDIF
 
    RETURN { "browse" => oW:Output(), "cartsum" => nT }
@@ -252,8 +252,8 @@ STATIC FUNCTION proc_cart()
    dbUseArea( .T., , "carts", "carts", .T., .F. )
    ordSetFocus( "user" )
 
-   IF "del" $ get
-      cCode := PadR( get[ "del" ], 16 )
+   IF "del" $ server[ "QUERY_HEADER_LIST" ]
+      cCode := PadR( server[ "QUERY_HEADER_LIST" ][ "del" ], 16 )
       IF items->( dbSeek( cCode ) ) .AND. carts->( FLock() )
          IF carts->( dbSeek( session[ "user" ] + cCode ) )
             carts->( dbDelete() )
@@ -278,8 +278,8 @@ STATIC FUNCTION proc_cart()
    oW:AddColumn( 104, "Total",       "TOTAL" )
    oW:AddColumn( 104, "",            {|| ULink( "Delete", "?del=" + RTrim( FIELD->CODE ) ) }, .T. )
    oW:nPageSize := 10
-   IF "_pos" $ get
-      oW:nPos := Val( get[ "_pos" ] )
+   IF "_pos" $ server[ "QUERY_HEADER_LIST" ]
+      oW:nPos := Val( server[ "QUERY_HEADER_LIST" ][ "_pos" ] )
    ENDIF
 
    RETURN { "browse" => oW:Output(), "cartsum" => nT }
@@ -315,9 +315,9 @@ STATIC FUNCTION proc_account_edit()
       cName := session[ "formdata_account/edit" ][ "name" ]
    ENDIF
    IF server[ "REQUEST_METHOD" ] == "POST"
-      cName := hb_HGetDef( post, "name", "" )
-      cPassword1 := hb_HGetDef( post, "password1", "" )
-      cPassword2 := hb_HGetDef( post, "password2", "" )
+      cName := hb_HGetDef( server[ "QUERY_BODY_LIST" ], "name", "" )
+      cPassword1 := hb_HGetDef( server[ "QUERY_BODY_LIST" ], "password1", "" )
+      cPassword2 := hb_HGetDef( server[ "QUERY_BODY_LIST" ], "password2", "" )
       IF Empty( cName )
          session[ "formdata_account/edit" ] := { "name" => cName }
          URedirect( "?err=1" )
@@ -340,8 +340,8 @@ STATIC FUNCTION proc_account_edit()
    ENDIF
 
    aRet := { "user" => users->USER, "name" => cName }
-   IF "err" $ get
-      SWITCH get[ "err" ]
+   IF "err" $ server[ "QUERY_HEADER_LIST" ]
+      SWITCH server[ "QUERY_HEADER_LIST" ][ "err" ]
       CASE "1"
          aRet[ "errtext" ] := "Name value should not be empty!"
          EXIT
@@ -367,10 +367,10 @@ STATIC FUNCTION proc_register()
    IF server[ "REQUEST_METHOD" ] == "POST"
       dbUseArea( .T., , "users", "users", .T., .F. )
       ordSetFocus( "user" )
-      cUser := hb_HGetDef( post, "user", "" )
-      cName := hb_HGetDef( post, "name", "" )
-      cPassword1 := hb_HGetDef( post, "password1", "" )
-      cPassword2 := hb_HGetDef( post, "password2", "" )
+      cUser := hb_HGetDef( server[ "QUERY_BODY_LIST" ], "user", "" )
+      cName := hb_HGetDef( server[ "QUERY_BODY_LIST" ], "name", "" )
+      cPassword1 := hb_HGetDef( server[ "QUERY_BODY_LIST" ], "password1", "" )
+      cPassword2 := hb_HGetDef( server[ "QUERY_BODY_LIST" ], "password2", "" )
 
       IF Empty( cUser ) .OR. Empty( cName ) .OR. Empty( cPassword1 ) .OR. Empty( cPassword2 )
          session[ "formdata_register" ] := { "user" => cUser, "name" => cName }
@@ -396,8 +396,8 @@ STATIC FUNCTION proc_register()
       RETURN NIL
    ENDIF
    aRet := { "user" => cUser, "name" => cName }
-   IF "err" $ get
-      SWITCH get[ "err" ]
+   IF "err" $ server[ "QUERY_HEADER_LIST" ]
+      SWITCH server[ "QUERY_HEADER_LIST" ][ "err" ]
       CASE "1"
          aRet[ "errtext" ] := "All fields are required!"
          EXIT
