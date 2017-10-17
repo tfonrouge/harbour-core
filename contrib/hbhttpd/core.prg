@@ -918,10 +918,22 @@ STATIC PROCEDURE ParseRequestBody( cRequest )
 STATIC FUNCTION MakeResponse( hConfig )
 
    LOCAL cRet, cStatus
+   LOCAL itm
+
+   IF hb_HHasKey( server, "CONTENT_TYPE" )
+      UAddHeader( "Content-Type", server[ "CONTENT_TYPE" ] )
+   ENDIF
 
    IF UGetHeader( "Content-Type" ) == NIL
       UAddHeader( "Content-Type", "text/html" )
    ENDIF
+
+   IF hb_HHasKey( server, "ADD_HEADERS" )
+      FOR EACH itm IN server[ "ADD_HEADERS" ]
+         UAddHeader( itm:__enumKey, itm )
+      NEXT
+   ENDIF
+
    UAddHeader( "Date", HttpDateFormat( hb_DateTime() ) )
 
    cRet := iif( server[ "SERVER_PROTOCOL" ] == "HTTP/1.0", "HTTP/1.0 ", "HTTP/1.1 " )
