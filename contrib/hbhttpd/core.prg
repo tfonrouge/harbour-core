@@ -31,7 +31,7 @@
 
 THREAD STATIC t_cResult, t_nStatusCode, t_aHeader, t_aSessionData
 
-MEMVAR server, get, post, cookie, session, httpd
+MEMVAR server, cookie, session, httpd
 
 CREATE CLASS UHttpdConnection
 
@@ -200,7 +200,8 @@ METHOD Run( hConfig ) CLASS UHttpd
       "FirewallFilter"       => "0.0.0.0/0", ;
       "HB_TK_INIT"           => HB_TK_INIT, ;
       "HB_TK_END"            => HB_TK_END, ;
-      "DBCLOSEALL"           => .T. ;
+      "DBCLOSEALL"           => .T., ;
+      "SupportedMethods"     => { "GET", "POST" } ;
    }
 
    FOR EACH xValue IN hConfig
@@ -558,7 +559,7 @@ STATIC FUNCTION ProcessConnection( oServer )
 
    ErrorBlock( {| o | UErrorHandler( o, oServer ) } )
 
-   PRIVATE server, get, post, cookie, session, httpd
+   PRIVATE server, cookie, session, httpd
 
    httpd := oServer
 
@@ -655,8 +656,8 @@ STATIC FUNCTION ProcessConnection( oServer )
 
          // PRIVATE
          server := hb_HClone( aServer )
-         get := { => }
-         post := { => }
+         server[ "QUERY_HEADER_LIST" ] := { => }
+         server[ "QUERY_BODY_LIST" ] := { => }
          cookie := { => }
          session := NIL
 
@@ -691,7 +692,7 @@ STATIC FUNCTION ProcessConnection( oServer )
                UAddHeader( "Connection", "close" )
             ELSEIF ! SubStr( server[ "SERVER_PROTOCOL" ], 6 ) $ "1.0 1.1"
                USetStatusCode( 505 ) /* HTTP version not supported */
-            ELSEIF ! server[ "REQUEST_METHOD" ] $ "GET POST"
+            ELSEIF aScan( oServer:hConfig[ "SupportedMethods" ], server[ "REQUEST_METHOD" ] ) = 0
                USetStatusCode( 501 ) /* Not implemented */
             ELSE
                IF server[ "SERVER_PROTOCOL" ] == "HTTP/1.1"
@@ -873,9 +874,9 @@ STATIC FUNCTION ParseRequestHeader( cRequest )
    IF ! server[ "QUERY_STRING" ] == ""
       FOR EACH cI IN hb_ATokens( server[ "QUERY_STRING" ], "&" )
          IF ( nI := At( "=", cI ) ) > 0
-            get[ UUrlDecode( Left( cI, nI - 1 ) ) ] := UUrlDecode( SubStr( cI, nI + 1 ) )
+            server["QUERY_HEADER_LIST"][ UUrlDecode( Left( cI, nI - 1 ) ) ] := UUrlDecode( SubStr( cI, nI + 1 ) )
          ELSE
-            get[ UUrlDecode( cI ) ] := NIL
+            server["QUERY_HEADER_LIST"][ UUrlDecode( cI ) ] := NIL
          ENDIF
       NEXT
    ENDIF
@@ -896,17 +897,17 @@ STATIC PROCEDURE ParseRequestBody( cRequest )
          IF cEncoding == "UTF-8"
             FOR EACH cPart IN hb_ATokens( cRequest, "&" )
                IF ( nI := At( "=", cPart ) ) > 0
-                  post[ hb_UTF8ToStr( UUrlDecode( Left( cPart, nI - 1 ) ) ) ] := hb_UTF8ToStr( UUrlDecode( SubStr( cPart, nI + 1 ) ) )
+                  server["QUERY_BODY_LIST"][ hb_UTF8ToStr( UUrlDecode( Left( cPart, nI - 1 ) ) ) ] := hb_UTF8ToStr( UUrlDecode( SubStr( cPart, nI + 1 ) ) )
                ELSE
-                  post[ hb_UTF8ToStr( UUrlDecode( cPart ) ) ] := NIL
+                  server["QUERY_BODY_LIST"][ hb_UTF8ToStr( UUrlDecode( cPart ) ) ] := NIL
                ENDIF
             NEXT
          ELSE
             FOR EACH cPart IN hb_ATokens( cRequest, "&" )
                IF ( nI := At( "=", cPart ) ) > 0
-                  post[ UUrlDecode( Left( cPart, nI - 1 ) ) ] := UUrlDecode( SubStr( cPart, nI + 1 ) )
+                  server["QUERY_BODY_LIST"][ UUrlDecode( Left( cPart, nI - 1 ) ) ] := UUrlDecode( SubStr( cPart, nI + 1 ) )
                ELSE
-                  post[ UUrlDecode( cPart ) ] := NIL
+                  server["QUERY_BODY_LIST"][ UUrlDecode( cPart ) ] := NIL
                ENDIF
             NEXT
          ENDIF
@@ -1466,12 +1467,12 @@ PROCEDURE UProcFiles( cFileName, lIndex )
       UAddHeader( "Content-Type", "text/html" )
 
       aDir := hb_vfDirectory( UOsFileName( cFileName ), "D" )
-      IF "s" $ get
+      IF "s" $ server[ "QUERY_HEADER_LIST" ]
          DO CASE
-         CASE get[ "s" ] == "s"
+         CASE server[ "QUERY_HEADER_LIST" ][ "s" ] == "s"
             ASort( aDir,,, {| X, Y | iif( X[ F_ATTR ] == "D", iif( Y[ F_ATTR ] == "D", X[ F_NAME ] < Y[ F_NAME ], .T. ), ;
                iif( Y[ F_ATTR ] == "D", .F., X[ F_SIZE ] < Y[ F_SIZE ] ) ) } )
-         CASE get[ "s" ] == "m"
+         CASE server[ "QUERY_HEADER_LIST" ][ "s" ] == "m"
             ASort( aDir,,, {| X, Y | iif( X[ F_ATTR ] == "D", iif( Y[ F_ATTR ] == "D", X[ F_NAME ] < Y[ F_NAME ], .T. ), ;
                iif( Y[ F_ATTR ] == "D", .F., X[ F_DATE ] < Y[ F_DATE ] ) ) } )
          OTHERWISE
@@ -1532,19 +1533,15 @@ PROCEDURE UProcInfo()
    AEval( ASort( hb_HKeys( server ) ), {| X | UWrite( '<tr><td>' + X + '</td><td>' + UHtmlEncode( hb_CStr( server[ X ] ) ) + '</td></tr>' ) } )
    UWrite( '</table>' )
 
-   IF ! Empty( get )
-      UWrite( '<h3>get</h3>' )
-      UWrite( '<table border=1 cellspacing=0>' )
-      AEval( ASort( hb_HKeys( get ) ), {| X | UWrite( '<tr><td>' + X + '</td><td>' + UHtmlEncode( hb_CStr( get[ X ] ) ) + '</td></tr>' ) } )
-      UWrite( '</table>' )
-   ENDIF
-
-   IF ! Empty( post )
-      UWrite( '<h3>post</h3>' )
-      UWrite( '<table border=1 cellspacing=0>' )
-      AEval( ASort( hb_HKeys( post ) ), {| X | UWrite( '<tr><td>' + X + '</td><td>' + UHtmlEncode( hb_CStr( post[ X ] ) ) + '</td></tr>' ) } )
-      UWrite( '</table>' )
-   ENDIF
+   UWrite( '<h3>' + server[ "REQUEST_METHOD" ] + '</h3>' )
+   UWrite( '<h3>Query Header</h3>' )
+   UWrite( '<table border=1 cellspacing=0>' )
+   AEval( ASort( hb_HKeys( server[ "QUERY_HEADER_LIST" ] ) ), {| X | UWrite( '<tr><td>' + X + '</td><td>' + UHtmlEncode( hb_CStr( server[ "QUERY_HEADER_LIST" ][ X ] ) ) + '</td></tr>' ) } )
+   UWrite( '</table>' )
+   UWrite( '<h3>Query Body</h3>' )
+   UWrite( '<table border=1 cellspacing=0>' )
+   AEval( ASort( hb_HKeys( server[ "QUERY_BODY_LIST" ] ) ), {| X | UWrite( '<tr><td>' + X + '</td><td>' + UHtmlEncode( hb_CStr( server[ "QUERY_BODY_LIST" ][ X ] ) ) + '</td></tr>' ) } )
+   UWrite( '</table>' )
 
    RETURN
 
