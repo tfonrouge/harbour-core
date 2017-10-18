@@ -658,6 +658,7 @@ STATIC FUNCTION ProcessConnection( oServer )
          server := hb_HClone( aServer )
          server[ "QUERY_HEADER_LIST" ] := { => }
          server[ "QUERY_BODY_LIST" ] := { => }
+         server[ "BODY_RAW" ] := nil
          cookie := { => }
          session := NIL
 
@@ -886,6 +887,8 @@ STATIC FUNCTION ParseRequestHeader( cRequest )
 STATIC PROCEDURE ParseRequestBody( cRequest )
 
    LOCAL nI, cPart, cEncoding
+
+   server[ "BODY_RAW" ] := cRequest
 
    IF "CONTENT_TYPE" $ server .AND. ;
       hb_LeftEq( server[ "CONTENT_TYPE" ], "application/x-www-form-urlencoded" )
