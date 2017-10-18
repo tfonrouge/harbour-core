@@ -1,3 +1,15 @@
+/*
+    + Simple HTTP Server as REST service provider for the AngularJS tutorial at: https://angular.io/tutorial
+    * define supported methods
+    * implements required headers to allow CORS ( https://enable-cors.org, https://en.wikipedia.org/wiki/Cross-origin_resource_sharing )
+    * uses simple fast plain dbf's
+    * can be easily configured to use another Harbour available database(?):
+      * MongoDb : https://github.com/tfonrouge/hbmongoc
+      * SQL : available on the Harbour main stream
+ 
+    (C) 2017 tfonrouge@gmail.com
+*/
+
 #require "hbhttpd"
 
 REQUEST DBFCDX
@@ -93,8 +105,7 @@ ENDTEXT
       "/files/*"          => {| x | QOut( hb_DirBase() + "files/" + X ), UProcFiles( hb_DirBase() + "files/" + X, .F. ) }, ;
       "/api/heroes"       => @proc_heroes(), ;
       "/api/heroes/*"     => @proc_heroeById(), ;
-      "/app/main"         => @proc_main(), ;
-      "/"                 => {|| URedirect( "/app/main" ) } } }
+      "/"                 => {|| URedirect( "/api/heroes" ) } } }
 
    ? "Listening on port:", hConfig[ "Port" ]
 
@@ -110,9 +121,6 @@ ENDTEXT
    oLogAccess:Close()
 
    RETURN
-
-STATIC FUNCTION proc_main()
-RETURN "Server Heroes running..."
 
 STATIC FUNCTION proc_heroes()
    LOCAL json
