@@ -105,7 +105,6 @@ PROCEDURE Main( ... )
    /* Load list of projects */
 
    LoadProjectListAutomatic( hProjectList )
-   LoadProjectListFromString( hProjectList, GetEnv( "HB_BUILD_ADDONS" ) )
 
    IF AScanL( aParams, "verbose" ) > 0
       hb_SetEnv( "HB_BUILD_VERBOSE", "yes" )
@@ -549,7 +548,7 @@ STATIC PROCEDURE call_hbmk2_hbinfo( cProjectRoot, cProjectName, hProject )
          ENDIF
       NEXT
    ELSE
-      OutStd( hb_StrFormat( "! Warning: 'hbmk2 %1$s --hbinfo' failed with exit code %2$d", cProjectPath, nErrorLevel ) + hb_eol() )
+      OutStd( hb_StrFormat( "! Warning: 'hbmk2 %1$s --hbinfo' failed with exit status %2$d", cProjectPath, nErrorLevel ) + hb_eol() )
    ENDIF
 
    RETURN
@@ -810,16 +809,6 @@ STATIC PROCEDURE LoadProjectListAutomatic( hProjectList )
             NEXT
          ENDIF
       ENDIF
-   NEXT
-
-   RETURN
-
-STATIC PROCEDURE LoadProjectListFromString( hProjectList, cString )
-
-   LOCAL cItem
-
-   FOR EACH cItem IN hb_ATokens( cString,, .T. )
-      AddProject( hProjectList, cItem )
    NEXT
 
    RETURN

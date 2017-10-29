@@ -313,7 +313,7 @@
 #endif
 
 #ifndef HB_OS_DOS
-   #if defined( DOS ) || defined( _QC ) || defined( __DOS__ ) || defined( MSDOS ) || defined( __MSDOS__ ) || defined( __RSX32__ )
+   #if defined( DOS ) || defined( _QC ) || defined( __DOS__ ) || defined( MSDOS ) || defined( __MSDOS__ )
       #define HB_OS_DOS
       #if defined( __386__ ) || defined( __DJGPP__ )
          #define HB_OS_DOS_32
@@ -323,7 +323,7 @@
    #endif
 #endif
 
-#if defined( __EMX__ ) && ! defined( __RSXNT__ )
+#if defined( __EMX__ )
    #define HB_OS_OS2_GCC
 #endif
 #ifndef HB_OS_OS2
@@ -618,7 +618,7 @@
 #if defined( __GNUC__ ) || defined( __SUNPRO_C )
    #define _HB_INLINE_  __inline__
 #elif defined( __BORLANDC__ ) || defined( _MSC_VER ) || \
-      defined( __WATCOMC__ ) || defined( __POCC__ ) || defined( __XCC__ ) || \
+      defined( __WATCOMC__ ) || defined( __POCC__ ) || \
       defined( __LCC__ ) || defined( __DMC__ )
    #define _HB_INLINE_  __inline
 #else /* __cplusplus */

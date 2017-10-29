@@ -70,14 +70,14 @@
                                                  ( const mtext * ) hb_itemGetStrU16( itm, HB_CDP_ENDIAN_NATIVE, phstr, plen ) : \
                                                  ( const mtext * ) hb_itemGetStr( itm, hb_setGetOSCP(), phstr, plen ) )
 #define M_HB_ITEMPUTSTR( itm, str )              ( s_fOCI_CharsetMetaDataUni ? \
-                                                 hb_itemPutStrU16( itm, HB_CDP_ENDIAN_NATIVE, ( HB_WCHAR * ) str ) : \
-                                                 hb_itemPutStr( itm, hb_setGetOSCP(), ( char * ) str ) )
+                                                 hb_itemPutStrU16( itm, HB_CDP_ENDIAN_NATIVE, ( const HB_WCHAR * ) str ) : \
+                                                 hb_itemPutStr( itm, hb_setGetOSCP(), ( const char * ) str ) )
 #define D_HB_ITEMPUTSTR( itm, str )              ( s_fOCI_CharsetUserDataUni ? \
-                                                 hb_itemPutStrU16( itm, HB_CDP_ENDIAN_NATIVE, ( HB_WCHAR * ) str ) : \
-                                                 hb_itemPutStr( itm, hb_setGetOSCP(), ( char * ) str ) )
+                                                 hb_itemPutStrU16( itm, HB_CDP_ENDIAN_NATIVE, ( const HB_WCHAR * ) str ) : \
+                                                 hb_itemPutStr( itm, hb_setGetOSCP(), ( const char * ) str ) )
 #define D_HB_ITEMPUTSTRLEN( itm, str, len )      ( s_fOCI_CharsetUserDataUni ? \
-                                                 hb_itemPutStrLenU16( itm, HB_CDP_ENDIAN_NATIVE, ( HB_WCHAR * ) str, len ) : \
-                                                 hb_itemPutStrLen( itm, hb_setGetOSCP(), ( char * ) str, len ) )
+                                                 hb_itemPutStrLenU16( itm, HB_CDP_ENDIAN_NATIVE, ( const HB_WCHAR * ) str, len ) : \
+                                                 hb_itemPutStrLen( itm, hb_setGetOSCP(), ( const char * ) str, len ) )
 
 typedef struct
 {

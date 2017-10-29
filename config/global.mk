@@ -163,7 +163,7 @@ ifeq ($(HB_INIT_DONE),)
       endif
 
       # Enforce some basic settings for release packages
-      export HB_BUILD_DYN := yes
+      export __HB_BUILD_DYN :=
       export HB_BUILD_OPTIM := yes
       export HB_BUILD_DEBUG := no
       export HB_BUILD_SHARED := no
@@ -173,7 +173,7 @@ ifeq ($(HB_INIT_DONE),)
    endif
 
    # Cannot build shared tools if we don't create dlls
-   ifeq ($(HB_BUILD_DYN),no)
+   ifeq ($(__HB_BUILD_DYN),no)
       export HB_BUILD_SHARED := no
    endif
 
@@ -261,9 +261,6 @@ ifeq ($(HB_INIT_DONE),)
    ifneq ($(HB_BUILD_PKG),)
       $(info ! HB_BUILD_PKG: $(HB_BUILD_PKG))
    endif
-   ifneq ($(HB_BUILD_DYN),)
-      $(info ! HB_BUILD_DYN: $(HB_BUILD_DYN))
-   endif
    ifneq ($(HB_BUILD_CONTRIB_DYN),)
       $(info ! HB_BUILD_CONTRIB_DYN: $(HB_BUILD_CONTRIB_DYN))
    endif
@@ -302,6 +299,9 @@ ifeq ($(HB_INIT_DONE),)
    endif
    ifneq ($(HB_INSTALL_IMPLIB),)
       $(info ! HB_INSTALL_IMPLIB: $(HB_INSTALL_IMPLIB))
+   endif
+   ifneq ($(__HB_BUILD_DYN),)
+      $(info ! __HB_BUILD_DYN: $(__HB_BUILD_DYN))
    endif
    ifneq ($(__HB_MT),)
       $(info ! __HB_MT: $(__HB_MT))
@@ -727,19 +727,13 @@ ifeq ($(HB_COMPILER),)
       ifneq ($(HB_COMP_PATH),)
          HB_COMPILER := clang
       else
-         HB_COMP_PATH := $(call find_in_path_par,clang,/Developer/usr/bin/)
+         HB_COMP_PATH := $(call find_in_path,gcc)
          ifneq ($(HB_COMP_PATH),)
-            HB_CCPREFIX := /Developer/usr/bin/
-            HB_COMPILER := clang
+            HB_COMPILER := gcc
          else
-            HB_COMP_PATH := $(call find_in_path,gcc)
+            HB_COMP_PATH := $(call find_in_path,icc)
             ifneq ($(HB_COMP_PATH),)
-               HB_COMPILER := gcc
-            else
-               HB_COMP_PATH := $(call find_in_path,icc)
-               ifneq ($(HB_COMP_PATH),)
-                  HB_COMPILER := icc
-               endif
+               HB_COMPILER := icc
             endif
          endif
       endif
@@ -820,17 +814,33 @@ ifeq ($(HB_COMPILER_VER),)
    ifneq ($(filter $(HB_COMPILER),clang clang64),)
 
       ifeq ($(HB_COMP_PATH_VER_DET),)
-         HB_COMP_PATH_VER_DET := $(HB_CCPREFIX)clang$(HB_CCSUFFIX)
+         HB_COMP_PATH_VER_DET := clang$(HB_CCSUFFIX)
       endif
       _C_VER := $(shell "$(HB_COMP_PATH_VER_DET)" -v 2>&1)
+      _C_VER_BAK := $(_C_VER)
 
-      ifneq ($(findstring based on LLVM,$(_C_VER)),)  # 'Apple LLVM version 6.1.0 (clang-602.0.53) (based on LLVM 3.6.0svn)'
-         __temp := svn)
-         _C_VER := $(wordlist 9,9,$(subst $(__temp),,$(_C_VER)))
-      else ifneq ($(findstring Apple LLVM version,$(_C_VER)),)  # 'Apple LLVM version 8.1.0 (clang-802.0.42)'
-         _C_VER := $(wordlist 4,4,$(_C_VER))
-         _APPLE_VER := yes
-      else ifneq ($(findstring version,$(_C_VER)),)  # 'clang version 3.0 (tags/RELEASE_30/final)'
+      ifneq ($(findstring Apple LLVM,$(_C_VER)),)
+         ifneq ($(findstring based on LLVM,$(_C_VER)),)  # 'Apple LLVM version 6.1.0 (clang-602.0.53) (based on LLVM 3.6.0svn)'
+            __temp := )
+            _C_VER := $(subst $(__temp),,$(_C_VER))
+            __temp := svn
+            _C_VER := $(subst $(__temp),,$(_C_VER))
+            _C_VER := $(wordlist 9,9,$(_C_VER))
+         else                                            # 'Apple LLVM version 8.1.0 (clang-802.0.42)'
+            _C_VER := $(wordlist 4,4,$(_C_VER))
+            _APPLE_VER := yes
+         endif
+      else ifneq ($(findstring FreeBSD clang,$(_C_VER)),)
+         ifneq ($(findstring based on LLVM,$(_C_VER)),)  # 'FreeBSD clang version 4.0.0 (tags/RELEASE_400/final 297347) (based on LLVM 4.0.0)'
+            __temp := )
+            _C_VER := $(subst $(__temp),,$(_C_VER))
+            __temp := svn
+            _C_VER := $(subst $(__temp),,$(_C_VER))
+            _C_VER := $(wordlist 10,10,$(_C_VER))
+         else                                            # 'FreeBSD clang version 3.0 (tags/RELEASE_30/final 145349) 20111210'
+            _C_VER := $(wordlist 4,4,$(_C_VER))
+         endif
+      else ifneq ($(findstring version,$(_C_VER)),)      # 'clang version 3.0 (tags/RELEASE_30/final)'
          _C_VER := $(wordlist 3,3,$(_C_VER))
       else
          _C_VER := 1.0
@@ -863,11 +873,13 @@ ifeq ($(HB_COMPILER_VER),)
          HB_COMP_PATH_VER_DET := $(HB_CCPREFIX)gcc$(HB_CCSUFFIX)
       endif
       _C_VER := $(shell "$(HB_COMP_PATH_VER_DET)" -dumpversion 2>&1)
+      _C_VER_BAK := $(_C_VER)
 
       # Try new option if the returned version is 1 or 2 character long
       # (possibly a major version number only)
       ifneq ($(filter $(call strlen,$(_C_VER)),1 2),)
          _C_VER := $(shell "$(HB_COMP_PATH_VER_DET)" -dumpfullversion 2>&1)
+         _C_VER_BAK := $(_C_VER)
       endif
 
       ifeq ($(_C_VER),)
@@ -894,6 +906,7 @@ ifeq ($(HB_COMPILER_VER),)
          HB_COMP_PATH := cl.exe
       endif
       _C_VER := $(shell "$(HB_COMP_PATH)" 2>&1)
+      _C_VER_BAK := $(_C_VER)
 
       ifeq ($(wordlist 7,7,$(_C_VER)),Version)  # 'Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 15.00.30729.01 for 80x86'
          _C_VER := $(wordlist 8,8,$(_C_VER))
@@ -911,6 +924,7 @@ ifeq ($(HB_COMPILER_VER),)
    else ifneq ($(filter $(HB_COMPILER),pocc pocc64 poccarm),)
 
       _C_VER := $(shell "$(HB_COMP_PATH_VER_DET)" 2>&1)
+      _C_VER_BAK := $(_C_VER)
 
       # 'Pelles ISO C Compiler, Version 8.00.28'
       _C_VER := $(wordlist 6,6,$(_C_VER))
@@ -923,6 +937,14 @@ ifeq ($(HB_COMPILER_VER),)
       endif
       HB_COMPILER_VER := $(_C_VER_MAJOR)$(_C_VER_MINOR)
 
+   endif
+
+   # Something went wrong, reset to oldest possible version
+   ifneq ($(HB_COMPILER_VER),)
+      ifneq ($(call strlen,$(HB_COMPILER_VER)), 4)
+         HB_COMPILER_VER := 0000
+         $(info ! Warning: Failed to auto-detect C compiler version: |$(_C_VER_BAK)|)
+      endif
    endif
 endif
 
@@ -1633,7 +1655,7 @@ ifeq ($(HB_INIT_DONE),)
          $(shell $(_cmd) > $(TOP)$(ROOT)include$(DIRSEP)_repover.txt)
          $(shell git ls-remote --get-url >> $(TOP)$(ROOT)include$(DIRSEP)_repover.txt)
       else
-         $(info ! WARNING: Git not found in PATH. Version information might not be accurate.)
+         $(info ! Warning: Git not found in PATH. Version information might not be accurate.)
       endif
    endif
 endif
@@ -1779,7 +1801,7 @@ ifeq ($(HB_HOST_INC),)
 endif
 
 ifeq ($(HB_INIT_DONE),)
-   ifneq ($(HB_BUILD_DYN),no)
+   ifneq ($(__HB_BUILD_DYN),no)
 
       HB_IMPLIB_PLOC :=
       HB_DYNLIB_PLOC :=

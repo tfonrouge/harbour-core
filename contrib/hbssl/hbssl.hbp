@@ -9,11 +9,12 @@
 
 -depurlbase=openssl:https://www.openssl.org/
 -depurlbase=openssl:https://github.com/vszakats/harbour-deps{win&(allmingw|allclang)}
--depurlbase=openssl:https://www.openssl.org/community/binaries.html
+-depurlbase=openssl:https://www.openssl.org/community/binaries.html{win&!(allmingw|allclang)}
 -deppkgname=openssl:libssl-dev{deb}
 -deppkgname=openssl:openssl-devel{rpm}
 -deppkgname=openssl:openssl@1.1{homebrew}
--deppkgname=openssl:openssl{homebrew}
+-deppkgname=openssl:openssl-devel{pkgng}
+-deppkgname=openssl:openssl{homebrew|pkgng}
 -deppkgname=openssl:libressl{homebrew}
 -deppkgname=openssl:openssl{pacman}
 -deppkgname=openssl:mingw-w64-i686-openssl{msys2&x86}

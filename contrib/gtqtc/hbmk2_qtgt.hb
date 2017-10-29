@@ -272,7 +272,9 @@ STATIC FUNCTION qt_tool_detect( hbmk, cName, cEnvQT, lSuffix )
                /* Return silently. It shall fail at dependency detection inside hbmk2 */
                RETURN NIL
             ELSEIF ! hb_vfExists( cBIN := hb_PathNormalize( hb_DirSepAdd( cEnv ) + ".." + hb_ps() + "bin" + hb_ps() + cName ) )
-               hbmk_OutErr( hbmk, hb_StrFormat( "Warning: %1$s points to incomplete QT installation at '%2$s'. '%3$s' executable not found.", aEnvList[ 1 ], cEnv, cName ) )
+               IF hbmk[ "cPLAT" ] == "win"
+                  hbmk_OutErr( hbmk, hb_StrFormat( "Warning: %1$s points to an incomplete QT installation at '%2$s'. '%3$s' executable not found.", aEnvList[ 1 ], cEnv, cName ) )
+               ENDIF
                cBIN := ""
             ENDIF
          ELSEIF ! hb_vfExists( cBIN := hb_DirSepAdd( hb_DirBase() ) + cName )
@@ -283,7 +285,9 @@ STATIC FUNCTION qt_tool_detect( hbmk, cName, cEnvQT, lSuffix )
             /* The extra PATH comes from this message:
                https://www.mail-archive.com/harbour@harbour-project.org/msg21734.html */
             IF Empty( cBIN := hbmk_FindInPath( cName, GetEnv( "PATH" ) + hb_osPathListSeparator() + "/opt/qtsdk/qt/bin" ) )
-               hbmk_OutErr( hbmk, hb_StrFormat( "%1$s not or wrongly set, could not auto-detect '%2$s' executable", hbmk_ArrayToList( aEnvList, ", " ), cName ) )
+               IF ! hbmk[ "lQUIET" ]
+                  hbmk_OutErr( hbmk, hb_StrFormat( "%1$s not/wrongly set, could not auto-detect '%2$s' executable", hbmk_ArrayToList( aEnvList, ", " ), cName ) )
+               ENDIF
                RETURN NIL
             ENDIF
          ENDIF

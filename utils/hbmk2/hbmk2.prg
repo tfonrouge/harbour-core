@@ -59,6 +59,8 @@
 /*
    Interesting C build overview from the author of a similar tool:
       http://nethack4.org/blog/building-c.html
+   About autotools:
+      https://autotools.io/
 
    Program Library HOWTO:
       https://www.dwheeler.com/program-library/Program-Library-HOWTO.pdf
@@ -380,6 +382,7 @@ EXTERNAL hbmk_KEYW
 #define _HBMK_IMPLIB_NOTFOUND   -1
 #define _HBMK_IMPLIB_OK         0
 #define _HBMK_IMPLIB_FAILED     1
+#define _HBMK_IMPLIB_COPYFAIL   2
 
 #define _CCOMP_PASS_C           1
 #define _CCOMP_PASS_CPP         2
@@ -1515,7 +1518,7 @@ STATIC FUNCTION DetectPackageManager()
    #elif defined( __PLATFORM__BSD )
       DO CASE
       CASE hb_vfDirExists( "/etc/pkg" )
-         cPkgMgr := "pkg"
+         cPkgMgr := "pkgng"
       OTHERWISE
          cPkgMgr := "ports"
       ENDCASE
@@ -4616,8 +4619,15 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
             cOpt_Lib := "-static -no_warning_for_no_symbols {FA} -o {OL} {LO}"
          ELSE
             DO CASE
-            CASE HBMK_ISCOMP( "clang|clang64" )
+            CASE HBMK_ISCOMP( "clang|clang64" ) .AND. hbmk[ _HBMK_cPLAT ] == "win"
+#if 1
+               cBin_Lib := hbmk[ _HBMK_cCCPREFIX ] + "ar"
+               IF ! Empty( hbmk[ _HBMK_cCCPATH ] )
+                  cBin_Lib := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_Lib
+               ENDIF
+#else
                cBin_Lib := "llvm-ar"
+#endif
             CASE hbmk[ _HBMK_cCOMP ] == "wasm"
                cBin_Lib := GetEnv( "LLVM_ROOT" ) + hb_ps() + "llvm-ar"
             CASE hbmk[ _HBMK_cCOMP ] == "icc"
@@ -4841,12 +4851,12 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          IF hbmk[ _HBMK_cPLAT ] == "win"
             cImpLibExt := ".dll" + cLibLibExt
             IF HBMK_ISCOMP( "clang|clang64" ) .AND. hbmk[ _HBMK_cCOMPVer ] >= "0500"
-               bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_gcc( hbmk, "llvm-dlltool" + " {FI} -d {ID} -l {OL}", cSourceDLL, cTargetLib, cFlags, cImpLibExt ) }
+               bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_gcc( hbmk, "llvm-dlltool" + " {FI} -d {ID} -l {OL}", @cSourceDLL, @cTargetLib, cFlags, cImpLibExt ) }
             ELSE
-               bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_gcc( hbmk, hbmk[ _HBMK_cCCPREFIX ] + "dlltool" + hbmk[ _HBMK_cCCSUFFIX ] + " {FI} -d {ID} -l {OL}", cSourceDLL, cTargetLib, cFlags, cImpLibExt ) }
+               bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_gcc( hbmk, hbmk[ _HBMK_cCCPREFIX ] + "dlltool" + hbmk[ _HBMK_cCCSUFFIX ] + " {FI} -d {ID} -l {OL}", @cSourceDLL, @cTargetLib, cFlags, cImpLibExt ) }
             ENDIF
          ENDIF
-         IF HBMK_ISCOMP( "clang|clang64" ) .AND. ! hbmk[ _HBMK_cPLAT ] == "darwin"
+         IF HBMK_ISCOMP( "clang|clang64" ) .AND. hbmk[ _HBMK_cPLAT ] == "win"
             cBin_SymLst := "llvm-nm"
          ELSE
             cBin_SymLst := hbmk[ _HBMK_cCCPREFIX ] + "nm"
@@ -5119,7 +5129,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
             cResExt := ".reso"
             cOpt_Res := "{FR} {IR} -O coff -o {OS}"
             IF ! Empty( hbmk[ _HBMK_cCCPATH ] )
-               cBin_Res := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_Res
+               cBin_Res := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_Res
             ENDIF
          ENDIF
 
@@ -5299,7 +5309,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          cLibPathSep := " "
          cLibLibExt := ".a"
          cImpLibExt := ".dll" + cLibLibExt
-         bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_gcc( hbmk, hbmk[ _HBMK_cCCPREFIX ] + "dlltool" + hbmk[ _HBMK_cCCSUFFIX ] + hbmk[ _HBMK_cCCEXT ] + " {FI} -d {ID} -l {OL}", cSourceDLL, cTargetLib, cFlags, cImpLibExt ) }
+         bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_gcc( hbmk, hbmk[ _HBMK_cCCPREFIX ] + "dlltool" + hbmk[ _HBMK_cCCSUFFIX ] + hbmk[ _HBMK_cCCEXT ] + " {FI} -d {ID} -l {OL}", @cSourceDLL, @cTargetLib, cFlags, cImpLibExt ) }
          IF hbmk[ _HBMK_cCOMP ] == "tcc"
             cBin_Lib := "tiny_libmaker.exe"
          ELSE
@@ -5311,10 +5321,10 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          cOpt_Lib := "rcs {FA} {OL} {LO}"
          cLibObjPrefix := NIL
          IF ! Empty( hbmk[ _HBMK_cCCPATH ] )
-            cBin_Lib     := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_Lib
-            cBin_CompCPP := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_CompCPP
-            cBin_CompC   := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_CompC
-            cBin_Link    := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_Link
+            cBin_Lib     := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_Lib
+            cBin_CompCPP := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_CompCPP
+            cBin_CompC   := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_CompC
+            cBin_Link    := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_Link
          ENDIF
          cBin_SymLst := hbmk[ _HBMK_cCCPREFIX ] + "nm" + hbmk[ _HBMK_cCCEXT ]
          cOpt_SymLst := "-g --defined-only -C {FN} {LI}"
@@ -5428,7 +5438,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
             cResExt := ".reso"
             cOpt_Res := "{FR} {IR} -O coff -o {OS}"
             IF ! Empty( hbmk[ _HBMK_cCCPATH ] )
-               cBin_Res := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_Res
+               cBin_Res := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_Res
             ENDIF
          ENDIF
 
@@ -5477,7 +5487,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          cOpt_Dyn := "-shared -o {OD} {LO} {LL} {LB} {LF} {FD} {IM} {DL} {LS}"
          cBin_Link := cBin_CompC
          cOpt_Link := "{LO} {LA} {FL} {IM} {DL}"
-         bBlk_ImpLib := {| cSourceDLL, cTargetLib | win_implib_copy( hbmk, cSourceDLL, cTargetLib ) }
+         bBlk_ImpLib := {| cSourceDLL, cTargetLib | win_implib_copy( hbmk, cSourceDLL, @cTargetLib ) }
          cLibPathPrefix := "-L"
          cLibPathSep := " "
          IF hbmk[ _HBMK_cCOMP ] == "gccomf"
@@ -5553,12 +5563,12 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
 #endif
 
          IF ! Empty( hbmk[ _HBMK_cCCPATH ] )
-            cBin_Lib     := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_Lib
-            cBin_CompCPP := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_CompCPP
-            cBin_CompC   := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_CompC
-            cBin_Link    := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_Link
+            cBin_Lib     := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_Lib
+            cBin_CompCPP := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_CompCPP
+            cBin_CompC   := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_CompC
+            cBin_Link    := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_Link
 #if 0
-            cBin_Res     := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_Res
+            cBin_Res     := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_Res
 #endif
          ENDIF
 
@@ -5663,10 +5673,10 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
 #endif
 
          IF ! Empty( hbmk[ _HBMK_cCCPATH ] )
-            cBin_Lib     := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_Lib
-            cBin_CompCPP := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_CompCPP
-            cBin_CompC   := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_CompC
-            cBin_Link    := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_Link
+            cBin_Lib     := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_Lib
+            cBin_CompCPP := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_CompCPP
+            cBin_CompC   := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_CompC
+            cBin_Link    := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_Link
          ENDIF
 
       /* Watcom family */
@@ -5990,7 +6000,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
             cOpt_Dyn  := "-Gn -Tpd -L{DL} {FD} " +                          "c0d32" + cObjExt                      + " {LO}, {OD}, " + iif( hbmk[ _HBMK_lMAP ], "{OM}", "nul" ) + ", {LL} {LB} {LF} " + cLibBCC_CRTL + " import32" + cLibExt + ", {IM}, {LS}{SCRIPT}"
          ENDIF
          IF hbmk[ _HBMK_cCOMP ] == "bcc"
-            bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_bcc( hbmk, "implib.exe -c {FI} {OL} {ID}", cSourceDLL, cTargetLib, cFlags ) }
+            bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_bcc( hbmk, "implib.exe -c {FI} {OL} {ID}", @cSourceDLL, cTargetLib, cFlags ) }
          ENDIF
          cLibPathPrefix := ""
          cLibPathSep := ";"
@@ -6203,7 +6213,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          CASE "msvcmips" ; AAdd( hbmk[ _HBMK_aOPTI ], "-machine:mips" ) ; EXIT
          CASE "msvcsh"   ; AAdd( hbmk[ _HBMK_aOPTI ], "-machine:sh5"  ) ; EXIT
          ENDSWITCH
-         bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_msvc( hbmk, cBin_Lib + " -nologo {FI} -def:{ID} -out:{OL}", cSourceDLL, cTargetLib, cFlags ) }
+         bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_msvc( hbmk, cBin_Lib + " -nologo {FI} -def:{ID} -out:{OL}", @cSourceDLL, @cTargetLib, cFlags ) }
          cLibPathPrefix := "-libpath:"
          cLibPathSep := " "
          cDefPrefix := "-def:"
@@ -6318,7 +6328,7 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          ENDIF
          cOptIncMask := "-I{DI}"
          cOpt_Dyn := "{FD} {IM} -dll -out:{OD} {DL} {LO} {LL} {LB} {LF} {LS}"
-         bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_pocc( hbmk, cBin_Lib + " {ID} -out:{OL}", cSourceDLL, cTargetLib, cFlags ) }
+         bBlk_ImpLib := {| cSourceDLL, cTargetLib, cFlags | win_implib_command_pocc( hbmk, cBin_Lib + " {ID} -out:{OL}", @cSourceDLL, @cTargetLib, cFlags ) }
          cBin_SymLst := "podump.exe"
          cOpt_SymLst := "-symbols {LI}"
          cLibHBX_Regex := R_( "SECT[0-9A-Z][0-9A-Z ].*[Ee]xternal.*_?HB_FUN_([A-Z0-9_]*)[\s]" )
@@ -6532,9 +6542,9 @@ STATIC FUNCTION __hbmk( aArgs, nArgTarget, nLevel, /* @ */ lPause, /* @ */ lExit
          ENDIF
 
          IF ! Empty( hbmk[ _HBMK_cCCPATH ] )
-            cBin_CompCPP := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_CompCPP
-            cBin_CompC   := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_CompC
-            cBin_Link    := hbmk[ _HBMK_cCCPATH ] + hb_ps() + cBin_Link
+            cBin_CompCPP := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_CompCPP
+            cBin_CompC   := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_CompC
+            cBin_Link    := hb_DirSepAdd( hbmk[ _HBMK_cCCPATH ] ) + cBin_Link
          ENDIF
 
       CASE hbmk[ _HBMK_cPLAT ] == "vxworks" .AND. hbmk[ _HBMK_cCOMP ] == "diab"
@@ -9332,15 +9342,20 @@ STATIC PROCEDURE convert_incpaths_to_options( hbmk, cOptIncMask, lCHD_Comp )
 
    RETURN
 
-/* Same as hb_vfCopyFile() but it preserves timestamps */
+/* Same as hb_vfCopyFile() but it preserves timestamps
+   and removes read-only flag on systems supporting it */
 STATIC FUNCTION hbmk_hb_vfCopyFile( cSrc, cDst )
 
    LOCAL nResult
-   LOCAL tDate
+   LOCAL tDate, nAttr
 
    IF ( nResult := hb_vfCopyFile( cSrc, cDst ) ) != F_ERROR
       hb_vfTimeGet( cSrc, @tDate )
       hb_vfTimeSet( cDst, tDate )
+      hb_vfAttrGet( cSrc, @nAttr )
+      IF hb_bitAnd( nAttr, HB_FA_READONLY ) != 0
+         hb_vfAttrSet( cDst, hb_bitAnd( nAttr, hb_bitNot( HB_FA_READONLY ) ) )
+      ENDIF
    ENDIF
 
    RETURN nResult
@@ -9517,7 +9532,7 @@ STATIC FUNCTION DoLink( hbmk )
 
 STATIC FUNCTION DoIMPLIB( hbmk, bBlk_ImpLib, cLibLibPrefix, cImpLibExt, aIMPLIBSRC, cPROGNAME, cInstCat, lDoSrc )
 
-   LOCAL cMakeImpLibDLL, cTargetLib
+   LOCAL cMakeImpLibDLL, cMakeImpLibDLLActual, cTargetLib
    LOCAL nNotFound
 
    LOCAL aToDelete
@@ -9548,13 +9563,29 @@ STATIC FUNCTION DoIMPLIB( hbmk, bBlk_ImpLib, cLibLibPrefix, cImpLibExt, aIMPLIBS
                IF hbmk[ _HBMK_lCLEAN ]
                   AAddNew( aToDelete, cTargetLib )
                ELSE
-                  SWITCH Eval( bBlk_ImpLib, cMakeImpLibDLL, cTargetLib, ArrayToList( hbmk[ _HBMK_aOPTI ] ) )
+                  cMakeImpLibDLLActual := cMakeImpLibDLL
+                  SWITCH Eval( bBlk_ImpLib, @cMakeImpLibDLLActual, @cTargetLib, ArrayToList( hbmk[ _HBMK_aOPTI ] ) )
                   CASE _HBMK_IMPLIB_OK
-                     _hbmk_OutStd( hbmk, hb_StrFormat( I_( "Created import library: %1$s <= %2$s" ), cTargetLib, cMakeImpLibDLL ) )
+                     IF hb_FileMatch( cMakeImpLibDLL, cMakeImpLibDLLActual )
+                        _hbmk_OutStd( hbmk, hb_StrFormat( I_( "Created import library: %1$s <= %2$s" ), cTargetLib, cMakeImpLibDLL ) )
+                     ELSE
+                        _hbmk_OutStd( hbmk, hb_StrFormat( I_( "Created import library: %1$s <= %2$s via %3$s" ), cTargetLib, cMakeImpLibDLL, cMakeImpLibDLLActual ) )
+                     ENDIF
                      AAddNewINST( hbmk[ _HBMK_aINSTFILE ], { cInstCat, cTargetLib }, .T. )
                      EXIT
                   CASE _HBMK_IMPLIB_FAILED
-                     _hbmk_OutErr( hbmk, hb_StrFormat( I_( "Error: Failed creating import library %1$s from %2$s." ), cTargetLib, cMakeImpLibDLL ) )
+                     IF hb_FileMatch( cMakeImpLibDLL, cMakeImpLibDLLActual )
+                        _hbmk_OutErr( hbmk, hb_StrFormat( I_( "Error: Failed creating import library %1$s from %2$s." ), cTargetLib, cMakeImpLibDLL ) )
+                     ELSE
+                        _hbmk_OutErr( hbmk, hb_StrFormat( I_( "Error: Failed creating import library %1$s from %2$s via %3$s." ), cTargetLib, cMakeImpLibDLL, cMakeImpLibDLLActual ) )
+                     ENDIF
+                     EXIT
+                  CASE _HBMK_IMPLIB_COPYFAIL
+                     IF hb_FileMatch( cMakeImpLibDLL, cMakeImpLibDLLActual )
+                        _hbmk_OutErr( hbmk, hb_StrFormat( I_( "Error: Failed creating import library %1$s from %2$s (while copying)." ), cTargetLib, cMakeImpLibDLL ) )
+                     ELSE
+                        _hbmk_OutErr( hbmk, hb_StrFormat( I_( "Error: Failed creating import library %1$s from %2$s via %3$s (while copying)." ), cTargetLib, cMakeImpLibDLL, cMakeImpLibDLLActual ) )
+                     ENDIF
                      EXIT
                   CASE _HBMK_IMPLIB_NOTFOUND
                      ++nNotFound
@@ -14531,7 +14562,25 @@ STATIC FUNCTION IsOMFLib( cFileName )
 
    RETURN .F.
 
-STATIC FUNCTION win_implib_coff( hbmk, cSourceDLL, cTargetLib )
+STATIC PROCEDURE win_implib_force_ld_name( hbmk, /* @ */ cTargetLib )
+
+   /* Even though 'ld' tool is able to recognize and use COFF .lib and .dll
+      files directly, it can apparently only do so when the file has either
+      its original '<libname>.lib', or the '<libname>.a' filename. If it
+      has the name '<libname>.dll.a', the file won't be found, even if its
+      content is an import library in COFF .lib format (or a .dll).
+      So let's make a trick and automatically revert to a recognized name
+      here. */
+   IF HBMK_ISCOMP( "mingw|mingw64|mingwarm|clang|clang64" ) .AND. hb_RightEq( cTargetLib, ".dll.a" )
+      IF ! hbmk[ _HBMK_lQuiet ]
+         _hbmk_OutStd( hbmk, I_( "Reverting to .a extension (from .dll.a) for COFF .lib or .dll implib." ) )
+      ENDIF
+      cTargetLib := Left( cTargetLib, Len( cTargetLib ) - Len( ".dll.a" ) ) + ".a"
+   ENDIF
+
+   RETURN
+
+STATIC FUNCTION win_implib_coff( hbmk, /* @ */ cSourceDLL, /* @ */ cTargetLib )
 
    LOCAL cSourceLib
 
@@ -14539,17 +14588,22 @@ STATIC FUNCTION win_implib_coff( hbmk, cSourceDLL, cTargetLib )
    IF hb_vfExists( cSourceLib := hb_FNameExtSet( cSourceDLL, ".lib" ) ) .AND. ;
       IsCOFFLib( cSourceLib )
 
+      cSourceDLL := cSourceLib
+
       IF ! hbmk[ _HBMK_lQuiet ]
          _hbmk_OutStd( hbmk, I_( "Found COFF .lib with the same name, falling back to using it instead of the .dll." ) )
       ENDIF
+
+      win_implib_force_ld_name( hbmk, @cTargetLib )
+
       RETURN iif( ;
          hb_FileMatch( cSourceLib, cTargetLib ) .OR. ;
-         hbmk_hb_vfCopyFile( cSourceLib, cTargetLib ) != F_ERROR, _HBMK_IMPLIB_OK, _HBMK_IMPLIB_FAILED )
+         hbmk_hb_vfCopyFile( cSourceLib, cTargetLib ) != F_ERROR, _HBMK_IMPLIB_OK, _HBMK_IMPLIB_COPYFAIL )
    ENDIF
 
    RETURN _HBMK_IMPLIB_NOTFOUND
 
-STATIC FUNCTION win_implib_omf( hbmk, cSourceDLL, cTargetLib )
+STATIC FUNCTION win_implib_omf( hbmk, /* @ */ cSourceDLL, cTargetLib )
 
    LOCAL cSourceLib
 
@@ -14557,44 +14611,55 @@ STATIC FUNCTION win_implib_omf( hbmk, cSourceDLL, cTargetLib )
    IF hb_vfExists( cSourceLib := hb_FNameExtSet( cSourceDLL, ".lib" ) ) .AND. ;
       IsOMFLib( cSourceLib )
 
+      cSourceDLL := cSourceLib
+
       IF ! hbmk[ _HBMK_lQuiet ]
          _hbmk_OutStd( hbmk, I_( "Found OMF .lib with the same name, falling back to using it instead of the .dll." ) )
       ENDIF
       RETURN iif( ;
          hb_FileMatch( cSourceLib, cTargetLib ) .OR. ;
-         hbmk_hb_vfCopyFile( cSourceLib, cTargetLib ) != F_ERROR, _HBMK_IMPLIB_OK, _HBMK_IMPLIB_FAILED )
+         hbmk_hb_vfCopyFile( cSourceLib, cTargetLib ) != F_ERROR, _HBMK_IMPLIB_OK, _HBMK_IMPLIB_COPYFAIL )
    ENDIF
 
    RETURN _HBMK_IMPLIB_NOTFOUND
 
-STATIC FUNCTION win_implib_def( hbmk, cCommand, cSourceDLL, cTargetLib, cFlags )
+STATIC FUNCTION win_implib_def( hbmk, cCommand, /* @ */ cSourceDLL, cTargetLib, cFlags )
 
    LOCAL cSourceDef
+   LOCAL nResult
 
    /* Try to find .def file with the same name */
    IF hb_vfExists( cSourceDef := hb_FNameExtSet( cSourceDLL, ".def" ) )
       IF ! hbmk[ _HBMK_lQuiet ]
          _hbmk_OutStd( hbmk, I_( "Found .def file with the same name, falling back to using it instead of the .dll." ) )
       ENDIF
-      RETURN win_implib_command( hbmk, cCommand, cSourceDef, cTargetLib, cFlags )
+      IF ( nResult := win_implib_command( hbmk, cCommand, cSourceDef, cTargetLib, cFlags ) ) != _HBMK_IMPLIB_NOTFOUND
+         cSourceDLL := cSourceDef
+         RETURN nResult
+      ENDIF
    ENDIF
 
    RETURN _HBMK_IMPLIB_NOTFOUND
 
-STATIC FUNCTION win_implib_copy( hbmk, cSourceDLL, cTargetLib )
+STATIC FUNCTION win_implib_copy( hbmk, cSourceDLL, /* @ */ cTargetLib )
 
    HB_SYMBOL_UNUSED( hbmk )
 
    IF hb_vfExists( cSourceDLL )
+
+      IF hb_FNameExt( cSourceDLL ) == ".dll"
+         win_implib_force_ld_name( hbmk, @cTargetLib )
+      ENDIF
+
       /* Use .dll directly if all other attempts failed */
       RETURN iif( ;
          hb_FileMatch( cSourceDLL, cTargetLib ) .OR. ;
-         hbmk_hb_vfCopyFile( cSourceDLL, cTargetLib ) != F_ERROR, _HBMK_IMPLIB_OK, _HBMK_IMPLIB_FAILED )
+         hbmk_hb_vfCopyFile( cSourceDLL, cTargetLib ) != F_ERROR, _HBMK_IMPLIB_OK, _HBMK_IMPLIB_COPYFAIL )
    ENDIF
 
    RETURN _HBMK_IMPLIB_NOTFOUND
 
-/* NOTE: There is a big problem with mingw/cygwin 'ld' linker:
+/* NOTE: There is a problem with mingw/cygwin 'ld' linker:
          It cannot properly link stdcall decorated (_sym@nn) function names
          directly with .dlls, since in .dlls the decoration is stripped from
          the exported symbols. So, it _requires_ a .def file or a COFF import .lib
@@ -14614,7 +14679,7 @@ STATIC FUNCTION win_implib_copy( hbmk, cSourceDLL, cTargetLib )
          ordinary .dlls, like with every other compiler.
          [vszakats] */
 
-STATIC FUNCTION win_implib_command_gcc( hbmk, cCommand, cSourceDLL, cTargetLib, cFlags, cImpLibExt )
+STATIC FUNCTION win_implib_command_gcc( hbmk, cCommand, /* @ */ cSourceDLL, /* @ */ cTargetLib, cFlags, cImpLibExt )
 
    LOCAL nResult
 
@@ -14629,7 +14694,7 @@ STATIC FUNCTION win_implib_command_gcc( hbmk, cCommand, cSourceDLL, cTargetLib, 
    SWITCH hb_FNameExt( cSourceDLL )
    CASE ".a"
       /* use these as-is, if specified */
-      RETURN win_implib_copy( hbmk, cSourceDLL, cTargetLib )
+      RETURN win_implib_copy( hbmk, cSourceDLL, @cTargetLib )
    CASE ".def"
       /* ugly hack to make it configurable to force skip COFF .lib processing and
          skip to .def lookup, and if that fails, to .def generation */
@@ -14642,7 +14707,7 @@ STATIC FUNCTION win_implib_command_gcc( hbmk, cCommand, cSourceDLL, cTargetLib, 
       /* fallthrough */
    OTHERWISE
       lDefSource := .F.
-      IF ( nResult := win_implib_coff( hbmk, cSourceDLL, cTargetLib ) ) != _HBMK_IMPLIB_NOTFOUND
+      IF ( nResult := win_implib_coff( hbmk, @cSourceDLL, @cTargetLib ) ) != _HBMK_IMPLIB_NOTFOUND
          RETURN nResult
       ENDIF
    ENDSWITCH
@@ -14673,17 +14738,17 @@ STATIC FUNCTION win_implib_command_gcc( hbmk, cCommand, cSourceDLL, cTargetLib, 
       cSourceDLL := tmp
    ENDIF
 
-   RETURN win_implib_copy( hbmk, cSourceDLL, cTargetLib )
+   RETURN win_implib_copy( hbmk, cSourceDLL, @cTargetLib )
 
-STATIC FUNCTION win_implib_command_bcc( hbmk, cCommand, cSourceDLL, cTargetLib, cFlags )
+STATIC FUNCTION win_implib_command_bcc( hbmk, cCommand, /* @ */ cSourceDLL, cTargetLib, cFlags )
 
    LOCAL nResult
 
-   IF ( nResult := win_implib_omf( hbmk, cSourceDLL, cTargetLib ) ) != _HBMK_IMPLIB_NOTFOUND
+   IF ( nResult := win_implib_omf( hbmk, @cSourceDLL, cTargetLib ) ) != _HBMK_IMPLIB_NOTFOUND
       RETURN nResult
    ENDIF
 
-   IF ( nResult := win_implib_def( hbmk, cCommand, cSourceDLL, cTargetLib, cFlags ) ) != _HBMK_IMPLIB_NOTFOUND
+   IF ( nResult := win_implib_def( hbmk, cCommand, @cSourceDLL, cTargetLib, cFlags ) ) != _HBMK_IMPLIB_NOTFOUND
       RETURN nResult
    ENDIF
 
@@ -14692,17 +14757,17 @@ STATIC FUNCTION win_implib_command_bcc( hbmk, cCommand, cSourceDLL, cTargetLib, 
 STATIC FUNCTION win_implib_command_watcom( hbmk, cCommand, cSourceDLL, cTargetLib, cFlags )
    RETURN win_implib_command( hbmk, cCommand, cSourceDLL, cTargetLib, cFlags )
 
-STATIC FUNCTION win_implib_command_pocc( hbmk, cCommand, cSourceDLL, cTargetLib, cFlags )
+STATIC FUNCTION win_implib_command_pocc( hbmk, cCommand, /* @ */ cSourceDLL, /* @ */ cTargetLib, cFlags )
 
    LOCAL nResult
 
-   IF ( nResult := win_implib_coff( hbmk, cSourceDLL, cTargetLib ) ) != _HBMK_IMPLIB_NOTFOUND
+   IF ( nResult := win_implib_coff( hbmk, @cSourceDLL, @cTargetLib ) ) != _HBMK_IMPLIB_NOTFOUND
       RETURN nResult
    ENDIF
 
    RETURN win_implib_command( hbmk, cCommand, cSourceDLL, cTargetLib, cFlags )
 
-STATIC FUNCTION win_implib_command_msvc( hbmk, cCommand, cSourceDLL, cTargetLib, cFlags )
+STATIC FUNCTION win_implib_command_msvc( hbmk, cCommand, /* @ */ cSourceDLL, /* @ */ cTargetLib, cFlags )
 
    LOCAL nResult
 
@@ -14717,11 +14782,11 @@ STATIC FUNCTION win_implib_command_msvc( hbmk, cCommand, cSourceDLL, cTargetLib,
 
    LOCAL cCommandDump
 
-   IF ( nResult := win_implib_coff( hbmk, cSourceDLL, cTargetLib ) ) != _HBMK_IMPLIB_NOTFOUND
+   IF ( nResult := win_implib_coff( hbmk, @cSourceDLL, @cTargetLib ) ) != _HBMK_IMPLIB_NOTFOUND
       RETURN nResult
    ENDIF
 
-   IF ( nResult := win_implib_def( hbmk, cCommand, cSourceDLL, cTargetLib, cFlags ) ) != _HBMK_IMPLIB_NOTFOUND
+   IF ( nResult := win_implib_def( hbmk, cCommand, @cSourceDLL, cTargetLib, cFlags ) ) != _HBMK_IMPLIB_NOTFOUND
       RETURN nResult
    ENDIF
 
@@ -19173,9 +19238,9 @@ STATIC PROCEDURE ShowHelp( hbmk, lMore, lLong )
       { "HB_USER_LDFLAGS"    , I_( "options to be passed to linker (executable) (before command-line options)" ) }, ;
       { "HB_USER_DFLAGS"     , I_( "options to be passed to linker (dynamic library) (before command-line options)" ) }, ;
       { "HB_USER_AFLAGS"     , I_( "options to be passed to linker (static library) (before command-line options)" ) }, ;
-      { "HB_CCPATH"          , I_( "override C compiler executable directory (gcc compiler families only)" ) }, ;
-      { "HB_CCPREFIX"        , I_( "override C compiler executable prefix (gcc compiler families only)" ) }, ;
-      { "HB_CCSUFFIX"        , I_( "override C compiler executable suffix (gcc compiler families only)" ) }, ;
+      { "HB_CCPATH"          , I_( "override C compiler executable directory (gcc compiler family only)" ) }, ;
+      { "HB_CCPREFIX"        , I_( "override C compiler executable prefix (gcc compiler family only)" ) }, ;
+      { "HB_CCSUFFIX"        , I_( "override C compiler executable suffix (gcc/clang compiler families only)" ) }, ;
       { _HBMK_ENV_INSTALL_PFX, H_( "override Harbour base installation directory" ) }, ;
       { "HB_INSTALL_ADDONS"  , H_( "override Harbour base add-ons directory" ) } }
 

@@ -113,7 +113,7 @@ Download source archive from any of these URLs and unpack:
 
 For all platforms you will need:
 
-* Supported ANSI C compiler
+* Supported ANSI C89 compiler
 * GNU Make (3.81 or upper)
 * Harbour sources
 
@@ -205,19 +205,9 @@ You should see `Hello, world!` on screen.
 Platform specific prerequisites:
 
 1. You will need to have the developer tools installed.
-2. Then you will need to install gmake and optionally bison.
-   If you installed the ports collection, then all you need to do to install
-   bison and gmake is to run the following commands, which may require that
-   you run su root first to get the correct permissions:
+2. Then you will need to install gmake and optionally bison:
 
-        $ cd /usr/ports/devel/gmake
-        $ make
-        $ make install
-        $ make clean
-        $ cd /usr/ports/devel/bison
-        $ make
-        $ make install
-        $ make clean
+        $ pkg install gmake bison
 
 To build:
 
@@ -463,10 +453,7 @@ also need to install `libslang`. If you installed the ports collection, then
 all you need to do to install `libslang` is to run the following commands,
 which may require that you run `su` first to get the correct permissions:
 
-    $ cd /usr/ports/devel/libslang
-    $ make
-    $ make install
-    $ make clean
+    $ pkg install libslang2
 
 
 # Build Options
@@ -505,11 +492,6 @@ settings are case-sensitive.
      Build space separated `<l>` list of contrib libraries.
      Build all if left empty (default).
 
-   - `HB_BUILD_ADDONS=<l>`
-
-     Build space separated <l> list of additional `.hbp`
-     projects.
-
    - `HB_BUILD_STRIP=[all|bin|lib|no]`
 
      Strip symbols and debug information from binaries.
@@ -538,8 +520,8 @@ settings are case-sensitive.
 
    - `HB_CCSUFFIX=[<suffix>]`
 
-     Used with gcc compiler family to specify compiler/linker tool name
-     suffix &mdash; usually version number.
+     Used with gcc/clang compiler families to specify compiler/linker tool
+     name suffix &mdash; usually version number.
 
    - `HB_INSTALL_PREFIX`
 
@@ -560,7 +542,7 @@ settings are case-sensitive.
      > to any other directory. On \*nix systems, if you must install, please
      > use a stable installer package instead.
 
-## For Harbour development
+## For developing Harbour itself
 
    - `HB_USER_PRGFLAGS`        User Harbour compiler options
    - `HB_USER_CFLAGS`          User C compiler options
@@ -582,20 +564,24 @@ settings are case-sensitive.
      Create release package. Default: `no`
      Requires `clean install` in root source dir.
 
-   - `HB_BUILD_DYN=no`
-
-     Create Harbour dynamic libraries. Default: `yes`
-
    - `HB_BUILD_CONTRIB_DYN=yes`
 
-     Create contrib dynamic libraries. Default: `no`,
+     Create contrib dynamic libraries (in addition to static).
+     Default: `no`,
      except Windows and darwin platforms, where it's `yes`.
+
+   - `HB_BUILD_3RD_DYN=yes`
+
+     Create dynamic libraries of vendored 3rd party libaries
+     (in addition to static). Default: `no`
 
    - `HB_BUILD_SHARED=yes`
 
      Create Harbour executables in shared mode.
-     Default: `yes` when `HB_INSTALL_PREFIX` points
-     to a \*nix system location, otherwise `no`.
+     Default: `yes` on non-\*nix platforms that support
+     is and on \*nix when `HB_INSTALL_PREFIX` points to
+     a system location, otherwise `no`.
+
    - `HB_BUILD_PARTS=[all|compiler|lib]`
 
      Build only specific part of Harbour.
@@ -958,16 +944,6 @@ export HB_BUILD_3RDEXT=no
 make
 ```
 
-## on Darwin (Mac) hosts
-
-```sh
-# To create "Universal" binaries, compatible with pre-Lion 32-bit Intel systems
-export HB_USER_LDFLAGS="-arch x86_64 -arch i386"
-export HB_USER_CFLAGS="$HB_USER_LDFLAGS"
-export HB_COMPILER=gcc
-make
-```
-
 ## on \*nix hosts in general
 
 ```sh
@@ -994,7 +970,7 @@ For all platforms you will need two things:
     Either a Harbour binary distribution or a local Harbour build will be okay.
     If you're reading this text, it's likely you have one of these already.
 
-* Supported ANSI C compiler
+* Supported ANSI C89 compiler
 
     Your compiler of choice has to be placed in the `PATH` &mdash; and
     configured appropriately according to instructions.
@@ -1113,8 +1089,8 @@ Press `<Alt+D>` in the app.
 * gccarm   - GNU C ARM
 
 ### win
-* clang    - LLVM/Clang
-* clang64  - LLVM/Clang x86-64
+* clang    - LLVM/Clang (5.0.0 and above)
+* clang64  - LLVM/Clang x86-64 (5.0.0 and above)
 * mingw    - MinGW GNU C (4.4.0 and above, 6.x or newer recommended)
 * mingw64  - MinGW GNU C x86-64
 * msvc     - Microsoft Visual C++ (2010 and above)
@@ -1291,9 +1267,10 @@ Supported shells per host platforms:
 
 * C/C++ Compilers/Shells:
 
-     * LLVM/Clang via MSYS2 [multi-platform, free software, open-source]
+     * LLVM/Clang via MSYS2 [win, multi-platform, free software, open-source]
         * <https://msys2.github.io/>
         * MinGW-w64 above + `pacman -S mingw-w64-{i686,x86_64}-clang`
+        * <https://stackoverflow.com/questions/25019057/how-are-msys-msys2-and-msysgit-related-to-each-other>
      * LLVM/Clang [multi-platform, free software, open-source]
         * <https://releases.llvm.org/>
      * MinGW-w64 via MSYS2 [win, free software, open-source] (recommended)
@@ -1305,6 +1282,9 @@ Supported shells per host platforms:
             <https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/>
           * 32-bit: threads-posix, dwarf-2
             <https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/>
+     * Dr. Mingw Just-in-Time debugger [win, free software, open-source]
+        * <https://github.com/jrfonseca/drmingw>
+        * MSYS2 package: mingw-w64-{i686,x86_64}-drmingw
      * Xcode / Command Line Tools for Xcode [darwin, zero price, proprietary with open-source components]
         * <https://itunes.apple.com/app/xcode/id497799835>
         * <https://developer.apple.com/downloads/> (needs login)
@@ -1378,8 +1358,9 @@ Supported shells per host platforms:
      * deb (Ubuntu): <https://packages.ubuntu.com/>
      * rpm (Fedora): <https://apps.fedoraproject.org/packages/>
      * pacman (Arch Linux): <https://www.archlinux.org/packages/>
-     * Homebrew: <http://formulae.brew.sh/>
-     * MSYS2: <https://github.com/Alexpux/MINGW-packages>
+     * pkgng, ports (FreeBSD): <https://www.freebsd.org/ports/> <https://www.freshports.org/>
+     * homebrew (macOS): <http://formulae.brew.sh/>
+     * msys2 (Windows): <https://github.com/Alexpux/MINGW-packages>
 
 * Documentation:
 
@@ -1399,16 +1380,13 @@ Supported shells per host platforms:
   * General:
      * [English](https://groups.google.com/forum/#!forum/harbour-users)
      * [Italian](https://groups.google.com/forum/#!forum/harbourita)
-     * [Portuguese](http://pctoledo.com.br/forum/viewforum.php?f=4)
-     * [Russian](http://clipper.borda.ru/?0-4)
+     * [Portuguese](https://pctoledo.websiteseguro.com/forum/viewforum.php?f=4)
 
   * Social media:
      * [Facebook](https://www.facebook.com/groups/harbour.project/)
-     * [Twitter](https://twitter.com/harbourproject)
 
   * Product-oriented:
      * [Harbour mainline development](https://groups.google.com/forum/#!forum/harbour-devel)
-     * [HMG (GUI)](http://hmgforum.com/viewforum.php?f=7)
      * [hbqt (GUI)](https://groups.google.com/forum/#!forum/qtcontribs)
      * [hwgui (GUI)](https://sourceforge.net/p/hwgui/mailman/hwgui-developers/)
      * [xHarbour fork](https://groups.google.com/forum/#!forum/comp.lang.xharbour)
@@ -1456,5 +1434,5 @@ Supported shells per host platforms:
    a subjective decision. If you don't like it, use what fits you best.
 
 ---
-This document Copyright &copy;&nbsp;2009&ndash;present Viktor Szakats (vszakats.net/harbour)<br>
+This document Copyright &copy;&nbsp;2009&ndash;present [Viktor Szakats](https://vszakats.net/harbour)<br>
 [![Creative Commons Attribution-ShareAlike 4.0](https://mirrors.creativecommons.org/presskit/buttons/80x15/svg/by-sa.svg)](https://creativecommons.org/licenses/by-sa/4.0/)

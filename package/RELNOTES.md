@@ -1,45 +1,50 @@
-## Harbour {HB_VERSION} ({HB_VER_COMMIT_ID_SHORT})
+## Harbour @HB_VERSION@ (@HB_VER_COMMIT_ID_SHORT@)
 
 Source archives and Windows binaries are available for download:
 
-  <{HB_VER_ORIGIN_URL}releases>
+  <@HB_VER_ORIGIN_URL@releases>
 
 ## Release Notes
 
 ### Package content
 
 * Harbour tools (requires 64-bit OS)
-* static/shared libraries for 32-bit and 64-bit targets
-* static/shared libraries of libcurl, openssl, libssh2, nghttp2
-  for 32-bit and 64-bit targets
-* example/test sources
-* script to download complete source code
-* `BUILD*.txt` in package root with build/package details
+* Static and dynamic libraries to create 32-bit and 64-bit apps
+* Static and dynamic libraries of `libcurl`, `openssl`, `libssh2`, `nghttp2`
+  for 32-bit and 64-bit apps
+* Example and test sources
+* [`getsrc.sh`](https://github.com/vszakats/harbour-core/blob/master/package/getsrc.sh)
+  script to download source code
+* `BUILD*.txt` with build details in Harbour root directory
 
 ### Usage
 
-1. Install/unpack to any directory.
-2. Launch a Command Prompt.
-3. Add Harbour to `PATH`: `set PATH=<path-to-harbour>\bin;%PATH%`
-4. Install MSYS2. Follow steps on <https://msys2.github.io/>. Make sure
-   to update MSYS2 to its current latest version, as described.
-5. Install MinGW-w64 + LLVM/Clang C compiler toolchain using this command
-   on the MSYS2 console:
-   `pacman --noconfirm -S git {base,msys2}-devel mingw-w64-{i686,x86_64}-{clang,toolchain}`
-6. Build test 32-bit executable:
+1. Unpack to any directory <sup>[1](#1)</sup></sup>
+2. Install MSYS2 by following steps at <https://msys2.github.io/><br>
+   **Make sure you update MSYS2 to its current latest version, as described there.**
+3. Install MinGW-w64 and LLVM/Clang C compiler toolchain on the MSYS2 console:
+   ```shell
+   pacman --noconfirm -S git {base,msys2}-devel mingw-w64-{i686,x86_64}-{clang,toolchain}
    ```
-   set PATH=<path-to-msys2>\mingw32\bin;<path-to-harbour>\bin;%PATH%
-   hbmk2 <path-to-harbour>/tests/hello.prg -run
+4. Launch the Command Prompt
+5. Build a 32-bit test app:
+   ```batch
+   set PATH=C:\msys64\mingw32\bin;C:\hb\bin;%PATH%
+   hbmk2 C:\hb\tests\hello.prg -run
    ```
-7. Build test 64-bit executable:
+6. Build a 64-bit test app:
+   ```batch
+   set PATH=C:\msys64\mingw64\bin;C:\hb\bin;%PATH%
+   hbmk2 C:\hb\tests\hello.prg -run
    ```
-   set PATH=<path-to-msys2>\mingw64\bin;<path-to-harbour>\bin;%PATH%
-   hbmk2 <path-to-harbour>/tests/hello.prg -run
-   ```
-8. Further hints in section **Build Your Own Harbour App** of `README.md`.
-9. To customize/build/rebuild Harbour components as you like, download
-   sources using `getsrc.sh` and continue as described in section
-   **How to Do a Partial Build** of `README.md`.
+7. Further hints in section **Build Your Own Harbour App** of
+   [`README.md`](https://github.com/vszakats/harbour-core#build-your-own-harbour-app)
+8. To customize/build/rebuild Harbour components, run
+   `C:\hb\getsrc.sh` to download sources and continue as described in
+   section **How to Do a Partial Build** of
+   [`README.md`](https://github.com/vszakats/harbour-core#how-to-do-a-partial-build)
+
+<a name="1"><sup>1</sup></a> This document uses `C:\hb`<br>
 
 ---
 Viktor Szakats

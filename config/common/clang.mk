@@ -105,7 +105,6 @@ ifeq ($(HB_PLATFORM),darwin)
    DLIBS := $(foreach lib,$(HB_USER_LIBS) $(SYSLIBS),-l$(lib))
    DFLAGS += $(LIBPATHS)
 else
-   AR := llvm-ar
    AR_RULE = ( $(AR) rcs $(ARFLAGS) $(HB_AFLAGS) $(HB_USER_AFLAGS) \
       $(LIB_DIR)/$@ $(^F) $(ARSTRIP) ) \
       || ( $(RM) $(LIB_DIR)/$@ && $(FALSE) )
@@ -115,6 +114,8 @@ else
    DY_OUT := -o$(subst x,x, )
 
    ifeq ($(HB_PLATFORM),win)
+#     AR := llvm-ar
+      AR := $(HB_CCPATH)$(HB_CCPREFIX)ar
 
       LDFLAGS += -static-libgcc
       DFLAGS += -static-libgcc
@@ -172,6 +173,8 @@ else
          DY_RULE = $(create_dynlib)
       endif
    else
+      AR := ar
+
       DLIBS := $(foreach lib,$(HB_USER_LIBS) $(SYSLIBS),-l$(lib))
 
       DY_RULE = $(DY) $(DFLAGS) -Wl,-soname,$(DYN_NAME_CPT) $(HB_USER_DFLAGS) \
