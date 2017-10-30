@@ -1160,7 +1160,7 @@ STATIC FUNCTION ErrDescCode( nCode )
 
 STATIC FUNCTION cvt2str( xI, lLong )
 
-   LOCAL cValtype, cI, xJ
+   LOCAL cValtype
 
    hb_default( @lLong, .F. )
 
@@ -1181,26 +1181,7 @@ STATIC FUNCTION cvt2str( xI, lLong )
    CASE "H"
       RETURN "[H" + hb_ntos( Len( xI ) ) + "]"
    CASE "O"
-      cI := ""
-      IF __objHasMsg( xI, "ID" )
-         xJ := xI:ID
-         IF ! HB_ISOBJECT( xJ )
-            cI += ",ID=" + cvt2str( xJ )
-         ENDIF
-      ENDIF
-      IF __objHasMsg( xI, "nID" )
-         xJ := xI:nID
-         IF ! HB_ISOBJECT( xJ )
-            cI += ",NID=" + cvt2str( xJ )
-         ENDIF
-      ENDIF
-      IF __objHasMsg( xI, "xValue" )
-         xJ := xI:xValue
-         IF ! HB_ISOBJECT( xJ )
-            cI += ",XVALUE=" + cvt2str( xJ )
-         ENDIF
-      ENDIF
-      RETURN "[O:" + xI:ClassName() + cI + "]"
+      RETURN "[O:" + xI:ClassName() + "]"
    CASE "D"
       RETURN iif( lLong, "[D]:", "" ) + hb_DToC( xI, "yyyy-mm-dd" )
    CASE "L"
