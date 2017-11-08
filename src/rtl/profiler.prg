@@ -99,9 +99,9 @@ CREATE CLASS HBProfileEntity
    VAR cName    READONLY
    VAR nCalls   READONLY
    VAR nTicks   READONLY
+   VAR nMeanTicks READONLY
 
    ACCESS nSeconds
-   ACCESS nMeanTicks
    ACCESS nMeanSeconds
 
    METHOD init( cName, aInfo )
@@ -116,17 +116,15 @@ METHOD init( cName, aInfo ) CLASS HBProfileEntity
    ::cName  := cName
    ::nCalls := aInfo[ 1 ]
    ::nTicks := aInfo[ 2 ]
+   ::nMeanTicks := iif( ::nCalls = 0, 0, ::nTicks / ::nCalls )
 
    RETURN Self
 
 ACCESS nSeconds CLASS HBProfileEntity
    RETURN hb_Clocks2Secs( ::nTicks )
 
-ACCESS nMeanTicks CLASS HBProfileEntity
-   RETURN iif( ::nCalls == 0, 0, ::nTicks / ::nCalls )
-
 ACCESS nMeanSeconds CLASS HBProfileEntity
-   RETURN iif( ::nCalls == 0, 0, ::nSeconds / ::nCalls )
+   RETURN iif( ::nCalls == 0, 0, hb_Clocks2Secs( ::nMeanTicks  ) )
 
 METHOD describe() CLASS HBProfileEntity
    RETURN "Base Entity"
@@ -191,6 +189,7 @@ CREATE CLASS HBProfile
    METHOD nameSort()
    METHOD callSort()
    METHOD timeSort()
+   METHOD meanTimeSort()
    METHOD totalCalls()
    METHOD totalTicks()
    METHOD totalSeconds()
@@ -344,6 +343,16 @@ METHOD timeSort() CLASS HBProfile
    LOCAL lProfile := __SetProfiler( .F. )
 
    ::sort( {| oX, oY | oX:nTicks > oY:nTicks } )
+
+   __SetProfiler( lProfile )
+
+   RETURN Self
+
+METHOD meanTimeSort() CLASS HBProfile
+
+   LOCAL lProfile := __SetProfiler( .F. )
+
+   ::sort( {| oX, oY | oX:nMeanTicks > oY:nMeanTicks } )
 
    __SetProfiler( lProfile )
 
