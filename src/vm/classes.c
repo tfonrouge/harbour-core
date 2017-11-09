@@ -5455,7 +5455,7 @@ HB_FUNC( __CLSMSGTYPE )
 /* __clsMsgScope( <hClass>, <cMsgName> | <sMsgName> ) --> <nScope>
  *
  * return scope of method attached to given message,
- * <nType> is one of HB_OO_CLSTP_* values defined in hboo.ch or
+ * <nScope> is one of HB_OO_CLSTP_* values defined in hboo.ch or
  * -1 if message is not supported.
  */
 HB_FUNC( __CLSMSGSCOPE )
