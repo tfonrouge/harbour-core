@@ -104,6 +104,7 @@ extern void       hb_objCloneBody( PHB_ITEM pDest, PHB_ITEM pObject, PHB_NESTED_
 #ifndef HB_NO_PROFILER
 /* profiler for object management */
 extern void       hb_mthAddTime( HB_ULONG ulClockTicks );       /* profiler from classes.c */
+extern void       hb_clrMthProfilerInfo( void );
 #endif
 
 #endif   /* _HB_API_INTERNAL_ */

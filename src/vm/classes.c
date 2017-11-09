@@ -5012,6 +5012,26 @@ void hb_mthAddTime( HB_ULONG ulClockTicks )
       }
    }
 }
+
+void hb_clrMthProfilerInfo( void )
+{
+   for( HB_USHORT uiClass = 0; uiClass < s_uiClasses; ++uiClass )
+   {
+      PCLASS pClass = s_pClasses[ uiClass ];
+      if( pClass )
+      {
+         for( HB_USHORT uiMethod = 0; uiMethod < pClass->uiMethods; ++uiMethod )
+         {
+            PMETHOD pMethod = pClass->pMethods + uiMethod;
+            if( pMethod )
+            {
+               pMethod->ulCalls = 0;
+               pMethod->ulTime = 0;
+            }
+         }
+      }
+   }
+}
 #endif
 
 /* __GetMsgPrf( <hClass>, <cMsg> ) --> <aMethodInfo> { { <nTimes>, <nTime> }, ... } */

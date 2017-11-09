@@ -229,6 +229,7 @@ static HB_CRITICAL_NEW( s_atInitMtx );
 static HB_ULONG hb_ulOpcodesCalls[ HB_P_LAST_PCODE ]; /* array to profile opcodes calls */
 static HB_ULONG hb_ulOpcodesTime[ HB_P_LAST_PCODE ];  /* array to profile opcodes consumed time */
 static HB_BOOL hb_bProfiler = HB_FALSE;                        /* profiler status is off */
+static void initProfilerArrays( void );                     /* clear profiler arrays */
 #endif
 
 #if defined( HB_PRG_TRACE )
@@ -1105,16 +1106,7 @@ void hb_vmInit( HB_BOOL bStartMainProc )
    hb_i18n_init();            /* initialize i18n module */
 
 #ifndef HB_NO_PROFILER
-   /* Initialize opcodes profiler support arrays */
-   {
-      HB_ULONG ul;
-
-      for( ul = 0; ul < HB_P_LAST_PCODE; ul++ )
-      {
-         hb_ulOpcodesCalls[ ul ] = 0;
-         hb_ulOpcodesTime[ ul ] = 0;
-      }
-   }
+   initProfilerArrays();
 #endif
 
    /* enable executing PCODE (HVM reenter request) */
@@ -12311,6 +12303,20 @@ void hb_vmUpdateAllocator( PHB_ALLOCUPDT_FUNC pFunc, int iCount )
 
 /* ------------------------------------------------------------------------ */
 
+#ifndef HB_NO_PROFILER
+static void initProfilerArrays()
+{
+   /* Initialize opcodes profiler support arrays */
+   HB_ULONG ul;
+
+   for( ul = 0; ul < HB_P_LAST_PCODE; ul++ )
+   {
+      hb_ulOpcodesCalls[ ul ] = 0;
+      hb_ulOpcodesTime[ ul ] = 0;
+   }
+}
+#endif
+
 /*
  * Turns on | off the profiler activity
  * __SetProfiler( <lOnOff> ) --> <lOldValue>
@@ -12324,6 +12330,23 @@ HB_FUNC( __SETPROFILER )
    hb_retl( hb_bProfiler );
    if( HB_ISLOG( 1 ) )
       hb_bProfiler = hb_parl( 1 );
+#endif
+}
+
+/*
+ * initialize profiler
+ * __initProfiler() -> always returns TRUE when profiling is available on HVM
+ */
+HB_FUNC( __INITPROFILER )
+{
+   HB_STACK_TLS_PRELOAD
+#ifdef HB_NO_PROFILER
+   hb_retl( HB_FALSE );
+#else
+   hb_retl( HB_TRUE );
+   hb_bProfiler = HB_FALSE;
+   initProfilerArrays();
+   hb_clrMthProfilerInfo();
 #endif
 }
 
