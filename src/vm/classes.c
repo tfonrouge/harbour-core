@@ -5027,6 +5027,7 @@ void hb_clrMthProfilerInfo( void )
             {
                pMethod->ulCalls = 0;
                pMethod->ulTime = 0;
+               pMethod->ulRecurse = 0;
             }
          }
       }
