@@ -12347,6 +12347,7 @@ HB_FUNC( __INITPROFILER )
    hb_bProfiler = HB_FALSE;
    initProfilerArrays();
    hb_clrMthProfilerInfo();
+   hb_dynsymClearProfilerInfo();
 #endif
 }
 

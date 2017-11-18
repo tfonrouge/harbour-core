@@ -354,6 +354,27 @@ PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol )
    return pDynSym;
 }
 
+/* Clear profiler info in dynamic symbol table
+ *
+ */
+#ifndef HB_NO_PROFILER
+void hb_dynsymClearProfilerInfo( void )
+{
+   HB_UINT uiIndex;
+   HB_UINT uiDynSymCount;
+
+   uiIndex = 0;
+   uiDynSymCount = s_uiDynSymbols;
+
+   while ( uiIndex < uiDynSymCount ) {
+      s_pDynItems[ uiIndex ].pDynSym->ulCalls = 0;
+      s_pDynItems[ uiIndex ].pDynSym->ulTime = 0;
+      s_pDynItems[ uiIndex ].pDynSym->ulRecurse = 0;
+      ++ uiIndex;
+   }
+}
+#endif
+
 /* finds and creates a symbol if not found */
 PHB_DYNS hb_dynsymGetCase( const char * szName )
 {

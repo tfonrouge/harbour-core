@@ -1047,6 +1047,9 @@ extern           PHB_ITEM  hb_dynsymGetMemvar( PHB_DYNS pDynSym ); /* return mem
 extern           void      hb_dynsymSetMemvar( PHB_DYNS pDynSym, PHB_ITEM pMemvar ); /* set memvar handle for a given dynamic symbol */
 extern           HB_LONG   hb_dynsymCount( void ); /* number of dynamic symbols */
 #endif
+#ifndef HB_NO_PROFILER
+extern void hb_dynsymClearProfilerInfo( void ); /* clear profiler info on all dynamic symbol items */
+#endif
 
 /* Symbol management */
 extern HB_EXPORT PHB_SYMB  hb_symbolNew( const char * szName ); /* create a new symbol */
