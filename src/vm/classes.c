@@ -5020,16 +5020,18 @@ void hb_clrMthProfilerInfo( void )
       PCLASS pClass = s_pClasses[ uiClass ];
       if( pClass )
       {
-         for( HB_USHORT uiMethod = 0; uiMethod < pClass->uiMethods; ++uiMethod )
+         HB_SIZE nMthNum;
+         PMETHOD pMethod = pClass->pMethods;
+         nMthNum = hb_clsMthNum( pClass );
+
+         do
          {
-            PMETHOD pMethod = pClass->pMethods + uiMethod;
-            if( pMethod )
-            {
-               pMethod->ulCalls = 0;
-               pMethod->ulTime = 0;
-               pMethod->ulRecurse = 0;
-            }
+            pMethod->ulCalls = 0;
+            pMethod->ulTime = 0;
+            pMethod->ulRecurse = 0;
+            ++pMethod;
          }
+         while ( --nMthNum );
       }
    }
 }
