@@ -64,8 +64,6 @@
 
    #if defined( __DJGPP__ )
       #include <sys/param.h>
-   #endif
-   #if defined( __DJGPP__ ) || defined( __BORLANDC__ )
       #include <sys/stat.h>
    #endif
    #include <dos.h>
@@ -139,18 +137,6 @@
          ( ( info->pFindFileData.dwFileAttributes & _HB_WIN_MASKATTR ) == 0 ) || \
          ( ( info->dwAttr & info->pFindFileData.dwFileAttributes & _HB_WIN_MASKATTR ) != 0 ) \
       )
-
-   #if defined( __DMC__ )
-      #if ! defined( FILE_ATTRIBUTE_ENCRYPTED )
-         #define FILE_ATTRIBUTE_ENCRYPTED      0x00004000L
-      #endif
-      #if ! defined( FILE_ATTRIBUTE_SPARSE_FILE )
-         #define FILE_ATTRIBUTE_SPARSE_FILE    0x00000200L
-      #endif
-      #if ! defined( FILE_ATTRIBUTE_REPARSE_POINT )
-         #define FILE_ATTRIBUTE_REPARSE_POINT  0x00000400L
-      #endif
-   #endif
 
 #elif defined( HB_OS_UNIX )
 
@@ -987,7 +973,7 @@ void hb_fsFindClose( PHB_FFIND ffind )
 
 #  if defined( __WATCOMC__ )
             _dos_findclose( &info->entry );
-#  elif ! defined( __DJGPP__ ) && ! defined( __BORLANDC__ )
+#  elif ! defined( __DJGPP__ )
             findclose( &info->entry );
 #  endif
 

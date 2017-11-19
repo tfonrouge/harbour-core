@@ -62,10 +62,6 @@
 #  define __C99FEATURES__
 #endif
 
-#if defined( __TINYC__ )
-   #define __NO_ISOCEXT
-#endif
-
 #include "hbapi.h"
 
 #if defined( __DJGPP__ )
@@ -196,7 +192,7 @@
 #     define hb_isfinite( d )       _finite( ( double ) d )
 #  elif defined( __BORLANDC__ ) || defined( __WATCOMC__ )
 #     define hb_isfinite( d )       _finite( d )
-#  elif defined( __GNUC__ ) || defined( __DJGPP__ ) || defined( __LCC__ ) || \
+#  elif defined( __GNUC__ ) || defined( __DJGPP__ ) || \
       defined( HB_OS_SUNOS )
 #     define hb_isfinite( d )       finite( d )
 #  endif

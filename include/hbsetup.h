@@ -413,12 +413,6 @@
    #endif
 #endif
 
-#ifndef HB_OS_SYMBIAN
-   #if defined( __symbian__ )
-      #define HB_OS_SYMBIAN
-   #endif
-#endif
-
 #ifndef HB_OS_ANDROID /* Experimental */
    #if defined( __ANDROID__ )
       #define HB_OS_ANDROID
@@ -452,7 +446,6 @@
        defined( HB_OS_QNX ) || \
        defined( HB_OS_VXWORKS ) || \
        defined( HB_OS_BEOS ) || \
-       defined( HB_OS_SYMBIAN ) || \
        defined( HB_OS_ANDROID ) || \
        defined( HB_OS_CYGWIN ) || \
        defined( HB_OS_MINIX ) || \
@@ -466,8 +459,6 @@
    #define HB_USE_SHARELOCKS_OFF
    /* NOTE: Needed to avoid 'implicit bzero() declaration' warnings */
    extern void bzero( char * buffer, int nbytes );
-#elif defined( HB_OS_SYMBIAN )
-   #define HB_NO_FNMATCH
 #endif
 
 /*
@@ -618,8 +609,7 @@
 #if defined( __GNUC__ ) || defined( __SUNPRO_C )
    #define _HB_INLINE_  __inline__
 #elif defined( __BORLANDC__ ) || defined( _MSC_VER ) || \
-      defined( __WATCOMC__ ) || defined( __POCC__ ) || \
-      defined( __LCC__ ) || defined( __DMC__ )
+      defined( __WATCOMC__ ) || defined( __POCC__ )
    #define _HB_INLINE_  __inline
 #else /* __cplusplus */
    #define _HB_INLINE_  inline

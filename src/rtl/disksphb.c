@@ -54,7 +54,7 @@
 #elif defined( HB_OS_ANDROID )
 #  include <sys/statfs.h>
 #elif defined( HB_OS_UNIX ) && !( defined( __WATCOMC__ ) || defined( __CEGCC__ ) )
-#  if defined( HB_OS_VXWORKS ) || defined( HB_OS_SYMBIAN )
+#  if defined( HB_OS_VXWORKS )
 #     include <sys/stat.h>
 #  else
 #     include <sys/statvfs.h>
@@ -158,7 +158,7 @@ double hb_fsDiskSpace( const char * pszPath, HB_USHORT uiType )
          else
 #endif
          {
-#if defined( _MSC_VER ) || defined( __LCC__ ) || defined( __GNUC__ )
+#if defined( _MSC_VER ) || defined( __GNUC__ )
 #  define HB_GET_LARGE_UINT( v )  ( ( double ) (v).LowPart + \
                                     ( double ) (v).HighPart * \
                                     ( ( ( double ) 0xFFFFFFFF ) + 1 ) )
@@ -309,7 +309,7 @@ double hb_fsDiskSpace( const char * pszPath, HB_USHORT uiType )
    }
 
 #elif defined( HB_OS_UNIX ) && \
-      !( defined( __WATCOMC__ ) || defined( __CEGCC__ ) || defined( HB_OS_SYMBIAN ) )
+      !( defined( __WATCOMC__ ) || defined( __CEGCC__ ) )
    {
 #if defined( HB_OS_DARWIN ) || defined( HB_OS_ANDROID ) || \
     defined( HB_OS_VXWORKS )

@@ -105,7 +105,7 @@
 #  include <errno.h>
 #endif
 
-#if ( defined( __DMC__ ) || defined( __BORLANDC__ ) || \
+#if ( defined( __BORLANDC__ ) || \
       defined( __IBMCPP__ ) || defined( _MSC_VER ) || \
       defined( __MINGW32__ ) || defined( __WATCOMC__ ) ) && \
       ! defined( HB_OS_UNIX ) && ! defined( HB_OS_WIN_CE )
@@ -123,7 +123,7 @@
       #include <dos.h>
    #endif
 
-   #if defined( _MSC_VER ) || defined( __MINGW32__ ) || defined( __DMC__ )
+   #if defined( _MSC_VER ) || defined( __MINGW32__ )
       #include <sys/locking.h>
       #define ftruncate _chsize
       #if defined( __MINGW32__ ) && ! defined( _LK_UNLCK )
@@ -149,10 +149,6 @@
    #endif
 #endif
 
-#if defined( __MPW__ )
-   #include <fcntl.h>
-#endif
-
 #if defined( HB_OS_DOS )
    #include <dos.h>
    #include <time.h>
@@ -175,8 +171,7 @@
    #if defined( HB_OS_WIN_CE )
       #include "hbwince.h"
    #endif
-   #if ! defined( INVALID_SET_FILE_POINTER ) && \
-       ( defined( __DMC__ ) || defined( _MSC_VER ) || defined( __LCC__ ) )
+   #if ! defined( INVALID_SET_FILE_POINTER ) && defined( _MSC_VER )
       #define INVALID_SET_FILE_POINTER ( ( DWORD ) -1 )
    #endif
    #if ! defined( INVALID_FILE_ATTRIBUTES )
@@ -241,7 +236,7 @@
    #define HB_FS_GETDRIVE(n)  do { n = fs_win_get_drive(); } while( 0 )
    #define HB_FS_SETDRIVE(n)  fs_win_set_drive( n )
 
-#elif defined( __DJGPP__ ) || defined( __BORLANDC__ )
+#elif defined( __DJGPP__ )
    /* 0 based version */
 
    #define HB_FS_GETDRIVE(n)  do { n = getdisk(); } while( 0 )
@@ -289,7 +284,7 @@
 #endif
 
 
-#if defined( __DMC__ ) || defined( _MSC_VER ) || defined( __MINGW32__ ) || \
+#if defined( _MSC_VER ) || defined( __MINGW32__ ) || \
     defined( __IBMCPP__ ) || defined( __WATCOMC__ ) || defined( HB_OS_OS2 )
 /* These compilers use sopen() rather than open(), because their
    versions of open() do not support combined O_ and SH_ flags */
@@ -634,7 +629,7 @@ static void convert_open_flags( HB_BOOL fCreate, HB_FATTR nAttr, HB_USHORT uiFla
    }
 
    /* shared flags (HB_FS_SOPEN) */
-#if defined( _MSC_VER ) || defined( __DMC__ )
+#if defined( _MSC_VER )
    if( ( uiFlags & FO_DENYREAD ) == FO_DENYREAD )
       *share = _SH_DENYRD;
    else if( uiFlags & FO_EXCLUSIVE )
@@ -747,7 +742,7 @@ static int hb_fsCanAccess( HB_FHANDLE hFile, HB_MAXINT nTimeOut, HB_BOOL fRead )
       break;
    }
 }
-#elif ! defined( HB_OS_SYMBIAN ) /* ! HB_HAS_POLL */
+#elif 1  /* ! HB_HAS_POLL */
 {
 #  if ! defined( HB_HAS_SELECT_TIMER )
    HB_MAXUINT timer = hb_timerInit( nTimeOut );
@@ -911,7 +906,7 @@ int hb_fsPoll( PHB_POLLFD pPollSet, int iCount, HB_MAXINT nTimeOut )
    if( pFree )
       hb_xfree( pFree );
 }
-#elif ! defined( HB_OS_SYMBIAN ) /* ! HB_HAS_POLL */
+#elif 1  /* ! HB_HAS_POLL */
 {
 #  if ! defined( HB_HAS_SELECT_TIMER )
    HB_MAXUINT timer = hb_timerInit( nTimeOut );
@@ -1028,7 +1023,7 @@ HB_FHANDLE hb_fsPOpen( const char * pszFileName, const char * pszMode )
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_fsPOpen(%p, %s)", ( const void * ) pszFileName, pszMode ) );
 
-#if defined( HB_OS_UNIX ) && ! defined( HB_OS_VXWORKS ) && ! defined( HB_OS_SYMBIAN )
+#if defined( HB_OS_UNIX ) && ! defined( HB_OS_VXWORKS )
    {
       HB_FHANDLE hPipeHandle[ 2 ];
       pid_t pid;
@@ -1280,7 +1275,7 @@ HB_BOOL hb_fsPipeCreate( HB_FHANDLE hPipe[ 2 ] )
    else
       hPipe[ 0 ] = hPipe[ 1 ] = FS_ERROR;
 }
-#elif defined( HB_OS_UNIX ) && ! defined( HB_OS_VXWORKS ) && ! defined( HB_OS_SYMBIAN )
+#elif defined( HB_OS_UNIX ) && ! defined( HB_OS_VXWORKS )
 {
    fResult = pipe( hPipe ) == 0;
    if( ! fResult )
@@ -1758,7 +1753,7 @@ HB_FHANDLE hb_fsOpenEx( const char * pszFileName, HB_USHORT uiFlags, HB_FATTR nA
 
 #if defined( HB_OS_DOS )
       if( attr != 0 && hFileHandle != ( HB_FHANDLE ) FS_ERROR )
-#     if defined( __DJGPP__ ) || defined( __BORLANDC__ )
+#     if defined( __DJGPP__ )
          _chmod( pszFileName, 1, attr );
 #     else
          _dos_setfileattr( pszFileName, attr );
@@ -2081,7 +2076,7 @@ HB_BOOL hb_fsGetAttr( const char * pszFileName, HB_FATTR * pnAttr )
 
 #  if defined( HB_OS_DOS )
       {
-#     if defined( __DJGPP__ ) || defined( __BORLANDC__ )
+#     if defined( __DJGPP__ )
          int attr = _chmod( pszFileName, 0, 0 );
          if( attr != -1 )
 #     else
@@ -2390,7 +2385,7 @@ HB_BOOL hb_fsSetAttr( const char * pszFileName, HB_FATTR nAttr )
 #  elif defined( HB_OS_DOS )
 
       nAttr &= ~( HB_FA_ARCHIVE | HB_FA_HIDDEN | HB_FA_READONLY | HB_FA_SYSTEM );
-#     if defined( __DJGPP__ ) || defined( __BORLANDC__ )
+#     if defined( __DJGPP__ )
       fResult = _chmod( pszFileName, 1, nAttr ) != -1;
 #     else
       fResult = _dos_setfileattr( pszFileName, nAttr ) != -1;
@@ -2781,7 +2776,7 @@ HB_SIZE hb_fsReadAt( HB_FHANDLE hFileHandle, void * pBuff, HB_SIZE nCount, HB_FO
 
    hb_vmUnlock();
 
-#if defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ ) && ! defined( HB_OS_VXWORKS ) && ! defined( HB_OS_SYMBIAN )
+#if defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ ) && ! defined( HB_OS_VXWORKS )
    {
       long lRead;
 #  if defined( HB_USE_LARGEFILE64 )
@@ -2920,7 +2915,7 @@ HB_SIZE hb_fsWriteAt( HB_FHANDLE hFileHandle, const void * pBuff, HB_SIZE nCount
 
    hb_vmUnlock();
 
-#if defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ ) && ! defined( HB_OS_VXWORKS ) && ! defined( HB_OS_SYMBIAN )
+#if defined( HB_OS_UNIX ) && ! defined( __WATCOMC__ ) && ! defined( HB_OS_VXWORKS )
    {
       long lWritten;
 #  if defined( HB_USE_LARGEFILE64 )
@@ -3258,7 +3253,7 @@ HB_BOOL hb_fsLock( HB_FHANDLE hFileHandle, HB_ULONG ulStart,
       }
       fResult = ret == NO_ERROR;
    }
-#elif defined( _MSC_VER ) || defined( __DMC__ )
+#elif defined( _MSC_VER )
    {
       HB_ULONG ulOldPos;
 

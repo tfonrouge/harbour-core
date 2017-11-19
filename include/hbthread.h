@@ -59,7 +59,7 @@
       defined( HB_OS_SUNOS ) || defined( HB_OS_HPUX ) || \
       defined( HB_OS_BSD ) || defined( HB_OS_BEOS ) || \
       defined( HB_OS_QNX ) || defined( HB_OS_VXWORKS ) || \
-      defined( HB_OS_SYMBIAN ) || defined( HB_OS_CYGWIN ) || \
+      defined( HB_OS_CYGWIN ) || \
       defined( HB_OS_AIX )
 #  include <pthread.h>
 #  define HB_PTHREAD_API
@@ -462,7 +462,7 @@ extern HB_BOOL hb_threadMutexSyncWait( PHB_ITEM pItemMtx, HB_ULONG ulMilliSec, P
 #ifdef HB_USE_TLS
 #  if ( defined( __GNUC__ ) && __GNUC__ >= 3 ) || defined( __BORLANDC__ )
 #     define HB_TLS_ATTR      __thread
-#  elif defined( _MSC_VER ) || defined( __WATCOMC__ ) || defined( __DMC__ )
+#  elif defined( _MSC_VER ) || defined( __WATCOMC__ )
 #     define HB_TLS_ATTR      __declspec( thread )
 #  else
 #     undef HB_USE_TLS

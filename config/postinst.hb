@@ -209,10 +209,10 @@ PROCEDURE Main( ... )
          CASE GetEnvC( "HB_INSTALL_DYN" ) == "/usr/local/harbour/lib"
             /* FIXME: Rewrite this in .prg:
                ld='/usr/lib'
-               if [ -n "${HB_INST_PKGPREF}" ] || [ -w "$ld" ]; then
-                 mkdir -p "${HB_INST_PKGPREF}$ld"
-                 ln -sf "../local/harbour/lib/$l" "${HB_INST_PKGPREF}$ld/$ll"
-                 ln -sf "../local/harbour/lib/$l" "${HB_INST_PKGPREF}$ld/$l"
+               if [ -n "${HB_INST_PKGPREF}" ] || [ -w "${ld}" ]; then
+                 mkdir -p "${HB_INST_PKGPREF}${ld}"
+                 ln -sf "../local/harbour/lib/${l}" "${HB_INST_PKGPREF}${ld}/${ll}"
+                 ln -sf "../local/harbour/lib/${l}" "${HB_INST_PKGPREF}${ld}/${l}"
                fi
             */
          ENDCASE
@@ -467,17 +467,17 @@ STATIC FUNCTION sfx_tgz_sh()
 #pragma __cstream | RETURN %s
 #!/bin/sh
 if [ "$1" = '--extract' ]; then
-   tail -c %1$d "$0" > "%2$s"
-   exit
+  tail -c %1$d "$0" > '%2$s'
+  exit
 fi
 if [ "$(id -u)" != 0 ]; then
-   echo 'This package has to be installed from root account.'
-   exit 1
+  echo 'This package has to be installed from root account.'
+  exit 1
 fi
 echo 'Do you want to install Harbour (y/n)'
 read ASK
 if [ "${ASK}" != 'y' ] && [ "${ASK}" != 'Y' ]; then
-   exit 1
+  exit 1
 fi
 ( tail -c %1$d "$0" | gzip -cd | ( cd /; tar xvpf - ) )%3$s
 exit $?
@@ -774,7 +774,7 @@ STATIC FUNCTION __hb_extern_get_list( cInputName )
 
    /* NOTE: non-gcc extractor configs don't support dynamic libs as input. */
    DO CASE
-   CASE "|" + GetEnv( "HB_COMPILER" ) + "|" $ "|clang|clang64|" .AND. ! GetEnv( "HB_PLATFORM" ) == "darwin"
+   CASE "|" + GetEnv( "HB_COMPILER" ) + "|" $ "|clang|clang64|" .AND. GetEnv( "HB_PLATFORM" ) == "win"
       cCommand := "llvm-nm -g --defined-only -C {I}"
    CASE "|" + GetEnv( "HB_COMPILER" ) + "|" $ "|gcc|mingw|mingw64|clang|djgpp|"
       cCommand := "nm -g" + iif( GetEnv( "HB_PLATFORM" ) == "darwin", "", " --defined-only -C" ) + " {I}"
@@ -818,7 +818,7 @@ STATIC FUNCTION __hb_extern_get_list( cInputName )
                aExtern := {}
                hExtern := { => }
                FOR EACH tmp IN aResult
-                  tmp[ 2 ] := hb_asciiLower( tmp[ 2 ] )
+                  tmp[ 2 ] := hb_asciiUpper( tmp[ 2 ] )
                   IF ! tmp[ 2 ] $ hExtern
                      AAdd( aExtern, tmp[ 2 ] )
                      hExtern[ tmp[ 2 ] ] := NIL
@@ -870,7 +870,7 @@ STATIC PROCEDURE __hb_extern_get_exception_list( cFile, /* @ */ aInclude, /* @ *
       ENDIF
       IF ! Empty( pRegex := hb_regexComp( "^DYNAMIC ([a-zA-Z0-9_]*)$", .T., .T. ) )
          FOR EACH tmp IN hb_regexAll( pRegex, StrTran( cFile, Chr( 13 ) ),,,,, .T. )
-            hDynamic[ Upper( tmp[ 2 ] ) ] := tmp[ 2 ]
+            hDynamic[ hb_asciiUpper( tmp[ 2 ] ) ] := tmp[ 2 ]
          NEXT
       ENDIF
    ENDIF
@@ -965,7 +965,7 @@ STATIC FUNCTION __hb_extern_gen( aFuncList, cOutputName )
       IF ! hb_WildMatchI( "HB_GT_*_DEFAULT", tmp, .T. ) .AND. ;
          ! hb_WildMatchI( _HB_SELF_PREFIX + "*" + _HB_SELF_SUFFIX, tmp, .T. ) .AND. ;
          AScan( aExclude, {| flt | hb_WildMatchI( flt, tmp, .T. ) } ) == 0
-         cExtern += "DYNAMIC " + hb_HGetDef( hDynamic, tmp, tmp ) + cEOL
+         cExtern += "DYNAMIC " + hb_HGetDef( hDynamic, tmp, hb_asciiLower( tmp ) ) + cEOL
       ENDIF
    NEXT
 

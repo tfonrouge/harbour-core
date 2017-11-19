@@ -1,12 +1,14 @@
 # Welcome to Harbour
 [![License](https://img.shields.io/badge/license-GPLv2%20%2B%20Library%20Exception-blue.svg)](LICENSE.txt "License")
-[![Download](https://img.shields.io/badge/download-snapshot_binary_(3.4)-ff4500.svg)](https://github.com/vszakats/harbour-core/releases "Download snapshot release")
+[![Download](https://img.shields.io/badge/download-snapshot_binary_(3.4)-blue.svg)](https://github.com/vszakats/harbour-core/releases "Download snapshot release")
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1eaedb.svg)](https://saythanks.io/to/vszakats)
 [![PayPal Donate](https://img.shields.io/badge/PayPal-Donate_Now-ff4500.svg?colorA=00457c)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BPSZQYKXMQJYG "Donate Now")
 <br>
 [![Build Status](https://api.travis-ci.org/vszakats/harbour-core.svg?branch=master)](https://travis-ci.org/vszakats/harbour-core)
 [![Build Status](https://ci.appveyor.com/api/projects/status/1kx6w3y6qasymah3/branch/master?svg=true)](https://ci.appveyor.com/project/vsz/harbour-core/branch/master)
 [![Coverity Status](https://scan.coverity.com/projects/3208/badge.svg)](https://scan.coverity.com/projects/3208)
+<br>
 [![Average time to resolve an Issue](https://isitmaintained.com/badge/resolution/vszakats/harbour-core.svg)](https://isitmaintained.com/project/vszakats/harbour-core "Average time to resolve an Issue")
 [![Percentage of Issues still open](https://isitmaintained.com/badge/open/vszakats/harbour-core.svg)](https://isitmaintained.com/project/vszakats/harbour-core "Percentage of Issues still open")
 
@@ -1062,7 +1064,6 @@ Press `<Alt+D>` in the app.
 * minix    - Minix 3 (experimental, tested on 3.2.1; earlier releases will not work)
 * cygwin   - Cygwin (experimental)
 * beos     - BeOS / Haiku (deprecated)
-* symbian  - Symbian OS (deprecated)
 
 ## You can override C compiler auto-detection with these `HB_COMPILER` values:
 
@@ -1093,8 +1094,8 @@ Press `<Alt+D>` in the app.
 * clang64  - LLVM/Clang x86-64 (5.0.0 and above)
 * mingw    - MinGW GNU C (4.4.0 and above, 6.x or newer recommended)
 * mingw64  - MinGW GNU C x86-64
-* msvc     - Microsoft Visual C++ (2010 and above)
-* msvc64   - Microsoft Visual C++ x86-64 (2010 and above)
+* msvc     - Microsoft Visual C++ (2013 and above)
+* msvc64   - Microsoft Visual C++ x86-64 (2013 and above)
 
 ### win (experimental)
 * clang-cl - LLVM/Clang-cl
@@ -1154,9 +1155,6 @@ Press `<Alt+D>` in the app.
 ### beos (deprecated)
 * gcc      - GNU C
 
-### symbian (deprecated)
-* gcc      - GNU C
-
 
 # Platform Matrix
 
@@ -1209,7 +1207,6 @@ Press `<Alt+D>` in the app.
  win      | win/pocc64        | x86-64 (deprecated)
  win      | wce/poccarm       | arm    (deprecated)
  win      | win/xcc           | x86    (deprecated)
- win      | symbian/gcc       | arm    (deprecated)
  os2      | os2/gcc           | x86
  os2      | os2/watcom        | x86
  os2      | win/watcom        | x86

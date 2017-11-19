@@ -45,6 +45,7 @@
  */
 
 #include "hbwapi.h"
+#include "hbapiitm.h"
 
 HB_FUNC( WAPI_GETLASTERROR )
 {

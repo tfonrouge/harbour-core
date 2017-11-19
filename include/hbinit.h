@@ -163,7 +163,6 @@ extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, HB_USHORT uiSy
       defined( __GNUC__ ) || \
       defined( __SUNPRO_C ) || defined( __SUNPRO_CC ) || \
       defined( __DCC__ ) || \
-      defined( __TINYC__ ) /* FIXME: __TINYC__ */ || \
       defined( __clang__ )
 
    #if defined( HB_PRAGMA_STARTUP ) || defined( HB_DATASEG_STARTUP )
@@ -203,8 +202,7 @@ extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, HB_USHORT uiSy
       }
 
 #elif defined( HB_PRAGMA_STARTUP ) || \
-      defined( __BORLANDC__ ) || defined( __LCC__ ) || \
-      defined( __POCC__ )
+      defined( __BORLANDC__ ) || defined( __POCC__ )
 
    #if ! defined( HB_PRAGMA_STARTUP )
       #define HB_PRAGMA_STARTUP

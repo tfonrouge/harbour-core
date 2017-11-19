@@ -266,8 +266,6 @@ const char * hb_verPlatformMacro( void )
    return "QNX";
 #elif defined( HB_OS_VXWORKS )
    return "VXWORKS";
-#elif defined( HB_OS_SYMBIAN )
-   return "SYMBIAN";
 #elif defined( HB_OS_CYGWIN )
    return "CYGWIN";
 #else
@@ -292,8 +290,7 @@ static int     s_iWine     = 0;
 
 #if ! defined( HB_OS_WIN_CE )
 
-#if ( defined( __DMC__ ) || ( defined( _MSC_VER ) && _MSC_VER < 1400 ) ) && \
-   ! defined( __POCC__ )
+#if ( defined( _MSC_VER ) && _MSC_VER < 1400 ) && ! defined( __POCC__ )
 
    typedef struct _OSVERSIONINFOEXW
    {
@@ -978,20 +975,6 @@ char * hb_verCompiler( void )
    iVerMinor = __POCC__ % 100;
    iVerPatch = 0;
 
-#elif defined( __LCC__ )
-
-   pszName = "Logiciels/Informatique lcc-win32";
-   iVerMajor = 0 /* __LCC__ / 100 */;
-   iVerMinor = 0 /* __LCC__ % 100 */;
-   iVerPatch = 0;
-
-#elif defined( __DMC__ )
-
-   pszName = __DMC_VERSION_STRING__;
-   iVerMajor = 0;
-   iVerMinor = 0;
-   iVerPatch = 0;
-
 #elif defined( __INTEL_COMPILER )
 
    pszName = "Intel(R) C";
@@ -1148,20 +1131,6 @@ char * hb_verCompiler( void )
       iVerPatch = 0;
    #endif
 
-#elif defined( __TURBOC__ )
-
-   pszName = "Borland Turbo C";
-   iVerMajor = __TURBOC__ >> 8;
-   iVerMinor = __TURBOC__ & 0xFF;
-   iVerPatch = 0;
-
-#elif defined( __MPW__ )
-
-   pszName = "MPW C";
-   iVerMajor = __MPW__ / 100;
-   iVerMinor = __MPW__ % 100;
-   iVerPatch = 0;
-
 #elif defined( __WATCOMC__ )
 
    #if __WATCOMC__ < 1200
@@ -1192,14 +1161,6 @@ char * hb_verCompiler( void )
    iVerPatch = ( __VERSION_NUMBER__ / 10 ) % 10;
    iVerMicro = __VERSION_NUMBER__ % 10;
    iElements = 4;
-
-#elif defined( __TINYC__ )
-
-   pszName = "Tiny C Compiler";
-
-   iVerMajor = __TINYC__ / 100;
-   iVerMinor = ( __TINYC__ % 100 ) / 10;
-   iVerPatch = ( __TINYC__ % 100 ) % 10;
 
 #elif defined( __PCC__ )
 
