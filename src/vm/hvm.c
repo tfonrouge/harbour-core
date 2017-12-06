@@ -12351,6 +12351,20 @@ HB_FUNC( __INITPROFILER )
 #endif
 }
 
+/*
+ * returns true if profiler is available
+ * __availProfiler() -> returns .T. when profiling is available
+ */
+HB_FUNC( __AVAILPROFILER )
+{
+   HB_STACK_TLS_PRELOAD
+#ifdef HB_NO_PROFILER
+   hb_retl( HB_FALSE );
+#else
+   hb_retl( HB_TRUE );
+#endif
+}
+
 HB_FUNC( __OPCOUNT ) /* it returns the total amount of opcodes */
 {
    HB_STACK_TLS_PRELOAD
