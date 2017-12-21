@@ -4894,7 +4894,7 @@ HB_FUNC_STATIC( msgGetData )
    HB_STACK_TLS_PRELOAD
    PHB_ITEM pObject  = hb_stackSelfItem();
 
-   if( HB_IS_ARRAY( pObject ) )
+   if( HB_IS_OBJECT( pObject ) )
    {
       HB_USHORT uiObjClass = pObject->item.asArray.value->uiClass;
       HB_USHORT uiClass    = hb_stackBaseItem()->item.asSymbol.stackstate->uiClass;
