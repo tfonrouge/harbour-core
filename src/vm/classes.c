@@ -738,14 +738,17 @@ static HB_USHORT hb_clsGetParent( PCLASS pClass, PHB_DYNS pParentSym )
 
 static HB_USHORT hb_clsParentInstanceOffset( PCLASS pClass, HB_USHORT uiParentCls )
 {
-   HB_USHORT uiCount = pClass->uiSuperClasses;
-
-   while( uiCount )
+   if ( pClass )
    {
-      if( pClass->pSuperClasses[ --uiCount ].uiClass == uiParentCls )
-         return pClass->pSuperClasses[ uiCount ].uiOffset;
+      HB_USHORT uiCount = pClass->uiSuperClasses;
+
+      while( uiCount )
+      {
+         if( pClass->pSuperClasses[ --uiCount ].uiClass == uiParentCls )
+            return pClass->pSuperClasses[ uiCount ].uiOffset;
+      }
+      return 0;
    }
-   return 0;
 }
 
 #if 0
@@ -4926,7 +4929,7 @@ HB_FUNC_STATIC( msgSetData )
    HB_STACK_TLS_PRELOAD
    PHB_ITEM pObject  = hb_stackSelfItem();
 
-   if( HB_IS_ARRAY( pObject ) )
+   if( HB_IS_OBJECT( pObject ) )
    {
       PHB_ITEM pReturn     = hb_param( 1, HB_IT_ANY );
       HB_USHORT uiObjClass = pObject->item.asArray.value->uiClass;
