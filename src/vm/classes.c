@@ -747,8 +747,8 @@ static HB_USHORT hb_clsParentInstanceOffset( PCLASS pClass, HB_USHORT uiParentCl
          if( pClass->pSuperClasses[ --uiCount ].uiClass == uiParentCls )
             return pClass->pSuperClasses[ uiCount ].uiOffset;
       }
-      return 0;
    }
+   return 0;
 }
 
 #if 0
